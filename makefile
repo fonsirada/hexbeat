@@ -10,11 +10,11 @@ game.gb: build build/graphics.o build/sprites.o build/main.o
 build:
 	mkdir build
 
-build/graphics.o: build src/graphics.asm src/hardware.inc src/utils.inc assets/*.tlm assets/*.chr
+build/graphics.o: build src/graphics.asm src/*.inc assets/*.tlm assets/*.chr
 	rgbasm -o build/graphics.o src/graphics.asm
 
-build/sprites.o: build src/sprites.asm src/hardware.inc src/utils.inc assets/*.tlm assets/*.chr
+build/sprites.o: build src/sprites.asm src/*.inc assets/*.tlm assets/*.chr
 	rgbasm -o build/sprites.o src/sprites.asm
 
-build/main.o: build src/main.asm src/hardware.inc assets/*.tlm assets/*.chr
+build/main.o: build src/main.asm src/*.inc assets/*.tlm assets/*.chr
 	rgbasm -o build/main.o src/main.asm
