@@ -72,7 +72,7 @@ init_graphics:
     ; set window parameters, currently offscreen
     ld a, WX_OFS
     ld [rWX], a
-    ld a, SCRN_Y
+    ld a, 119
     ld [rWY], a
 
     ; set graphics parameters and turn back LCD on
@@ -81,51 +81,53 @@ init_graphics:
 
     ret
 
-; moves the window during a vblank
-update_window:
-    halt
-    halt
-    halt
 
-    push bc
-    push af
 
-    ld a, [rWY]
-    ld b, a
+; ; moves the window during a vblank
+; update_window:
+;     halt
+;     halt
+;     halt
 
-    ; bring up window
-    cp SCRN_Y
-    jr nz, .check_upper_threshold
-        ld a, WINDOW_MOVING_UP
-        ld [WINDOW_MOVEMENT_TOGGLE], a
-        jr .move_window
+;     push bc
+;     push af
 
-    .check_upper_threshold
-        ld a, b
-        cp WINDOW_UPPER_THRESHOLD
-        jr nz, .move_window
-            ld a, WINDOW_MOVING_DOWN
-            ld [WINDOW_MOVEMENT_TOGGLE], a
+;     ld a, [rWY]
+;     ld b, a
 
-    .move_window
-    ; check if window is moving up or down
-    ld a, [WINDOW_MOVEMENT_TOGGLE]
-    xor WINDOW_MOVING_DOWN
-    jr z, .window_down
-        ; bring window up
-        dec b
-        dec b
+;     ; bring up window
+;     cp SCRN_Y
+;     jr nz, .check_upper_threshold
+;         ld a, WINDOW_MOVING_UP
+;         ld [WINDOW_MOVEMENT_TOGGLE], a
+;         jr .move_window
 
-    .window_down
-    inc b
+;     .check_upper_threshold
+;         ld a, b
+;         cp WINDOW_UPPER_THRESHOLD
+;         jr nz, .move_window
+;             ld a, WINDOW_MOVING_DOWN
+;             ld [WINDOW_MOVEMENT_TOGGLE], a
 
-    ld a, b
-    ld [rWY], a
+;     .move_window
+;     ; check if window is moving up or down
+;     ld a, [WINDOW_MOVEMENT_TOGGLE]
+;     xor WINDOW_MOVING_DOWN
+;     jr z, .window_down
+;         ; bring window up
+;         dec b
+;         dec b
 
-    pop af
-    pop bc
+;     .window_down
+;     inc b
 
-    ret
+;     ld a, b
+;     ld [rWY], a
+
+;     pop af
+;     pop bc
+
+;     ret
 
 export init_graphics
 export update_window
