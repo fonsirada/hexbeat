@@ -82,7 +82,6 @@ init_graphics:
     ret
 
 
-
 ; ; moves the window during a vblank
 ; update_window:
 ;     halt

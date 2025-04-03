@@ -40,16 +40,6 @@ macro Move8x16Right
     pop bc
 endm
 
-; move 24x32 sprite
-macro MoveDown
-    push bc
-    ld a, [SPRITE_0_ADDRESS + OAMA_Y]
-    ld b, a
-    inc b
-    copy [SPRITE_0_ADDRESS + OAMA_Y], b
-    copy [SPRITE_1_ADDRESS + OAMA_Y], b
-    pop bc
-endm
 
 /*
 ;; FUNCTIONS
