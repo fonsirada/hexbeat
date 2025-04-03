@@ -6,7 +6,7 @@
 ; @date March 10, 2025
 ;
 
-include "hardware.inc"
+include "src/hardware.inc"
 
 section "graphics_functions", rom0
 
@@ -132,7 +132,7 @@ export update_window
 
 ; GRAPHICS ASSETS
 section "graphics_data", rom0[GRAPHICS_DATA_ADDRESS_START]
-incbin "witch_tileset.chr"
-incbin "witch_bg_hall_v1.tlm"
-incbin "witch_bg_hall_v1.tlm"
+incbin "assets/witch_tileset.chr"
+incbin "assets/witch_bg_hall_v1.tlm"
+incbin "assets/witch_bg_hall_v1.tlm"
 ; incbin  "window.tlm"
