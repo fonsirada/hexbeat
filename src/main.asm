@@ -20,5 +20,5 @@ section "main", rom0[ROM_MAIN_ADDRESS]
 main:
     call init_graphics
     .loop
-        call update_window
+        ;call update_window
         jr .loop
