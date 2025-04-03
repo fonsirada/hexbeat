@@ -1,7 +1,7 @@
 ;
-; CS-240 World 4: Moving window and assets
+; CS-240 World 5: Basic Game Functionality
 ;
-; @file world4.asm
+; @file main.asm
 ; @author Darren Strash
 ; @date March 4, 2025
 ;
