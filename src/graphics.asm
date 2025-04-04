@@ -81,20 +81,14 @@ InitSample:
     ; place the window at the bottom of the LCD
     ld a, 7
     ld [rWX], a
-    ld a, 120
+    ld a, 0
     ld [rWY], a
 
-    ; set the first sprite
-    copy [SPRITE_0_ADDRESS + OAMA_X], 16
-    copy [SPRITE_0_ADDRESS + OAMA_Y], 32
-    copy [SPRITE_0_ADDRESS + OAMA_TILEID], 16
-    copy [SPRITE_0_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-
     ; set the second sprite
-    copy [SPRITE_1_ADDRESS + OAMA_Y], 80
-    copy [SPRITE_1_ADDRESS + OAMA_X], 80
+    copy [SPRITE_1_ADDRESS + OAMA_Y], 90
+    copy [SPRITE_1_ADDRESS + OAMA_X], 20
     copy [SPRITE_1_ADDRESS + OAMA_TILEID], 0
-    copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0 | OAMF_XFLIP
+    copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
     ; set the graphics parameters and turn back LCD on
     ld a, LCDCF_ON | LCDCF_WIN9C00 | LCDCF_WINON | LCDCF_BG8800 | LCDCF_BG9800 | LCDCF_OBJ16 | LCDCF_OBJON | LCDCF_BGON
@@ -104,39 +98,60 @@ InitSample:
 
 UpdateSample:
     halt
-    push bc ; storing state of bc
+
     ; get the joypad buttons that are being held!
     ld a, [PAD_CURR]
 
-    ; Is button 'a' being held?
+    ; jump when 'a' is held
     bit PADB_A, a
     jr nz, .done_jumping
-    ; perform action
-        ; jump
-        ld a, [SPRITE_1_ADDRESS + OAMA_Y]
-        ld b, 10
-        .go_up
-            dec a
-            halt 
-            halt
-            ld [SPRITE_1_ADDRESS + OAMA_Y], a
-            dec b
-            jr nz, .go_up
-        
-        ld b, 10
-        .go_down
-            inc a
-            halt 
-            halt
-            ld [SPRITE_1_ADDRESS + OAMA_Y], a
-            dec b
-            jr nz, .go_down
-
+        ; using b as a counter for jump height
+        push af
+        push bc
+        call Jump
+        pop bc
         copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+        pop af
+
     .done_jumping
-    pop bc ;popping pc back
+
+    ; 'start' button to start the level
+    bit PADB_START, a
+    jr nz, .done_starting
+        push af
+        ; move window to bottom of the LCD for UI (getting rid of start screen)
+        ld a, 7
+        ld [rWX], a
+        ld a, 120
+        ld [rWY], a
+        pop af
+
+    .done_starting
 
     ret
+
+Jump:
+    ld a, [SPRITE_1_ADDRESS + OAMA_Y]
+    ld b, 20
+    .go_up
+        dec a
+        dec a
+        halt
+        ld [SPRITE_1_ADDRESS + OAMA_Y], a
+        dec b
+        jr nz, .go_up
+    
+    ld b, 20
+    .go_down
+        inc a
+        inc a
+        halt 
+        ld [SPRITE_1_ADDRESS + OAMA_Y], a
+        dec b
+        jr nz, .go_down
+
+    ret
+
 
 export InitSample, UpdateSample
 
