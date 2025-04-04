@@ -8,7 +8,7 @@
 if !def(WRAM_RGBINC)
 def WRAM_RGBINC equ 1
 
-rsset _RAM
+rsset $C000 ; was _RAM from hardware.inc but using magic number just to compile
 def PAD_CURR rb 1
 def PAD_PREV rb 1
 def PAD_PRSS rb 1
