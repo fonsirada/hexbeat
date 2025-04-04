@@ -69,6 +69,10 @@ init_graphics:
     ld [rIE], a
     ei
 
+    ; set background parameters
+    ld a, 24
+    ld [rSCY], a
+
     ; set window parameters, currently offscreen
     ld a, WX_OFS
     ld [rWX], a
@@ -135,5 +139,4 @@ export update_window
 section "graphics_data", rom0[GRAPHICS_DATA_ADDRESS_START]
 incbin "assets/witch_tileset.chr"
 incbin "assets/witch_bg_hall_v1.tlm"
-incbin "assets/witch_bg_hall_v1.tlm"
-; incbin  "window.tlm"
+incbin "assets/w5_window_v1.tlm"
