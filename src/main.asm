@@ -8,17 +8,37 @@
 ; build with:
 ; make
 
-def ROM_HEADER_ADDRESS      equ $0100
-def ROM_MAIN_ADDRESS        equ $0150
+include "src/hardware.inc"
+include "src/joypad.inc"
 
-section "header", rom0[ROM_HEADER_ADDRESS]
-    ; disable interrupts and jump to main
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+section "header", rom0[$0100]
+entrypoint:
     di
-    jr main
+    jp main
+    ds ($0150 - @), 0
 
-section "main", rom0[ROM_MAIN_ADDRESS]
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+macro DisableLCD
+    ; wait for the vblank
+    .wait_vblank\@
+        ld a, [rLY]
+        cp a, SCRN_Y
+        jr nz, .wait_vblank\@
+
+    ; turn the LCD off
+    xor a
+    ld [rLCDC], a
+endm
+
+section "main", rom0
 main:
-    call init_graphics
+    DisableLCD
+    call InitSample
+    InitJoypad
     .loop
-        ;call update_window
+        call UpdateSample
+        UpdateJoypad
         jr .loop

@@ -8,7 +8,7 @@
 if !def(JOYPAD_RGBINC)
 def JOYPAD_RGBINC equ 1
 
-include "wram.inc"
+include "src/wram.inc"
 
 def NONE_HELD equ $FF
 
