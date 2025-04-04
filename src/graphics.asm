@@ -78,6 +78,10 @@ InitSample:
     ld a, 24
     ld [rSCY], a
 
+    ; set background parameters
+    ld a, 24
+    ld [rSCY], a
+
     ; place the window at the bottom of the LCD
     ld a, 7
     ld [rWX], a
@@ -108,28 +112,16 @@ UpdateSample:
     ; get the joypad buttons that are being held!
     ld a, [PAD_CURR]
 
-    ; Is button 'a' being held?
-    bit PADB_A, a
-    jr nz, .done_jumping
+    ; Is right being held?
+    bit PADB_RIGHT, a
+    jr nz, .done_moving_right
     ; perform action
-        ; jump
-        ld a, [SPRITE_1_ADDRESS + OAMA_Y]
-        dec a
-        dec a
-        dec a
-        ld [SPRITE_1_ADDRESS + OAMA_Y], a
-        halt
-        halt
-        halt
-        halt
+        ; move right
+        ld a, [SPRITE_1_ADDRESS + OAMA_X]
         inc a
-        inc a
-        inc a
-        ld [SPRITE_1_ADDRESS + OAMA_Y], a
-
-
+        ld [SPRITE_1_ADDRESS + OAMA_X], a
         copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-    .done_jumping
+    .done_moving_right
 
     ret
 

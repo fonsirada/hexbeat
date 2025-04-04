@@ -15,6 +15,7 @@ macro copy
 endm
 
 ; move 8x16 sprite down
+; *how to make the "sprite 0 address" bit modular?
 macro Move8x16Down
     push bc
     ld a, [SPRITE_0_ADDRESS + OAMA_Y]
@@ -27,6 +28,12 @@ macro Move8x16Down
     ld b, a
     copy [SPRITE_1_ADDRESS + OAMA_Y], b
     pop bc
+endm
+
+macro Move24x32Down
+    Move8x16Down ;
+    Move8x16Down ;
+    Move8x16Down ;
 endm
 
 ; move 8x16 sprite right
