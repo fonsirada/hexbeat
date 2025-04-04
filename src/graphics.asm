@@ -75,7 +75,7 @@ InitSample:
     ei
 
     ; set background parameters
-    ld a, 24
+    ld a, 0
     ld [rSCY], a
 
     ; start screen (window covers background)
@@ -158,11 +158,12 @@ Start:
     ret
 
 
+
 export InitSample, UpdateSample
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 section "graphics_data", rom0[GRAPHICS_DATA_ADDRESS_START]
-incbin "assets/witch_tileset.chr"
+incbin "assets/tileset_16mode.chr"
 incbin "assets/witch_bg_hall_v1.tlm"
 incbin "assets/w5_window_v1.tlm"
