@@ -104,7 +104,7 @@ InitSample:
 
 UpdateSample:
     halt
-
+    push bc ; storing state of bc
     ; get the joypad buttons that are being held!
     ld a, [PAD_CURR]
 
@@ -114,22 +114,27 @@ UpdateSample:
     ; perform action
         ; jump
         ld a, [SPRITE_1_ADDRESS + OAMA_Y]
-        dec a
-        dec a
-        dec a
-        ld [SPRITE_1_ADDRESS + OAMA_Y], a
-        halt
-        halt
-        halt
-        halt
-        inc a
-        inc a
-        inc a
-        ld [SPRITE_1_ADDRESS + OAMA_Y], a
-
+        ld b, 10
+        .go_up
+            dec a
+            halt 
+            halt
+            ld [SPRITE_1_ADDRESS + OAMA_Y], a
+            dec b
+            jr nz, .go_up
+        
+        ld b, 10
+        .go_down
+            inc a
+            halt 
+            halt
+            ld [SPRITE_1_ADDRESS + OAMA_Y], a
+            dec b
+            jr nz, .go_down
 
         copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
     .done_jumping
+    pop bc ;popping pc back
 
     ret
 
