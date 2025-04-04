@@ -78,17 +78,11 @@ InitSample:
     ld a, 24
     ld [rSCY], a
 
-    ; place the window at the bottom of the LCD
+    ; start screen (window covers background)
     ld a, 7
     ld [rWX], a
     ld a, 0
     ld [rWY], a
-
-    ; set the second sprite
-    copy [SPRITE_1_ADDRESS + OAMA_Y], 90
-    copy [SPRITE_1_ADDRESS + OAMA_X], 20
-    copy [SPRITE_1_ADDRESS + OAMA_TILEID], 0
-    copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
     ; set the graphics parameters and turn back LCD on
     ld a, LCDCF_ON | LCDCF_WIN9C00 | LCDCF_WINON | LCDCF_BG8800 | LCDCF_BG9800 | LCDCF_OBJ16 | LCDCF_OBJON | LCDCF_BGON
@@ -119,11 +113,7 @@ UpdateSample:
     bit PADB_START, a
     jr nz, .done_starting
         push af
-        ; move window to bottom of the LCD for UI (getting rid of start screen)
-        ld a, 7
-        ld [rWX], a
-        ld a, 120
-        ld [rWY], a
+        call Start
         pop af
 
     .done_starting
@@ -150,6 +140,21 @@ Jump:
         dec b
         jr nz, .go_down
 
+    ret
+
+Start:
+    ; move window to bottom of the LCD for UI (getting rid of start screen)
+    ld a, 7
+    ld [rWX], a
+    ld a, 120
+    ld [rWY], a
+
+    ; set the mc sprite
+    copy [SPRITE_1_ADDRESS + OAMA_Y], 90
+    copy [SPRITE_1_ADDRESS + OAMA_X], 20
+    copy [SPRITE_1_ADDRESS + OAMA_TILEID], 0
+    copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+    
     ret
 
 
