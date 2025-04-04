@@ -108,16 +108,28 @@ UpdateSample:
     ; get the joypad buttons that are being held!
     ld a, [PAD_CURR]
 
-    ; Is right being held?
-    bit PADB_RIGHT, a
-    jr nz, .done_moving_right
+    ; Is button 'a' being held?
+    bit PADB_A, a
+    jr nz, .done_jumping
     ; perform action
-        ; move right
-        ld a, [SPRITE_1_ADDRESS + OAMA_X]
+        ; jump
+        ld a, [SPRITE_1_ADDRESS + OAMA_Y]
+        dec a
+        dec a
+        dec a
+        ld [SPRITE_1_ADDRESS + OAMA_Y], a
+        halt
+        halt
+        halt
+        halt
         inc a
-        ld [SPRITE_1_ADDRESS + OAMA_X], a
+        inc a
+        inc a
+        ld [SPRITE_1_ADDRESS + OAMA_Y], a
+
+
         copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-    .done_moving_right
+    .done_jumping
 
     ret
 
