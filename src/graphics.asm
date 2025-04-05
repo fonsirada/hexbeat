@@ -25,7 +25,7 @@ def GRAPHICS_DATA_ADDRESS_END       equ ($8000)
 def GRAPHICS_DATA_ADDRESS_START     equ (GRAPHICS_DATA_ADDRESS_END - GRAPHICS_DATA_SIZE)
 
 def SPRITE_0_ADDRESS equ (_OAMRAM)
-def SPRITE_1_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS)
+def SPRITE_1_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 1)
 
 
 ; load the graphics data from ROM to VRAM
@@ -74,25 +74,20 @@ InitSample:
     ld [rIE], a
     ei
 
-    ; set background parameters
-    ld a, 0
+    ; set bg to start screen
+    ld a, 120
     ld [rSCY], a
 
     ; place the window at the bottom of the LCD
     ld a, 7
     ld [rWX], a
-    ld a, 0
+    ld a, 136
     ld [rWY], a
 
-    ; set the second sprite
-    copy [SPRITE_1_ADDRESS + OAMA_Y], 90
-    copy [SPRITE_1_ADDRESS + OAMA_X], 20
-    copy [SPRITE_1_ADDRESS + OAMA_TILEID], 0
-    copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
     ; set the graphics parameters and turn back LCD on
-    ld a, LCDCF_ON | LCDCF_WIN9C00 | LCDCF_WINON | LCDCF_BG8800 | LCDCF_BG9800 | LCDCF_OBJ16 | LCDCF_OBJON | LCDCF_BGON
-    ld [rLCDC], a
+    ; ld a, LCDCF_ON | LCDCF_WIN9C00 | LCDCF_WINON | LCDCF_BG8800 | LCDCF_BG9800 | LCDCF_OBJ16 | LCDCF_OBJON | LCDCF_BGON
+    ; ld [rLCDC], a
 
     ret
 
@@ -120,14 +115,20 @@ UpdateSample:
     jr nz, .done_starting
         push af
         ; move window to bottom of the LCD for UI (getting rid of start screen)
-        ld a, 7
-        ld [rWX], a
-        ld a, 120
+        ld a, 0
+        ld [rSCY], a
+        ld a, 112
         ld [rWY], a
         pop af
-
     .done_starting
 
+    ld a, [rSCY]
+    xor 0
+    jr nz, .end_update
+        ld a, [rSCX]
+        inc a
+        ld [rSCX], a
+    .end_update
     ret
 
 Jump:

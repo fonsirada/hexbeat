@@ -33,11 +33,20 @@ macro DisableLCD
     ld [rLCDC], a
 endm
 
+macro EnableLCD
+    ; set the graphics parameters and turn back LCD on
+    ld a, LCDCF_ON | LCDCF_WIN9C00 | LCDCF_WINON | LCDCF_BG8800 | LCDCF_BG9800 | LCDCF_OBJ16 | LCDCF_OBJON | LCDCF_BGON
+    ld [rLCDC], a
+
+endm
+
 section "main", rom0
 main:
     DisableLCD
     call InitSample
+    call InitPlayer
     InitJoypad
+    EnableLCD
     .loop
         call UpdateSample
         UpdateJoypad
