@@ -10,6 +10,7 @@
 
 include "src/hardware.inc"
 include "src/joypad.inc"
+include "src/sprites.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -50,6 +51,6 @@ main:
     EnableLCD
     .loop
         call UpdateSample
-        ; UpdateRunAnim
+        UpdateRunAnim
         UpdateJoypad
         jr .loop
