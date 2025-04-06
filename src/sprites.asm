@@ -24,40 +24,67 @@ def MC_BOT_Y equ (MC_TOP_Y + 16)
 ;;;;;;;
 InitPlayer:
     ; MC.00
-    copy [SPRITE_0_ADDRESS + OAMA_Y], MC_TOP_Y
-    copy [SPRITE_0_ADDRESS + OAMA_X], 20
+    copy [SPRITE_0_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_0_ADDRESS + OAMA_X], 0
     copy [SPRITE_0_ADDRESS + OAMA_TILEID], 0
     copy [SPRITE_0_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
     ; MC.01
-    copy [SPRITE_1_ADDRESS + OAMA_Y], MC_TOP_Y
-    copy [SPRITE_1_ADDRESS + OAMA_X], 28
+    copy [SPRITE_1_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_1_ADDRESS + OAMA_X], 0
     copy [SPRITE_1_ADDRESS + OAMA_TILEID], 2
     copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
     ; MC.02
-    copy [SPRITE_2_ADDRESS + OAMA_Y], MC_TOP_Y
-    copy [SPRITE_2_ADDRESS + OAMA_X], 36
+    copy [SPRITE_2_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_2_ADDRESS + OAMA_X], 0
     copy [SPRITE_2_ADDRESS + OAMA_TILEID], 4
     copy [SPRITE_2_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
     ; MC.10
-    copy [SPRITE_3_ADDRESS + OAMA_Y], MC_BOT_Y
-    copy [SPRITE_3_ADDRESS + OAMA_X], 20
+    copy [SPRITE_3_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_3_ADDRESS + OAMA_X], 0
     copy [SPRITE_3_ADDRESS + OAMA_TILEID], 6
     copy [SPRITE_3_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
     ; MC.11
-    copy [SPRITE_4_ADDRESS + OAMA_Y], MC_BOT_Y
-    copy [SPRITE_4_ADDRESS + OAMA_X], 28
+    copy [SPRITE_4_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_4_ADDRESS + OAMA_X], 0
     copy [SPRITE_4_ADDRESS + OAMA_TILEID], 8
     copy [SPRITE_4_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
     ; MC.12
-    copy [SPRITE_5_ADDRESS + OAMA_Y], MC_BOT_Y
-    copy [SPRITE_5_ADDRESS + OAMA_X], 36
+    copy [SPRITE_5_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_5_ADDRESS + OAMA_X], 0
     copy [SPRITE_5_ADDRESS + OAMA_TILEID], 10
     copy [SPRITE_5_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+
+    ret
+
+MovePlayerToStart:
+    ; MC.00
+    copy [SPRITE_0_ADDRESS + OAMA_Y], MC_TOP_Y
+    copy [SPRITE_0_ADDRESS + OAMA_X], 20
+
+    ; MC.01
+    copy [SPRITE_1_ADDRESS + OAMA_Y], MC_TOP_Y
+    copy [SPRITE_1_ADDRESS + OAMA_X], 28
+
+    ; MC.02
+    copy [SPRITE_2_ADDRESS + OAMA_Y], MC_TOP_Y
+    copy [SPRITE_2_ADDRESS + OAMA_X], 36
+
+    ; MC.10
+    copy [SPRITE_3_ADDRESS + OAMA_Y], MC_BOT_Y
+    copy [SPRITE_3_ADDRESS + OAMA_X], 20
+
+    ; MC.11
+    copy [SPRITE_4_ADDRESS + OAMA_Y], MC_BOT_Y
+    copy [SPRITE_4_ADDRESS + OAMA_X], 28
+
+    ; MC.12
+    copy [SPRITE_5_ADDRESS + OAMA_Y], MC_BOT_Y
+    copy [SPRITE_5_ADDRESS + OAMA_X], 36
 
     ret
 
@@ -71,9 +98,10 @@ InitPlayerSpriteLocation:
     copy16bit [$C01A], [$C01B], _OAMRAM + sizeof_OAM_ATTRS * 5
 
     ret
+
+
+
+    
 ;;;;;;;
 
-
-
-
-export InitPlayer, InitPlayerSpriteLocation
+export InitPlayer, InitPlayerSpriteLocation, MovePlayerToStart

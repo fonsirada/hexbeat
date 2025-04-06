@@ -1,8 +1,6 @@
 
 ; ADD HEADER
 
-;;;
-
 
 ;;;; SPRITE MACROS
 macro UpdateRunAnim
@@ -10,45 +8,47 @@ macro UpdateRunAnim
     push bc
     push hl
 
-    ; loop thru wram address locations
+    ; starting address
     ld hl, $C010 ; or, PC_SPRITE_1_LOC
 
+    ; loop through sprites thru WRAM address locs
     .next_tile
     push hl
 
-    ; store _OAMRAM in hl
+    ; store sprite address in hl
     ld b, [hl]
     inc hl
     ld c, [hl]
     ld h, b
     ld l, c
 
-    ; ld a, [hl] ; now @ sprite address
-    ;add hl, OAMA_TILEID ; get tileid address
+    ; get sprite's tileid address
     ld a, l
     add a, OAMA_TILEID
     ld l, a
 
-    ;ld b, a
+    ; load tile ID into (a)
+    ld a, [hl] 
 
-    ld a, [hl] ; get tile ID in (a)
-
-    cp a, $30 ; check if last frame was reached --> may be $50?
+    ; check if last frame was reached
+    cp a, $30 
     jr c, .load_new_tileid
-        sub a, $30
-        ; load (starting tile ID - 10) ==> (a)
+        ; reset to first frame
+        sub a, $30 ; M#: "run anim frames" ?
         jr .post_add
     .load_new_tileid
-    add a, $10 ; go to next frame
+        ; go to next frame
+        add a, $10 ; M#: "frame gap"
     .post_add
     ld [hl], a
 
-    ;; now going to next sprite...
+    ; now going to next sprite...
     pop hl
     inc hl
     inc hl
     
-    ; cp hl, $C016 ; number of obj16 tiles in sprite ;repl w/ PC_SPRITE_6_LOC or smth
+    ; check if last sprite was reached in WRAM
+    ; number of obj16 tiles in sprite ;repl w/ PC_SPRITE_6_LOC or smth
     ld a, l
     cp a, $1C
     jr nz, .next_tile
