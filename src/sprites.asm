@@ -60,10 +60,54 @@ InitPlayer:
     copy [SPRITE_5_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
     ret
+
+; put PC sprite ids in WRAM
+InitPlayerSpriteLocation:
+    ;copy16bit [$C010], _OAMRAM
+    ;copy [$C011], _OAMRAM + sizeof_OAM_ATTRS * 1
+    ;copy [$C012], _OAMRAM + sizeof_OAM_ATTRS * 2
+    ;copy [$C013], _OAMRAM + sizeof_OAM_ATTRS * 3
+    ;copy [$C014], _OAMRAM + sizeof_OAM_ATTRS * 4
+    ;copy [$C015], _OAMRAM + sizeof_OAM_ATTRS * 5
+
+    ret
+
 ;;;;;;;
 
 
 ;; MACROS
+macro UpdateFrame
+    push af
+    push hl
+
+    ; loop thru wram address locations
+    ld hl, $$C010 ; or, PC_SPRITE_1_LOC
+
+    .next_tile
+    ld a, [$C010] ; $C000 standing in for address
+    ld a, [a] ; ...can you do this? now @ sprite address
+    add a, OAMA_TILEID ; get tileid address
+    ld b, a
+
+    ld a, [b] ; get tile ID in (a)
+
+    cp a, $40 ; check if last frame was reached --> may be $50?
+    jr .load_new_tileid
+        ; load (starting tile ID - 10) ==> (a)
+        ; calc'd by subtracting $40?
+    .load_new_tileid
+    add a, $10 ; go to next frame
+    ld [b], a
+
+    ;; now going to next sprite...
+    inc hl
+    cp hl, $C016 ; number of obj16 tiles in sprite ;repl w/ PC_SPRITE_6_LOC or smth
+    jr nz .next_tile
+
+    pop hl
+    pop af
+endm
+
 
 ; move 8x16 sprite down
 ; *how to make the "sprite 0 address" bit modular?

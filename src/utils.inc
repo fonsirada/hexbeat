@@ -10,8 +10,23 @@ include "src/hardware.inc"
 ; copy \2 into \1 through (a)
 ; example: copy [$FF84], 10
 macro copy
+    push af
     ld a, \2
     ld \1, a
+    pop af
+endm
+
+macro copy16bit
+    push hl
+    ld hl, \1
+    ld \2, hl
+    /*
+    ld h, high(\2)
+    ld l, low(\2)
+    ld high(\1), h
+    ld low(\1), l
+    */
+    pop hl
 endm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
