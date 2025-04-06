@@ -58,6 +58,14 @@ macro UpdateRunAnim
     pop af
 endm
 
+macro UpdateJumpAnim
+    ; up:
+    ; for first third,
+
+    ; down:
+endm
+
+
 ; move 8x16 sprite down
 ; *how to make the "sprite 0 address" bit modular?
 macro Move8x16Down
