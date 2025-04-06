@@ -25,7 +25,11 @@ def GRAPHICS_DATA_ADDRESS_END       equ ($8000)
 def GRAPHICS_DATA_ADDRESS_START     equ (GRAPHICS_DATA_ADDRESS_END - GRAPHICS_DATA_SIZE)
 
 def SPRITE_0_ADDRESS equ (_OAMRAM)
-def SPRITE_1_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 1)
+def SPRITE_1_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS)
+def SPRITE_2_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 2)
+def SPRITE_3_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 3)
+def SPRITE_4_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 4)
+def SPRITE_5_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 5)
 
 
 ; load the graphics data from ROM to VRAM
@@ -78,7 +82,7 @@ InitSample:
     ld a, 120
     ld [rSCY], a
 
-    ; place the window at the bottom of the LCD
+    ; start screen (window covers background)
     ld a, 7
     ld [rWX], a
     ld a, 136
@@ -114,12 +118,14 @@ UpdateSample:
     bit PADB_START, a
     jr nz, .done_starting
         push af
+        call Start
         ; move window to bottom of the LCD for UI (getting rid of start screen)
         ld a, 0
         ld [rSCY], a
         ld a, 112
         ld [rWY], a
         pop af
+
     .done_starting
 
     ld a, [rSCY]
@@ -153,6 +159,20 @@ Jump:
 
     ret
 
+Start:
+    ; move window to bottom of the LCD for UI (getting rid of start screen)
+    ld a, 7
+    ld [rWX], a
+    ld a, 120
+    ld [rWY], a
+
+    ; set the mc sprite
+    copy [SPRITE_1_ADDRESS + OAMA_Y], 90
+    copy [SPRITE_1_ADDRESS + OAMA_X], 20
+    copy [SPRITE_1_ADDRESS + OAMA_TILEID], 0
+    copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+    
+    ret
 
 
 export InitSample, UpdateSample
