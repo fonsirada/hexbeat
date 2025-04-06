@@ -7,19 +7,9 @@
 
 include "src/hardware.inc"
 include "src/utils.inc"
+include "src/sprites.inc"
 
 section "sprites", rom0
-
-;; CONST
-def SPRITE_0_ADDRESS equ (_OAMRAM)
-def SPRITE_1_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS)
-def SPRITE_2_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 2)
-def SPRITE_3_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 3)
-def SPRITE_4_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 4)
-def SPRITE_5_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 5)
-
-def MC_TOP_Y equ (80)
-def MC_BOT_Y equ (MC_TOP_Y + 16)
 
 ;;;;;;;
 InitPlayer:

@@ -25,13 +25,6 @@ def GRAPHICS_DATA_SIZE              equ (TILES_BYTE_SIZE + TILEMAPS_BYTE_SIZE)
 def GRAPHICS_DATA_ADDRESS_END       equ ($8000)
 def GRAPHICS_DATA_ADDRESS_START     equ (GRAPHICS_DATA_ADDRESS_END - GRAPHICS_DATA_SIZE)
 
-def SPRITE_0_ADDRESS equ (_OAMRAM)
-def SPRITE_1_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS)
-def SPRITE_2_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 2)
-def SPRITE_3_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 3)
-def SPRITE_4_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 4)
-def SPRITE_5_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 5)
-
 
 ; load the graphics data from ROM to VRAM
 macro LoadGraphicsDataIntoVRAM
@@ -138,43 +131,6 @@ UpdateSample:
     .end_update
     ret
 
-Jump:
-    ; sprites 0 1 2 and 3 4 5 have same Y respectively - $10 off
-    ld a, [SPRITE_0_ADDRESS + OAMA_Y]
-    ld b, 20
-    .go_up
-        dec a
-        dec a
-        halt
-        ld [SPRITE_0_ADDRESS + OAMA_Y], a
-        ld [SPRITE_1_ADDRESS + OAMA_Y], a
-        ld [SPRITE_2_ADDRESS + OAMA_Y], a
-        add $10
-        ld [SPRITE_3_ADDRESS + OAMA_Y], a
-        ld [SPRITE_4_ADDRESS + OAMA_Y], a
-        ld [SPRITE_5_ADDRESS + OAMA_Y], a
-        sub $10
-        dec b
-        jr nz, .go_up
-    
-    ld b, 20
-    .go_down
-        inc a
-        inc a
-        halt 
-        ld [SPRITE_0_ADDRESS + OAMA_Y], a
-        ld [SPRITE_1_ADDRESS + OAMA_Y], a
-        ld [SPRITE_2_ADDRESS + OAMA_Y], a
-        add $10
-        ld [SPRITE_3_ADDRESS + OAMA_Y], a
-        ld [SPRITE_4_ADDRESS + OAMA_Y], a
-        ld [SPRITE_5_ADDRESS + OAMA_Y], a
-        sub $10
-        dec b
-        jr nz, .go_down
-    
-    ret
-
 Start:
     ; move window to bottom of the LCD for UI (getting rid of start screen)
     ld a, 7
@@ -182,6 +138,8 @@ Start:
     ld a, 120
     ld [rWY], a
     
+    call MovePlayerToStart
+
     ret
 
 
