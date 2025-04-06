@@ -25,7 +25,11 @@ def GRAPHICS_DATA_ADDRESS_END       equ ($8000)
 def GRAPHICS_DATA_ADDRESS_START     equ (GRAPHICS_DATA_ADDRESS_END - GRAPHICS_DATA_SIZE)
 
 def SPRITE_0_ADDRESS equ (_OAMRAM)
-def SPRITE_1_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 1)
+def SPRITE_1_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS)
+def SPRITE_2_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 2)
+def SPRITE_3_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 3)
+def SPRITE_4_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 4)
+def SPRITE_5_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 5)
 
 
 ; load the graphics data from ROM to VRAM
@@ -121,6 +125,7 @@ UpdateSample:
         ld a, 112
         ld [rWY], a
         pop af
+
     .done_starting
 
     ld a, [rSCY]
@@ -168,7 +173,6 @@ Start:
     copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
     
     ret
-
 
 
 export InitSample, UpdateSample
