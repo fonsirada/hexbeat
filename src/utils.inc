@@ -18,14 +18,12 @@ endm
 
 macro copy16bit
     push hl
-    ld hl, \1
-    ld \2, hl
-    /*
-    ld h, high(\2)
-    ld l, low(\2)
-    ld high(\1), h
-    ld low(\1), l
-    */
+
+    ld a, high(\3)
+    ld \1, a
+    ld a, low(\3)
+    ld \2, a
+
     pop hl
 endm
 

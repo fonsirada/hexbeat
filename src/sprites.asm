@@ -63,12 +63,12 @@ InitPlayer:
 
 ; put PC sprite ids in WRAM
 InitPlayerSpriteLocation:
-    ;copy16bit [$C010], _OAMRAM
-    ;copy [$C011], _OAMRAM + sizeof_OAM_ATTRS * 1
-    ;copy [$C012], _OAMRAM + sizeof_OAM_ATTRS * 2
-    ;copy [$C013], _OAMRAM + sizeof_OAM_ATTRS * 3
-    ;copy [$C014], _OAMRAM + sizeof_OAM_ATTRS * 4
-    ;copy [$C015], _OAMRAM + sizeof_OAM_ATTRS * 5
+    copy16bit [$C010], [$C011], _OAMRAM
+    copy16bit [$C012], [$C013], _OAMRAM + sizeof_OAM_ATTRS * 1
+    copy16bit [$C014], [$C015], _OAMRAM + sizeof_OAM_ATTRS * 2
+    copy16bit [$C016], [$C017], _OAMRAM + sizeof_OAM_ATTRS * 3
+    copy16bit [$C018], [$C019], _OAMRAM + sizeof_OAM_ATTRS * 4
+    copy16bit [$C01A], [$C01B], _OAMRAM + sizeof_OAM_ATTRS * 5
 
     ret
 
@@ -76,15 +76,15 @@ InitPlayerSpriteLocation:
 
 
 ;; MACROS
-macro UpdateFrame
+macro UpdateRunAnim
     push af
     push hl
 
     ; loop thru wram address locations
-    ld hl, $$C010 ; or, PC_SPRITE_1_LOC
+    ld hl, $C010 ; or, PC_SPRITE_1_LOC
 
     .next_tile
-    ld a, [$C010] ; $C000 standing in for address
+    ld a, [hl] 
     ld a, [a] ; ...can you do this? now @ sprite address
     add a, OAMA_TILEID ; get tileid address
     ld b, a
@@ -144,4 +144,4 @@ endm
 
 
 
-export InitPlayer
+export InitPlayer, InitPlayerSpriteLocation

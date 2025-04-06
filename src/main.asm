@@ -44,6 +44,7 @@ section "main", rom0
 main:
     DisableLCD
     call InitSample
+    call InitPlayerSpriteLocation
     call InitPlayer
     InitJoypad
     EnableLCD
