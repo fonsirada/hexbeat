@@ -7,6 +7,8 @@ include "src/utils.inc"
 
 section "joypad", rom0
 
+update_joypad_status:
+    halt
 ; update_joypad:
 ;     halt
 
