@@ -50,5 +50,6 @@ main:
     EnableLCD
     .loop
         call UpdateSample
+        ; UpdateRunAnim
         UpdateJoypad
         jr .loop
