@@ -44,13 +44,23 @@ endm
 section "main", rom0
 main:
     DisableLCD
-    call InitSample
-    call InitPlayerSpriteLocation
+    call InitGraphics
+    call InitSpriteData
     call InitPlayer
+    call InitSprites
+
     InitJoypad
     EnableLCD
-    .loop
-        call UpdateSample
-        UpdateRunAnim
+
+    .loop ; not enough time in vblank rn...
+        call Start
+        
+        ld a, [rGAME]
+        bit 0, a ; check if game is started; replace w/ consts or macros
+        jr z, .post_graphics
+            call UpdateGraphics
+            call UpdatePlayer
+            call UpdateSprites
+        .post_graphics
         UpdateJoypad
         jr .loop

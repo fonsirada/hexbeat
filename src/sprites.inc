@@ -2,6 +2,8 @@
 ; ADD HEADER
 
 ;; CONSTs
+
+; PLAYER
 def SPRITE_0_ADDRESS equ (_OAMRAM)
 def SPRITE_1_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS)
 def SPRITE_2_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 2)
@@ -9,11 +11,28 @@ def SPRITE_3_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 3)
 def SPRITE_4_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 4)
 def SPRITE_5_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 5)
 
+; TARGETS
+def SPRITE_6_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 6)
+def SPRITE_7_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 7)
+
+; 'SHIELD' SPRITES
+def SPRITE_8_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 8)
+def SPRITE_9_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 9)
+
+; SPELL OBJS
+def SPRITE_10_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 10)
+def SPRITE_11_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 11)
+def SPRITE_12_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 12)
+def SPRITE_13_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 13)
+
+
 def MC_TOP_Y equ (80)
 def MC_BOT_Y equ (MC_TOP_Y + 16)
 
 
 ;;;; SPRITE MACROS
+
+;;; -> PLAYER
 macro UpdateRunAnim
     push af
     push bc

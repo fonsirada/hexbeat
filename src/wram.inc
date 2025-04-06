@@ -15,6 +15,14 @@ def PAD_PRSS rb 1
 def PAD_RLSE rb 1
 def sizeof_PAD rb 0
 
+;;;;; game data?
+def rGAME                   equ $C004
+def GAME_BASE               equ %00000000
+def GAME_STARTED            equ %00000001
+def GAME_ENDED              equ %00000010
+; def GAME_HIT?
+; def ???
+
 
 ;;;;; stuff from joypad 2 reading ;;;;;
 

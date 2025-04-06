@@ -55,7 +55,7 @@ endm
 
 section "sample", rom0
 
-InitSample:
+InitGraphics:
     ; init the palettes
     ld a, %11100100
     ld [rBGP], a
@@ -73,23 +73,20 @@ InitSample:
     ei
 
     ; set bg to start screen
-    ld a, 120
-    ld [rSCY], a
+    copy [rSCY], 120
 
-    ; start screen (window covers background)
-    ld a, 7
-    ld [rWX], a
-    ld a, 136
-    ld [rWY], a
+    ; hide window offscreen
+    copy [rWX], 7
+    copy [rWY], 136
+ 
 
-
-    ; set the graphics parameters and turn back LCD on
-    ; ld a, LCDCF_ON | LCDCF_WIN9C00 | LCDCF_WINON | LCDCF_BG8800 | LCDCF_BG9800 | LCDCF_OBJ16 | LCDCF_OBJON | LCDCF_BGON
-    ; ld [rLCDC], a
+    ; set macro data
+    ld a, GAME_BASE ; load settings here
+    ld [rGAME], a ; load (a) into the data 'register'
 
     ret
 
-UpdateSample:
+UpdateGraphics:
     halt
 
     ; get the joypad buttons that are being held!
@@ -105,45 +102,55 @@ UpdateSample:
         pop bc
         copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
         pop af
-
     .done_jumping
 
-    ; 'start' button to start the level
-    bit PADB_START, a
-    jr nz, .done_starting
-        push af
-        call Start
-        ; move window to bottom of the LCD for UI (getting rid of start screen)
-        ld a, 0
-        ld [rSCY], a
-        ld a, 112
-        ld [rWY], a
-        pop af
-
-    .done_starting
-
-    ld a, [rSCY]
-    xor 0
-    jr nz, .end_update
+    ; if started (screen Y = 0), start bg scrolling
+    ld a, [rGAME]
+    bit 0, a
+    jr z, .end_update
         ld a, [rSCX]
         inc a
         ld [rSCX], a
     .end_update
     ret
 
+;;; START SCREEN FUNCTIONALITY
+; storing macro game data in $C004 for now
+; bits: GAME_START | GAME_END | _ | _ | _ | _ | _ | _ 
 Start:
-    ; move window to bottom of the LCD for UI (getting rid of start screen)
-    ld a, 7
-    ld [rWX], a
-    ld a, 120
-    ld [rWY], a
-    
-    call MovePlayerToStart
+    halt ; --> is there a better placement to avoid slowing down the game?
 
+    push af
+
+    ; check if game started
+    ld a, [rGAME]
+    bit 0, a
+    jr nz, .done_starting 
+
+    ; *check indent formatting here
+    ; check if START was pressed
+    ld a, [PAD_CURR]
+    bit PADB_START, a
+    jr nz, .done_starting
+        ; move window to bottom of the LCD for UI (getting rid of start screen)
+        ld a, 0
+        ld [rSCY], a
+        ld a, 112
+        ld [rWY], a
+
+        call MovePlayerToStart
+        call MoveSpritesToStart
+    
+        ld a, [rGAME] ; TO-DO: make a macro for this
+        set 0, a
+        ld [rGAME], a
+    .done_starting
+
+    pop af
     ret
 
 
-export InitSample, UpdateSample
+export InitGraphics, UpdateGraphics, Start
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

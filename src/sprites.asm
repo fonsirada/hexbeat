@@ -12,86 +12,88 @@ include "src/sprites.inc"
 section "sprites", rom0
 
 ;;;;;;;
-InitPlayer:
-    ; MC.00
-    copy [SPRITE_0_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_0_ADDRESS + OAMA_X], 0
-    copy [SPRITE_0_ADDRESS + OAMA_TILEID], 0
-    copy [SPRITE_0_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-
-    ; MC.01
-    copy [SPRITE_1_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_1_ADDRESS + OAMA_X], 0
-    copy [SPRITE_1_ADDRESS + OAMA_TILEID], 2
-    copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-
-    ; MC.02
-    copy [SPRITE_2_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_2_ADDRESS + OAMA_X], 0
-    copy [SPRITE_2_ADDRESS + OAMA_TILEID], 4
-    copy [SPRITE_2_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-
-    ; MC.10
-    copy [SPRITE_3_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_3_ADDRESS + OAMA_X], 0
-    copy [SPRITE_3_ADDRESS + OAMA_TILEID], 6
-    copy [SPRITE_3_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-
-    ; MC.11
-    copy [SPRITE_4_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_4_ADDRESS + OAMA_X], 0
-    copy [SPRITE_4_ADDRESS + OAMA_TILEID], 8
-    copy [SPRITE_4_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-
-    ; MC.12
-    copy [SPRITE_5_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_5_ADDRESS + OAMA_X], 0
-    copy [SPRITE_5_ADDRESS + OAMA_TILEID], 10
-    copy [SPRITE_5_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+InitSpriteData:
+    call InitPlayerSpriteData
+    ; to-do:
+    ; - add 'shield' sprites
+    ; - add multiple spell sprites
 
     ret
 
-MovePlayerToStart:
-    ; MC.00
-    copy [SPRITE_0_ADDRESS + OAMA_Y], MC_TOP_Y
-    copy [SPRITE_0_ADDRESS + OAMA_X], 20
+InitSprites:
+    ; TARGETS
+    copy [SPRITE_6_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_6_ADDRESS + OAMA_X], 0
+    copy [SPRITE_6_ADDRESS + OAMA_TILEID], $4E
+    copy [SPRITE_6_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
-    ; MC.01
-    copy [SPRITE_1_ADDRESS + OAMA_Y], MC_TOP_Y
-    copy [SPRITE_1_ADDRESS + OAMA_X], 28
+    copy [SPRITE_7_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_7_ADDRESS + OAMA_X], 0
+    copy [SPRITE_7_ADDRESS + OAMA_TILEID], $5E
+    copy [SPRITE_7_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
-    ; MC.02
-    copy [SPRITE_2_ADDRESS + OAMA_Y], MC_TOP_Y
-    copy [SPRITE_2_ADDRESS + OAMA_X], 36
+    ; PLAYER 'SHIELD' SPRITES
+    copy [SPRITE_8_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_8_ADDRESS + OAMA_X], 0
+    copy [SPRITE_8_ADDRESS + OAMA_TILEID], $6E
+    copy [SPRITE_8_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
-    ; MC.10
-    copy [SPRITE_3_ADDRESS + OAMA_Y], MC_BOT_Y
-    copy [SPRITE_3_ADDRESS + OAMA_X], 20
+    copy [SPRITE_9_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_9_ADDRESS + OAMA_X], 0
+    copy [SPRITE_9_ADDRESS + OAMA_TILEID], $7E
+    copy [SPRITE_9_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
-    ; MC.11
-    copy [SPRITE_4_ADDRESS + OAMA_Y], MC_BOT_Y
-    copy [SPRITE_4_ADDRESS + OAMA_X], 28
+    ; SPELL OBJ SPRITES
+    ;-- SPELL 1
+    copy [SPRITE_10_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_10_ADDRESS + OAMA_X], 0
+    copy [SPRITE_10_ADDRESS + OAMA_TILEID], $0E
+    copy [SPRITE_10_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
-    ; MC.12
-    copy [SPRITE_5_ADDRESS + OAMA_Y], MC_BOT_Y
-    copy [SPRITE_5_ADDRESS + OAMA_X], 36
+    copy [SPRITE_11_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_11_ADDRESS + OAMA_X], 0
+    copy [SPRITE_11_ADDRESS + OAMA_TILEID], $1E
+    copy [SPRITE_11_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+
+    ;-- SPELL 2
+    copy [SPRITE_12_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_12_ADDRESS + OAMA_X], 0
+    copy [SPRITE_12_ADDRESS + OAMA_TILEID], $2E
+    copy [SPRITE_12_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+
+    copy [SPRITE_13_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_13_ADDRESS + OAMA_X], 0
+    copy [SPRITE_13_ADDRESS + OAMA_TILEID], $3E
+    copy [SPRITE_13_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
     ret
 
-; put PC sprite ids in WRAM
-InitPlayerSpriteLocation:
-    copy16bit [$C010], [$C011], _OAMRAM
-    copy16bit [$C012], [$C013], _OAMRAM + sizeof_OAM_ATTRS * 1
-    copy16bit [$C014], [$C015], _OAMRAM + sizeof_OAM_ATTRS * 2
-    copy16bit [$C016], [$C017], _OAMRAM + sizeof_OAM_ATTRS * 3
-    copy16bit [$C018], [$C019], _OAMRAM + sizeof_OAM_ATTRS * 4
-    copy16bit [$C01A], [$C01B], _OAMRAM + sizeof_OAM_ATTRS * 5
+MoveSpritesToStart:
+    copy [SPRITE_6_ADDRESS + OAMA_Y], MC_TOP_Y - 16
+    copy [SPRITE_6_ADDRESS + OAMA_X], 20 + 32
+
+    copy [SPRITE_7_ADDRESS + OAMA_Y], MC_TOP_Y + 16
+    copy [SPRITE_7_ADDRESS + OAMA_X], 20 + 32
+
+    copy [SPRITE_10_ADDRESS + OAMA_Y], MC_TOP_Y - 20
+    copy [SPRITE_10_ADDRESS + OAMA_X], 0
+
+    copy [SPRITE_11_ADDRESS + OAMA_Y], MC_TOP_Y - 20
+    copy [SPRITE_11_ADDRESS + OAMA_X], 0
+
+
+UpdateSprites:
+    ; scrolling spell 1
+    ld a, [SPRITE_10_ADDRESS + OAMA_X]
+    dec a
+    dec a
+    dec a
+    dec a
+    ld [SPRITE_10_ADDRESS + OAMA_X], a
+    add a, 8
+    ld [SPRITE_11_ADDRESS + OAMA_X], a
 
     ret
 
 
-
-    
-;;;;;;;
-
-export InitPlayer, InitPlayerSpriteLocation, MovePlayerToStart
+export InitSpriteData, InitSprites, UpdateSprites, MoveSpritesToStart
