@@ -61,6 +61,7 @@ InitGraphics:
     ld a, GAME_BASE ; load settings here
     ld [rGAME], a ; load (a) into the data 'register'
     ld [rPLAYER], a
+    ld [rPCA_COUNT], a
 
     ret
 
@@ -70,6 +71,8 @@ UpdateGraphics:
     ; get the joypad buttons that are being held!
     ld a, [PAD_CURR]
 
+    ; moved jump call to player.asm -S
+    /*
     ; jump when 'a' is held
     bit PADB_A, a
     jr nz, .done_jumping
@@ -81,6 +84,7 @@ UpdateGraphics:
         copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
         pop af
     .done_jumping
+    */
 
     ; if started (screen Y = 0), start bg scrolling
     ld a, [rGAME]

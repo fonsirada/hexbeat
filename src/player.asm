@@ -95,9 +95,7 @@ Jump:
     bit 3, a
     jr z, .go_up
         ld a, [SPRITE_0_ADDRESS + OAMA_Y]
-        inc a
-        inc a
-        halt 
+        add 8
         ld [SPRITE_0_ADDRESS + OAMA_Y], a
         ld [SPRITE_1_ADDRESS + OAMA_Y], a
         ld [SPRITE_2_ADDRESS + OAMA_Y], a
@@ -111,9 +109,7 @@ Jump:
     .go_up
     ld a, [SPRITE_0_ADDRESS + OAMA_Y]
     ; sprites 0-1-2 and 3-4-5 have same Y respectively - $10 off
-    dec a
-    dec a
-    halt
+    sub 8
     ld [SPRITE_0_ADDRESS + OAMA_Y], a
     ld [SPRITE_1_ADDRESS + OAMA_Y], a
     ld [SPRITE_2_ADDRESS + OAMA_Y], a
@@ -144,8 +140,6 @@ Jump:
     ret
 
 PlayerHitHigh:
-    ; copy [rGAME], GAME_B
-
     ; hit shield
     copy [SPRITE_9_ADDRESS + OAMA_Y], 0
     copy [SPRITE_9_ADDRESS + OAMA_X], 0
@@ -156,33 +150,28 @@ PlayerHitHigh:
     bit 6, a ;check for hold anim
     jr nz, .extend_frame
         UpdatePlayerAnim $C010, $C01C, $90 
-
         jr .end_frame_update
     .extend_frame
         copy [SPRITE_9_ADDRESS + OAMA_Y], MC_TOP_Y + 12
         copy [SPRITE_9_ADDRESS + OAMA_X], 20 + 24
         copy [rGAME], GAME_BASE
     .end_frame_update
-    ; frame 1: ($40)
-    ; frame 2: ($50)
     ; frame 3-4: ($60) + set shield visible
+
+    call Jump
+    ; may req some pushing/pulling
     ret
 
-
 PlayerHitLow:
-    ; copy [rGAME], GAME_B
-
     ; hit shield
     copy [SPRITE_9_ADDRESS + OAMA_Y], 0
     copy [SPRITE_9_ADDRESS + OAMA_X], 0
 
     ; if on frame 3, run an additional frame
-    ; condition
     ld a, [rGAME]
     bit 6, a ;check for hold anim
     jr nz, .extend_frame
         UpdatePlayerAnim $C010, $C01C, $60 ;, $FF; $60
-
         jr .end_frame_update
     .extend_frame
         copy [SPRITE_9_ADDRESS + OAMA_Y], MC_TOP_Y + 12
@@ -192,21 +181,6 @@ PlayerHitLow:
     ; frame 1: ($40)
     ; frame 2: ($50)
     ; frame 3-4: ($60) + set shield visible
-    ret
-
-HandleJoypad:
-    ; uhhh trying a diff thing for now...
-    /*
-    ld a, [PAD_CURR]
-    bit PADB_B, a
-    jr nz, .skip_check
-    ld a, [rGAME]
-        set GAMEB_B, a
-        
-
-    bit PADB_A, a
-        set GAMEB_A, a
-    */
     ret
 
 
@@ -222,19 +196,70 @@ UpdatePlayer:
     halt
     halt
 
-    /*
-    ; joypad flag handling; broken rn :(
+    ; joypad flag handling; B
     ld a, [PAD_CURR]
     bit PADB_B, a
-    ld a, [rGAME]
+    jr nz, .skip_B
+        SetRegBit rPLAYER, PLAYERB_B
+        copy [rPCA_COUNT], $00 ; lower half
+        SetPlayerTiles $30
+        ; unset A flag?
+    .skip_B
     
+    ld a, [PAD_CURR] ;remove once regs preserved?
+    bit PADB_A, a
+    jr nz, .skip_A
+        SetRegBit rPLAYER, PLAYERB_A
+        copy [rPCA_COUNT], $00 ; lower half
+        SetPlayerTiles $60
+        ; unset B flag?
+    .skip_A
+
+    ; IF/ELSE -> if A is set, run animA, if B is set run animB, else run Run
+    ld a, [rPLAYER]
+    bit PLAYERB_B, a
+    jr nz, .update_b; .fin_a_update
+
+    bit PLAYERB_A, a
+    jr nz, .update_a ; replace
+
+    jr .update_run
+
+    .update_b
+    ld a, [rPCA_COUNT]
+    cp a, $3
+    jr z, .update_a
+        SetPlayerY MC_TOP_Y
+        call PlayerHitLow
+
+        ld a, [rPCA_COUNT]
+        inc a
+        ld [rPCA_COUNT], a
+
+        jr .done_update
+
+    .update_a
+    cp a, $3
+    jr z, .update_run
+        call PlayerHitHigh
+
+        ld a, [rPCA_COUNT]
+        inc a
+        ld [rPCA_COUNT], a
+
+        jr .done_update
     
-    ld a, [rGAME]
-    bit 4, a
-    */
+    .update_run
+        ResRegBit rPLAYER, PLAYERB_B
+        ResRegBit rPLAYER, PLAYERB_A
+    
+    ; else,
+        ; unset flags, 
+        ; reset threshold..? maybe not + leave that to joypad handling
+        ; SetPlayerTiles $00 ; may not be needed?
 
-    ; add dual AB press condition here?
 
+    /*
     ld a, [PAD_CURR]
     bit PADB_A, a
     jr nz, .done_high
@@ -242,21 +267,21 @@ UpdatePlayer:
         call PlayerHitHigh
         jp .done_update
     .done_high
-
+    
     ld a, [PAD_CURR]
     bit PADB_B, a
     jr nz, .done_low
-        ; SetPlayerTiles $40
         call PlayerHitLow
         jr .done_update
     .done_low
+    */
+
         SetPlayerY MC_TOP_Y
-        
         ld a, [rPLAYER]
         res 3, a
         ld [rPLAYER], a
 
-        ; SetPlayerTiles $00
+        ; SetPlayerTiles $00 ; don't need this line?
         UpdatePlayerAnim $C010, $C01C, $30 ;, $FF
 
     .done_update

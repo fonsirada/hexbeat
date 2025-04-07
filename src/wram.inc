@@ -15,27 +15,24 @@ def PAD_PRSS rb 1
 def PAD_RLSE rb 1
 
 ;;;;; game data?
-def rGAME    rb 1
-def rPLAYER  rb 1
-def rPC_ANIM_COUNTER    rb 1
-
+def rGAME               rb 1
+def rPLAYER             rb 1
+def rPCA_COUNT          rb 1 ; high nibble = A; low nibble = B
 
 def GAME_BASE               equ %00000000
 def GAME_STARTED            equ %00000001
 def GAME_ENDED              equ %00000010
-def GAME_A                  equ %00100000
-def GAME_B                  equ %00010000
 
-def GAMEB_A                 equ 5
-def GAMEB_B                 equ 4
 def GAMEB_STARTED           equ 0
 def GAMEB_ENDED             equ 1
-; outsource below to rPLAYER?
 
 def PLAYERF_HIT                equ %10000000
-def PLAYERF_HOLDANIM           equ %01000000
+def PLAYERF_HOLD               equ %01000000
 def PLAYERF_A                  equ %00100000
 def PLAYERF_B                  equ %00010000
 def PLAYERF_FALL               equ %00001000
+
+def PLAYERB_A               equ 5
+def PLAYERB_B               equ 4
 
 endc

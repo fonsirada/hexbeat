@@ -35,9 +35,23 @@ macro copy16bit
 endm
 
 macro SetRegBit
+    push af
+
     ld a, [\1]
     set \2, a
     ld [\1], a
+
+    pop af
+endm
+
+macro ResRegBit
+    push af
+
+    ld a, [\1]
+    res \2, a
+    ld [\1], a
+    
+    pop af
 endm
 
 
