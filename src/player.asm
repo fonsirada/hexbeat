@@ -186,12 +186,8 @@ PlayerHitLow:
 
 
 ; problems:
-; need b_anim to run in full after pressing b, not just while holding
-; - also need b_anim to restart if pressing b again
+; need a_anim to run in full after pressing a, not just while holding
 ; - also, [hold] should NOT cause b to run again
-; similarly, restructure jump to run frame-by-frame instead of as its own func
-; - same issues w/ b_anim
-; might need macro to restore run anim sprite addresses after running player anim?
 UpdatePlayer:
     halt 
     halt
@@ -219,14 +215,9 @@ UpdatePlayer:
     ; IF/ELSE -> if A is set, run animA, if B is set run animB, else run Run
     ld a, [rPLAYER]
     bit PLAYERB_B, a
-    jr nz, .update_b; .fin_a_update
+    jr z, .update_a
 
-    bit PLAYERB_A, a
-    jr nz, .update_a ; replace
-
-    jr .update_run
-
-    .update_b
+    ; update B
     ld a, [rPCA_COUNT]
     cp a, $3
     jr z, .update_a
@@ -240,6 +231,10 @@ UpdatePlayer:
         jr .done_update
 
     .update_a
+    bit PLAYERB_A, a
+    jr z, .update_run
+    
+    ld a, [rPCA_COUNT]
     cp a, $3
     jr z, .update_run
         call PlayerHitHigh
