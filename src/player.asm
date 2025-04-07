@@ -238,6 +238,7 @@ UpdatePlayer:
     bit PADB_A, a
     jr nz, .done_high
         ; SetPlayerTiles $70
+        call Jump
         call PlayerHitHigh
         jp .done_update
     .done_high

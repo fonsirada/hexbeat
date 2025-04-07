@@ -89,6 +89,13 @@ macro EnableLCD
 
 endm
 
+; sets 0th bit in rGAME register - so program knows the game has started (level screen)
+macro StartGame
+    ld a, [rGAME]
+    set 0, a
+    ld [rGAME], a
+endm
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Pad input
@@ -118,8 +125,6 @@ macro TestPadInput_Released
 endm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
 
 
 ;;;;;
