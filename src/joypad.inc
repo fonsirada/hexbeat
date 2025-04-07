@@ -10,10 +10,11 @@ def JOYPAD_RGBINC equ 1
 
 include "src/wram.inc"
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 def NONE_HELD equ $FF
 
-;;;;; stuff from joypad 2 reading ;;;;;
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; init a pad input struct at address \1
 ; expected to be used only once at initialization

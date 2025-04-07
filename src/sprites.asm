@@ -81,7 +81,6 @@ MoveSpritesToStart:
     copy [SPRITE_7_ADDRESS + OAMA_Y], MC_TOP_Y + 16
     copy [SPRITE_7_ADDRESS + OAMA_X], 20 + 32
 
-
     ; SPELL 1
     copy [SPRITE_10_ADDRESS + OAMA_Y], MC_TOP_Y - 20
     copy [SPRITE_10_ADDRESS + OAMA_X], 0

@@ -5,7 +5,10 @@
 ; @author Sydney Chen, Alfonso Rada
 ; @brief storing all sprite constants and macros
 
-;; CONSTs
+if !def(SPRITES_RGBINC)
+def SPRITES_RGBINC equ 1
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; PLAYER
 def SPRITE_0_ADDRESS equ (_OAMRAM)
@@ -33,11 +36,13 @@ def MC_TOP_Y equ (80)
 def MC_BOT_Y equ (MC_TOP_Y + 16)
 def MC_JUMP_THRES equ (MC_TOP_Y - 24)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;; SPRITE MACROS
+;;; PLAYER MACROS
 
-;;; -> PLAYER
-; w/ run: UpdatePlayerAnim $C010, $C01C, $30
+; updates the Player sprite(s) to the next frame
+; run as: UpdatePlayerAnim (WRAM start address, WRAM end address, ending tileID)
+; ex: UpdatePlayerAnim $C010, $C01C, $30
 macro UpdatePlayerAnim
     push af
     push bc
@@ -94,24 +99,24 @@ macro UpdatePlayerAnim
     ld a, [hl] 
 
     ; check if last frame was reached
-    cp a, \3 ; $30 
+    cp a, \3
     jr c, .load_new_tileid
         ; reset to first frame
-        sub a, \3 ; $30 ; M#: "run anim frames" ?
+        sub a, \3
         jr .finish_load
+
     .load_new_tileid
-        ; go to next frame
-        add a, $10 ; M#: "frame gap"
+        add a, $10
+
     .finish_load
     ld [hl], a
 
-    ; now going to next sprite...
+    ; now going to next sprite in WRAM...
     pop hl
     inc hl
     inc hl
     
     ; check if last sprite was reached in WRAM
-    ; number of obj16 tiles in sprite ;repl w/ PC_SPRITE_6_LOC or smth
     ld a, l
     cp a, low(\2); $1C 
     jr nz, .next_tile
@@ -122,6 +127,7 @@ macro UpdatePlayerAnim
     pop af
 endm
 
+; set the Player sprite(s)'s tileIDs based on the first sprite
 macro SetPlayerTiles
    copy [SPRITE_0_ADDRESS + OAMA_TILEID], \1
    copy [SPRITE_1_ADDRESS + OAMA_TILEID], \1 + 2
@@ -132,6 +138,7 @@ macro SetPlayerTiles
 
    endm
 
+; set the Player sprite(s)'s Y value based on the first sprite
 macro SetPlayerY
     ld a, \1
     ld [SPRITE_0_ADDRESS + OAMA_Y], a
@@ -144,14 +151,6 @@ macro SetPlayerY
     sub a, $10
 endm
 
-; move 8x16 sprite right
-macro Move8x16Right
-    push bc
-    ld a, [SPRITE_0_ADDRESS + OAMA_X]
-    ld b, a
-    inc b
-    copy [SPRITE_0_ADDRESS + OAMA_X], b
-    copy [SPRITE_1_ADDRESS + OAMA_X], b
-    pop bc
-endm
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+endc
