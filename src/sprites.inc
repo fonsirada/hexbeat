@@ -25,9 +25,9 @@ def SPRITE_11_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 11)
 def SPRITE_12_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 12)
 def SPRITE_13_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 13)
 
-
 def MC_TOP_Y equ (80)
 def MC_BOT_Y equ (MC_TOP_Y + 16)
+def MC_JUMP_THRES equ (MC_TOP_Y - 16)
 
 
 ;;;; SPRITE MACROS

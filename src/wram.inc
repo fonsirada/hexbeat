@@ -25,6 +25,8 @@ def GAME_B                  equ %00010000
 
 def GAMEB_A                 equ 5
 def GAMEB_B                 equ 4
+def GAMEB_STARTED           equ 0
+def GAMEB_ENDED             equ 1
 ; outsource below to rPLAYER?
 
 def rPLAYER                   equ $C005

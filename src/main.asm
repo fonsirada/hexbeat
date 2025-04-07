@@ -11,6 +11,7 @@
 include "src/hardware.inc"
 include "src/joypad.inc"
 include "src/sprites.inc"
+include "src/utils.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -22,45 +23,28 @@ entrypoint:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-macro DisableLCD
-    ; wait for the vblank
-    .wait_vblank\@
-        ld a, [rLY]
-        cp a, SCRN_Y
-        jr nz, .wait_vblank\@
-
-    ; turn the LCD off
-    xor a
-    ld [rLCDC], a
-endm
-
-macro EnableLCD
-    ; set the graphics parameters and turn back LCD on
-    ld a, LCDCF_ON | LCDCF_WIN9C00 | LCDCF_WINON | LCDCF_BG8800 | LCDCF_BG9800 | LCDCF_OBJ16 | LCDCF_OBJON | LCDCF_BGON
-    ld [rLCDC], a
-
-endm
-
 section "main", rom0
 main:
     DisableLCD
+
     call InitGraphics
     call InitSpriteData
     call InitPlayer
     call InitSprites
-
     InitJoypad
     EnableLCD
 
-    .loop ; not enough time in vblank rn...
+    .loop
         call Start
-        
+
         ld a, [rGAME]
-        bit 0, a ; check if game is started; replace w/ consts or macros
+        bit GAMEB_STARTED, a ; check if game is started; replace w/ consts or macros
         jr z, .post_graphics
             call UpdateGraphics
             call UpdatePlayer
             call UpdateSprites
         .post_graphics
+
         UpdateJoypad
+
         jr .loop
