@@ -85,11 +85,9 @@ InitPlayerSpriteData:
 
     ret
 
-; will be called every frame
 Jump:
     ld a, [rPLAYER]
     bit 3, a
-    ; go up when flag is not set, down when set
     jr z, .go_up
         ld a, [SPRITE_0_ADDRESS + OAMA_Y]
         inc a
@@ -107,7 +105,7 @@ Jump:
 
     .go_up
     ld a, [SPRITE_0_ADDRESS + OAMA_Y]
-    ; sprites 0 1 2 and 3 4 5 have same Y respectively - $10 off
+    ; sprites 0-1-2 and 3-4-5 have same Y respectively - $10 off
     dec a
     dec a
     halt
@@ -120,15 +118,16 @@ Jump:
     ld [SPRITE_5_ADDRESS + OAMA_Y], a
     sub $10
     
+    ; go back down
     .check_thres1
     cp MC_JUMP_THRES
     jr nz, .check_thres2
-        ; when you reach threshold, reset flag
         ld a, [rPLAYER]
         set 3, a
         ld [rPLAYER], a
         jr .return
 
+    ; go back up
     .check_thres2
     cp MC_TOP_Y
     jr nz, .return
