@@ -93,11 +93,12 @@ InitPlayerSpriteData:
 Jump:
     ld a, [rPLAYER]
     bit 3, a
+    ld a, [SPRITE_0_ADDRESS + OAMA_Y]
     jr z, .go_up
-        ld a, [SPRITE_0_ADDRESS + OAMA_Y]
         inc a
         inc a
-        halt 
+        halt
+        ; sprites 0-1-2 and 3-4-5 have same Y respectively - $10 off
         ld [SPRITE_0_ADDRESS + OAMA_Y], a
         ld [SPRITE_1_ADDRESS + OAMA_Y], a
         ld [SPRITE_2_ADDRESS + OAMA_Y], a
@@ -109,8 +110,6 @@ Jump:
         jr .check_thres1
 
     .go_up
-    ld a, [SPRITE_0_ADDRESS + OAMA_Y]
-    ; sprites 0-1-2 and 3-4-5 have same Y respectively - $10 off
     dec a
     dec a
     halt

@@ -44,7 +44,6 @@ InitGraphics:
     InitOAM
     LoadGraphicsDataIntoVRAM
 
-    ; enable the vblank interrupt
     ld a, IEF_VBLANK
     ld [rIE], a
     ei
@@ -70,16 +69,13 @@ UpdateGraphics:
     ; get the joypad buttons that are being held!
     ld a, [PAD_CURR]
 
-    ; jump when 'a' is held
+    ; jump when 'a' is held - this should probably be in joypad.inc
     bit PADB_A, a
     jr nz, .done_jumping
-        ; using b as a counter for jump height
         push af
-        push bc
         call Jump
-        pop bc
-        copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
         pop af
+        copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
     .done_jumping
 
     ; if started (screen Y = 0), start bg scrolling
