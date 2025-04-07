@@ -60,6 +60,7 @@ InitGraphics:
     ; set macro data
     ld a, GAME_BASE ; load settings here
     ld [rGAME], a ; load (a) into the data 'register'
+    ld [rPLAYER], a
 
     ret
 
