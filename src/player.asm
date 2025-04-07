@@ -84,7 +84,10 @@ InitPlayerSpriteData:
 
     ret
 
+; will be called every frame
 Jump:
+
+
     ; sprites 0 1 2 and 3 4 5 have same Y respectively - $10 off
     ld a, [SPRITE_0_ADDRESS + OAMA_Y]
     ld b, 16
