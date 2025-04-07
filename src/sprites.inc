@@ -122,61 +122,27 @@ macro UpdatePlayerAnim
     pop af
 endm
 
+macro SetPlayerTiles
+   copy [SPRITE_0_ADDRESS + OAMA_TILEID], \1
+   copy [SPRITE_1_ADDRESS + OAMA_TILEID], \1 + 2
+   copy [SPRITE_2_ADDRESS + OAMA_TILEID], \1 + 4
+   copy [SPRITE_3_ADDRESS + OAMA_TILEID], \1 + 6
+   copy [SPRITE_4_ADDRESS + OAMA_TILEID], \1 + 8
+   copy [SPRITE_5_ADDRESS + OAMA_TILEID], \1 + 10
 
-macro UpdateRunAnim
-    push af
-    push bc
-    push hl
+   endm
 
-    ; starting address
-    ld hl, $C010 ; or, PC_SPRITE_1_LOC
-
-    ; loop through sprites thru WRAM address locs
-    .next_tile
-    push hl
-
-    ; store sprite address in hl
-    ld b, [hl]
-    inc hl
-    ld c, [hl]
-    ld h, b
-    ld l, c
-
-    ; get sprite's tileid address
-    ld a, l
-    add a, OAMA_TILEID
-    ld l, a
-
-    ; load tile ID into (a)
-    ld a, [hl] 
-
-    ; check if last frame was reached
-    cp a, $30 
-    jr c, .load_new_tileid
-        ; reset to first frame
-        sub a, $30 ; M#: "run anim frames" ?
-        jr .post_add
-    .load_new_tileid
-        ; go to next frame
-        add a, $10 ; M#: "frame gap"
-    .post_add
-    ld [hl], a
-
-    ; now going to next sprite...
-    pop hl
-    inc hl
-    inc hl
-    
-    ; check if last sprite was reached in WRAM
-    ; number of obj16 tiles in sprite ;repl w/ PC_SPRITE_6_LOC or smth
-    ld a, l
-    cp a, $1C 
-    jr nz, .next_tile
-
-    pop hl
-    pop bc
-    pop af
+macro SetPlayerY
+    ld a, \1
+    ld [SPRITE_0_ADDRESS + OAMA_Y], a
+    ld [SPRITE_1_ADDRESS + OAMA_Y], a
+    ld [SPRITE_2_ADDRESS + OAMA_Y], a
+    add a, $10
+    ld [SPRITE_3_ADDRESS + OAMA_Y], a
+    ld [SPRITE_4_ADDRESS + OAMA_Y], a
+    ld [SPRITE_5_ADDRESS + OAMA_Y], a
 endm
+
 
 
 
