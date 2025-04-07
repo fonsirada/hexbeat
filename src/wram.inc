@@ -20,14 +20,20 @@ def rGAME                   equ $C004
 def GAME_BASE               equ %00000000
 def GAME_STARTED            equ %00000001
 def GAME_ENDED              equ %00000010
-; outsource below to rPLAYER?
-def GAME_HIT                equ %10000000
-def GAME_HOLDANIM           equ %01000000
 def GAME_A                  equ %00100000
 def GAME_B                  equ %00010000
 
 def GAMEB_A                 equ 5
 def GAMEB_B                 equ 4
+; outsource below to rPLAYER?
+
+def rPLAYER                   equ $C005
+def PLAYER_HIT                equ %10000000
+def PLAYER_HOLDANIM           equ %01000000
+def PLAYER_A                  equ %00100000
+def PLAYER_B                  equ %00010000
+def PLAYER_FALL               equ %00001000
+
 
 
 ;;;;; stuff from joypad 2 reading ;;;;;
