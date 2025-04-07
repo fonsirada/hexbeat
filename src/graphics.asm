@@ -1,10 +1,13 @@
-; build with
-; rgbasm -o main.o main.asm && rgblink --tiny -o joypad.gb main.o && rgbfix -v -p 0xFF joypad.gb
+; 
+; CS-240 World 5: Basic Game Functionality
+;
+; @file graphics.asm
+; @author Darren Strash, Sydney Chen, Alfonso Rada
+; @brief store overall graphics-related functions
 
 include "src/utils.inc"
 include "src/joypad.inc"
 include "src/sprites.inc"
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -24,32 +27,6 @@ def TILEMAPS_BYTE_SIZE              equ (TILEMAPS_COUNT * BYTES_PER_TILEMAP)
 def GRAPHICS_DATA_SIZE              equ (TILES_BYTE_SIZE + TILEMAPS_BYTE_SIZE)
 def GRAPHICS_DATA_ADDRESS_END       equ ($8000)
 def GRAPHICS_DATA_ADDRESS_START     equ (GRAPHICS_DATA_ADDRESS_END - GRAPHICS_DATA_SIZE)
-
-
-; load the graphics data from ROM to VRAM
-macro LoadGraphicsDataIntoVRAM
-    ld de, GRAPHICS_DATA_ADDRESS_START
-    ld hl, _VRAM8000
-    .load_tile\@
-        ld a, [de]
-        inc de
-        ld [hli], a
-        ld a, d
-        cp a, high(GRAPHICS_DATA_ADDRESS_END)
-        jr nz, .load_tile\@
-endm
-
-; clear the OAM
-macro InitOAM
-    ld c, OAM_COUNT
-    ld hl, _OAMRAM + OAMA_Y
-    ld de, sizeof_OAM_ATTRS
-    .init_oam\@
-        ld [hl], 0
-        add hl, de
-        dec c
-        jr nz, .init_oam\@
-endm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

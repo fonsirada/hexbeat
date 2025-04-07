@@ -42,8 +42,34 @@ endm
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; LCD control
+; LCD control / Graphics
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; load the graphics data from ROM to VRAM
+macro LoadGraphicsDataIntoVRAM
+    ld de, GRAPHICS_DATA_ADDRESS_START
+    ld hl, _VRAM8000
+    .load_tile\@
+        ld a, [de]
+        inc de
+        ld [hli], a
+        ld a, d
+        cp a, high(GRAPHICS_DATA_ADDRESS_END)
+        jr nz, .load_tile\@
+endm
+
+; clear the OAM
+macro InitOAM
+    ld c, OAM_COUNT
+    ld hl, _OAMRAM + OAMA_Y
+    ld de, sizeof_OAM_ATTRS
+    .init_oam\@
+        ld [hl], 0
+        add hl, de
+        dec c
+        jr nz, .init_oam\@
+endm
+
 macro DisableLCD
     ; wait for the vblank
     .wait_vblank\@
