@@ -11,6 +11,7 @@
 include "src/hardware.inc"
 include "src/joypad.inc"
 include "src/sprites.inc"
+include "src/utils.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
