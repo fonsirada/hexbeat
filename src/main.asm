@@ -21,6 +21,7 @@ entrypoint:
     jp main
     ds ($0150 - @), 0
 
+    
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 section "main", rom0
@@ -32,13 +33,14 @@ main:
     call InitPlayer
     call InitSprites
     InitJoypad
+
     EnableLCD
 
     .loop
         call Start
 
         ld a, [rGAME]
-        bit GAMEB_STARTED, a ; check if game is started; replace w/ consts or macros
+        bit GAMEB_START, a
         jr z, .post_graphics
             call UpdateGraphics
             call UpdatePlayer

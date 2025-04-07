@@ -115,7 +115,6 @@ Jump:
     cp MC_TOP_Y
     jr nz, .return
         RegBitOp rPLAYER, PLAYERB_FALL, res
-    
     .return
     ret
 
@@ -175,19 +174,17 @@ UpdatePlayer:
     ld a, [PAD_CURR]
     bit PADB_B, a
     jr nz, .skip_B
-        SetRegBit rPLAYER, PLAYERB_B
-        copy [rPCA_COUNT], $00 ; lower half
+        RegBitOp rPLAYER, PLAYERB_B, set
+        copy [rPCA_COUNT], $00 
         SetPlayerTiles $30
-        ; unset A flag?
     .skip_B
     
     ld a, [PAD_CURR] ;remove once regs preserved?
     bit PADB_A, a
     jr nz, .skip_A
-        SetRegBit rPLAYER, PLAYERB_A
-        copy [rPCA_COUNT], $00 ; lower half
+        RegBitOp rPLAYER, PLAYERB_A, set
+        copy [rPCA_COUNT], $00
         SetPlayerTiles $60
-        ; unset B flag?
     .skip_A
 
     ; IF/ELSE -> if A is set, run animA, if B is set run animB, else run Run
@@ -195,57 +192,32 @@ UpdatePlayer:
     ld a, [rPLAYER]
     bit PLAYERB_B, a
     jr z, .update_a
+        ; update B
+        ld a, [rPCA_COUNT]
+        cp a, $3
+        jr z, .update_a
+            SetPlayerY MC_TOP_Y
+            call PlayerHitLow
+            RegOp rPCA_COUNT, inc
 
-    ; update B
-    ld a, [rPCA_COUNT]
-    cp a, $3
-    jr z, .update_a
-        SetPlayerY MC_TOP_Y
-        call PlayerHitLow
-        RegOp rPCA_COUNT, inc
-
-        jr .done_update
+            jr .done_update
 
     .update_a
-    bit PLAYERB_A, a
-    jr z, .update_run
-    
-    ld a, [rPCA_COUNT]
-    cp a, $3
-    jr z, .update_run
-        call PlayerHitHigh
-        RegOp rPCA_COUNT, inc
+        bit PLAYERB_A, a
+        jr z, .update_run
+        
+        ld a, [rPCA_COUNT]
+        cp a, $3
+        jr z, .update_run
+            call PlayerHitHigh
+            RegOp rPCA_COUNT, inc
 
-        jr .done_update
+            jr .done_update
     
     .update_run
         RegBitOp rPLAYER, PLAYERB_B, res
         RegBitOp rPLAYER, PLAYERB_B, res
     
-    ; else,
-        ; unset flags, 
-        ; reset threshold..? maybe not + leave that to joypad handling
-        ; SetPlayerTiles $00 ; may not be needed?
-
-
-    /*
-    ld a, [PAD_CURR]
-    bit PADB_A, a
-    jr nz, .done_high
-        ; SetPlayerTiles $70
-        call Jump
-        call PlayerHitHigh
-        jp .done_update
-    .done_high
-    
-    ld a, [PAD_CURR]
-    bit PADB_B, a
-    jr nz, .done_low
-        call PlayerHitLow
-        jr .done_update
-    .done_low
-    */
-
         SetPlayerY MC_TOP_Y
         ld a, [rPLAYER]
         res 3, a

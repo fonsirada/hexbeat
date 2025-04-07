@@ -14,18 +14,20 @@ def PAD_PREV rb 1
 def PAD_PRSS rb 1
 def PAD_RLSE rb 1
 
-;;;;; game data?
+;;; ADDITIONAL REGISTERS
 def rGAME               rb 1
 def rPLAYER             rb 1
-def rPCA_COUNT          rb 1 ; high nibble = A; low nibble = B
+def rPCA_COUNT          rb 1
 
+;;; rGAME
 def GAME_BASE               equ %00000000
-def GAME_STARTED            equ %00000001
-def GAME_ENDED              equ %00000010
+def GAME_START              equ %00000001
+def GAME_END                equ %00000010
 
-def GAMEB_STARTED           equ 0
-def GAMEB_ENDED             equ 1
+def GAMEB_START             equ 0
+def GAMEB_END               equ 1
 
+;;; rPLAYER
 def PLAYERF_HIT                equ %10000000
 def PLAYERF_HOLD               equ %01000000
 def PLAYERF_A                  equ %00100000

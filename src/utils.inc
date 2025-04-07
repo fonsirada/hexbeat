@@ -34,26 +34,6 @@ macro copy16bit
     pop hl
 endm
 
-macro SetRegBit
-    push af
-
-    ld a, [\1]
-    set \2, a
-    ld [\1], a
-
-    pop af
-endm
-
-macro ResRegBit
-    push af
-
-    ld a, [\1]
-    res \2, a
-    ld [\1], a
-    
-    pop af
-endm
-
 macro RegBitOp
     ld a, [\1]
     \3 \2, a
@@ -70,31 +50,6 @@ endm
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; LCD control / Graphics
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; load the graphics data from ROM to VRAM
-macro LoadGraphicsDataIntoVRAM
-    ld de, GRAPHICS_DATA_ADDRESS_START
-    ld hl, _VRAM8000
-    .load_tile\@
-        ld a, [de]
-        inc de
-        ld [hli], a
-        ld a, d
-        cp a, high(GRAPHICS_DATA_ADDRESS_END)
-        jr nz, .load_tile\@
-endm
-
-; clear the OAM
-macro InitOAM
-    ld c, OAM_COUNT
-    ld hl, _OAMRAM + OAMA_Y
-    ld de, sizeof_OAM_ATTRS
-    .init_oam\@
-        ld [hl], 0
-        add hl, de
-        dec c
-        jr nz, .init_oam\@
-endm
 
 macro DisableLCD
     ; wait for the vblank
@@ -115,6 +70,7 @@ macro EnableLCD
 
 endm
 
+
 ; sets 0th bit in rGAME register - so program knows the game has started (level screen)
 macro StartGame
     ld a, [rGAME]
@@ -126,9 +82,7 @@ endm
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Pad input
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
+/*
 ; raise the zero flag if all keys in \2 are held in the pad input struct \1
 ; example: TestPadInput_HeldAll _RAM + 4, PADF_LEFT | PADF_DOWN
 macro TestPadInput_HeldAll
@@ -149,7 +103,7 @@ macro TestPadInput_Released
     ld a, [\1 + PAD_INPUT_RELEASED]
     and a, \2
 endm
-
+*/
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 

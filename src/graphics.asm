@@ -38,6 +38,33 @@ def UI_Y                            equ 112
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; load the graphics data from ROM to VRAM
+macro LoadGraphicsDataIntoVRAM
+    ld de, GRAPHICS_DATA_ADDRESS_START
+    ld hl, _VRAM8000
+    .load_tile\@
+        ld a, [de]
+        inc de
+        ld [hli], a
+        ld a, d
+        cp a, high(GRAPHICS_DATA_ADDRESS_END)
+        jr nz, .load_tile\@
+endm
+
+; clear the OAM
+macro InitOAM
+    ld c, OAM_COUNT
+    ld hl, _OAMRAM + OAMA_Y
+    ld de, sizeof_OAM_ATTRS
+    .init_oam\@
+        ld [hl], 0
+        add hl, de
+        dec c
+        jr nz, .init_oam\@
+endm
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 section "sample", rom0 ; should this stay as "sample"?
 
 InitGraphics:
@@ -64,7 +91,6 @@ InitGraphics:
     copy [rWX], WX_OFS
     copy [rWY], WY_OFS
  
-
     ; set up game and player settings
     ld a, GAME_BASE 
     ld [rGAME], a
@@ -77,26 +103,20 @@ InitGraphics:
 UpdateGraphics:
     halt
 
-    ; if started, start bg scrolling
-    ld a, [rGAME]
-    bit GAMEB_STARTED, a
-    jr z, .end_update
-        ld a, [rSCX]
-        inc a
-        ld [rSCX], a
+    ; scroll bg
+    ld a, [rSCX]
+    add 2
+    ld [rSCX], a
 
-    .end_update
     ret
 
 ;;; START SCREEN FUNCTIONALITY - still need this?
-; storing macro game data in $C004 for now
-; bits: GAME_START | GAME_END | _ | _ | _ | _ | _ | _ 
 Start:
-    halt ; --> is there a better placement to avoid slowing down the game?
+    halt
 
     ; check if game started
     ld a, [rGAME]
-    bit GAMEB_STARTED, a
+    bit GAMEB_START, a
     jr nz, .done_starting
         ld a, [PAD_CURR]
         bit PADB_START, a
@@ -109,7 +129,8 @@ Start:
 
             call MovePlayerToStart
             call MoveSpritesToStart
-            StartGame
+            RegBitOp rGAME, GAMEB_START, set
+            ;StartGame
 
     .done_starting
     ret
