@@ -1,5 +1,9 @@
-
-; ADD HEADER
+; 
+; CS-240 World 5: Basic Game Functionality
+;
+; @file sprites.inc
+; @author Sydney Chen, Alfonso Rada
+; @brief storing all sprite constants and macros
 
 ;; CONSTs
 

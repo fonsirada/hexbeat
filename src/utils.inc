@@ -1,3 +1,10 @@
+; 
+; CS-240 World 5: Basic Game Functionality
+;
+; @file utils.inc
+; @author Darren Strash, Sydney Chen, Alfonso Rada
+; @brief store general usage macros
+
 if !def(UTILS_RGBINC)
 def UTILS_RGBINC equ 1
 

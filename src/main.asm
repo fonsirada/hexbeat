@@ -2,8 +2,8 @@
 ; CS-240 World 5: Basic Game Functionality
 ;
 ; @file main.asm
-; @author Darren Strash
-; @date March 4, 2025
+; @author Darren Strash, Sydney Chen, Alfonso Rada
+; @date April 6, 2025
 ;
 ; build with:
 ; make
