@@ -143,32 +143,6 @@ macro SetPlayerY
     ld [SPRITE_5_ADDRESS + OAMA_Y], a
 endm
 
-
-
-
-
-; move 8x16 sprite down
-; *how to make the "sprite 0 address" bit modular?
-macro Move8x16Down
-    push bc
-    ld a, [SPRITE_0_ADDRESS + OAMA_Y]
-    ld b, a
-    inc b
-    copy [SPRITE_0_ADDRESS + OAMA_Y], b
-
-    ld a, b
-    add a, 8
-    ld b, a
-    copy [SPRITE_1_ADDRESS + OAMA_Y], b
-    pop bc
-endm
-
-macro Move24x32Down
-    Move8x16Down ;
-    Move8x16Down ;
-    Move8x16Down ;
-endm
-
 ; move 8x16 sprite right
 macro Move8x16Right
     push bc
