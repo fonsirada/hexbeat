@@ -65,7 +65,7 @@ endm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-section "sample", rom0 ; should this stay as "sample"?
+section "graphics", rom0 
 
 InitGraphics:
     ; init the palettes
@@ -99,7 +99,7 @@ InitGraphics:
 
     ret
 
-; background scrolling
+    
 UpdateGraphics:
     halt
 
@@ -110,7 +110,7 @@ UpdateGraphics:
 
     ret
 
-;;; START SCREEN FUNCTIONALITY - still need this?
+; set-up game + remove start screen once START is pressed
 Start:
     halt
 
@@ -118,6 +118,7 @@ Start:
     ld a, [rGAME]
     bit GAMEB_START, a
     jr nz, .done_starting
+
         ld a, [PAD_CURR]
         bit PADB_START, a
         jr nz, .done_starting
@@ -130,11 +131,11 @@ Start:
             call MovePlayerToStart
             call MoveSpritesToStart
             RegBitOp rGAME, GAMEB_START, set
-            ;StartGame
 
     .done_starting
     ret
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 export InitGraphics, UpdateGraphics, Start
 

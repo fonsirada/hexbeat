@@ -18,11 +18,14 @@ include "src/hardware.inc"
 ; example: copy [$FF84], 10
 macro copy
     push af
+
     ld a, \2
     ld \1, a
+
     pop af
 endm
 
+; copy 16bit reg \2 into 16bit reg \1 using (a)
 macro copy16bit
     push hl
 
@@ -34,22 +37,22 @@ macro copy16bit
     pop hl
 endm
 
+; run a bit operation \3 on address \1 at bit \2 using (a)
 macro RegBitOp
     ld a, [\1]
     \3 \2, a
     ld [\1], a
 endm
 
-; THIS WORKS???
+; run an operation \2 on address \1 using (a)
 macro RegOp
     ld a, [\1]
     \2 a
     ld [\1], a
 endm
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; LCD control / Graphics
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;; LCD CONTROL
 
 macro DisableLCD
     ; wait for the vblank
@@ -69,34 +72,6 @@ macro EnableLCD
     ld [rLCDC], a
 
 endm
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Pad input
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-/*
-; raise the zero flag if all keys in \2 are held in the pad input struct \1
-; example: TestPadInput_HeldAll _RAM + 4, PADF_LEFT | PADF_DOWN
-macro TestPadInput_HeldAll
-    ld a, [\1 + PAD_INPUT_CURRENT]
-    and a, \2
-endm
-
-; raise the zero flag if input \2 is pressed in the pad input struct \1
-; example: TestPadInput_Pressed _HRAM + 12, PADF_LEFT
-macro TestPadInput_Pressed
-    ld a, [\1 + PAD_INPUT_PRESSED]
-    and a, \2
-endm
-
-; raise the zero flag if input \2 is released in the pad input struct \1
-; example: TestPadInput_Released _RAM + 24, PADF_A
-macro TestPadInput_Released
-    ld a, [\1 + PAD_INPUT_RELEASED]
-    and a, \2
-endm
-*/
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

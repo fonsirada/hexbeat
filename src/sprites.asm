@@ -5,18 +5,16 @@
 ; @author Sydney Chen, Alfonso Rada
 ; @brief storing non-player sprite functions
 
-; tile conversion commands:
-; /Users/sydneychen/Desktop/cs240/aseprite/build/bin/aseprite
-; cd ../../gca/tools/conv
-; ./gfxconv ../../../cs240\ game/tileset_16mode.png ../../../cs240\ game/w5_window_v1.png ../../../cs240\ game/witch_bg_hall_v1.png
-
 include "src/hardware.inc"
 include "src/utils.inc"
 include "src/sprites.inc"
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 section "sprites", rom0
 
-;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 InitSpriteData:
     call InitPlayerSpriteData
     ; to-do:
@@ -104,6 +102,6 @@ UpdateSprites:
 
     ret
 
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 export InitSpriteData, InitSprites, UpdateSprites, MoveSpritesToStart

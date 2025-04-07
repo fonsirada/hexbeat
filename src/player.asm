@@ -11,7 +11,11 @@ include "src/joypad.inc"
 include "src/sprites.inc"
 include "src/wram.inc"
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 section "player", rom0
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 InitPlayer:
     ; MC.00
@@ -228,5 +232,6 @@ UpdatePlayer:
     .done_update
     ret
 
-;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 export Jump, UpdatePlayer, InitPlayer, InitPlayerSpriteData, MovePlayerToStart

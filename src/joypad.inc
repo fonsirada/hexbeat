@@ -1,9 +1,9 @@
 ; 
 ; CS 240: Storing Joypad state, including pressed/released/etc
 ;
-; @file wram.inc
-; @author Darren Strash and CS 240
-; @brief a place to store all WRAM variables
+; @file joypad.inc
+; @author Darren Strash
+; @brief stores joypad handling macros
 
 if !def(JOYPAD_RGBINC)
 def JOYPAD_RGBINC equ 1
@@ -143,5 +143,7 @@ macro UpdateJoypad
     or a, c
     ld [PAD_RLSE], a
 endm
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 endc

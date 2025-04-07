@@ -22,7 +22,7 @@ def SPRITE_5_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 5)
 def SPRITE_6_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 6)
 def SPRITE_7_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 7)
 
-; 'SHIELD' SPRITES
+; PLAYER 'SHIELD'
 def SPRITE_8_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 8)
 def SPRITE_9_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 9)
 
