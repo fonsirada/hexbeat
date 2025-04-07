@@ -236,7 +236,7 @@ UpdatePlayer:
     jr nz, .done_high
         ; SetPlayerTiles $70
         call PlayerHitHigh
-        jr .done_update
+        jp .done_update
     .done_high
 
     ld a, [PAD_CURR]
