@@ -33,6 +33,92 @@ def MC_BOT_Y equ (MC_TOP_Y + 16)
 ;;;; SPRITE MACROS
 
 ;;; -> PLAYER
+; w/ run: UpdatePlayerAnim $C010, $C01C, $30
+macro UpdatePlayerAnim
+    push af
+    push bc
+    push hl
+
+    ; starting address
+    ld hl, \1 ; $C010 ; or, PC_SPRITE_1_LOC
+
+    ; loop through sprites thru WRAM address locs
+    .next_tile
+    push hl
+
+    ; store sprite address in hl
+    ld b, [hl]
+    inc hl
+    ld c, [hl]
+    ld h, b
+    ld l, c
+
+    ; get sprite's tileid address
+    ld a, l
+    add a, OAMA_TILEID
+    ld l, a
+
+    ; HOLD IS BROKEN; FIGURE OUT WHY.
+    ; hold a frame --> move to start?
+    /*
+    ld a, [rGAME]
+    bit 6, a
+    jr nz, .skip_hold
+        ; end update and reset hold flag
+        ; ld a, [rGAME]
+        xor GAME_HOLDANIM
+        ld [rGAME], a
+
+        jr .end_update
+    .skip_hold
+
+    ; load tile ID into (a)
+    ld a, [hl] 
+
+    ; check if raising hold flag
+    ; cp first tileID w/ given tile ID, if equal, set flag
+    ; if no hold desired, set arbitrarily high 4th param
+    cp a, \4
+    jr nz, .done_hold_check
+        ld a, [rGAME] ; make this a macro
+        xor GAME_HOLDANIM
+        ld [rGAME], a
+    .done_hold_check
+    */
+    ; ld a, \4
+
+    ld a, [hl] 
+
+    ; check if last frame was reached
+    cp a, \3 ; $30 
+    jr c, .load_new_tileid
+        ; reset to first frame
+        sub a, \3 ; $30 ; M#: "run anim frames" ?
+        jr .finish_load
+    .load_new_tileid
+        ; go to next frame
+        add a, $10 ; M#: "frame gap"
+    .finish_load
+    ld [hl], a
+
+    ; now going to next sprite...
+    pop hl
+    inc hl
+    inc hl
+    
+    ; check if last sprite was reached in WRAM
+    ; number of obj16 tiles in sprite ;repl w/ PC_SPRITE_6_LOC or smth
+    ld a, l
+    cp a, low(\2); $1C 
+    jr nz, .next_tile
+
+    .end_update
+    pop hl
+    pop bc
+    pop af
+endm
+
+
 macro UpdateRunAnim
     push af
     push bc
@@ -80,7 +166,7 @@ macro UpdateRunAnim
     ; check if last sprite was reached in WRAM
     ; number of obj16 tiles in sprite ;repl w/ PC_SPRITE_6_LOC or smth
     ld a, l
-    cp a, $1C
+    cp a, $1C 
     jr nz, .next_tile
 
     pop hl
@@ -88,12 +174,7 @@ macro UpdateRunAnim
     pop af
 endm
 
-macro UpdateJumpAnim
-    ; up:
-    ; for first third,
 
-    ; down:
-endm
 
 
 ; move 8x16 sprite down
