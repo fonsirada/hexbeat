@@ -141,6 +141,7 @@ macro SetPlayerY
     ld [SPRITE_3_ADDRESS + OAMA_Y], a
     ld [SPRITE_4_ADDRESS + OAMA_Y], a
     ld [SPRITE_5_ADDRESS + OAMA_Y], a
+    sub a, $10
 endm
 
 ; move 8x16 sprite right

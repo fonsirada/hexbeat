@@ -92,63 +92,42 @@ InitPlayerSpriteData:
 
 Jump:
     ld a, [rPLAYER]
-    bit 3, a
+    bit PLAYERB_FALL, a
     ld a, [SPRITE_0_ADDRESS + OAMA_Y]
     jr z, .go_up
-        ld a, [SPRITE_0_ADDRESS + OAMA_Y]
         add 8
-        ld [SPRITE_0_ADDRESS + OAMA_Y], a
-        ld [SPRITE_1_ADDRESS + OAMA_Y], a
-        ld [SPRITE_2_ADDRESS + OAMA_Y], a
-        add $10
-        ld [SPRITE_3_ADDRESS + OAMA_Y], a
-        ld [SPRITE_4_ADDRESS + OAMA_Y], a
-        ld [SPRITE_5_ADDRESS + OAMA_Y], a
-        sub $10
+        SetPlayerY a
         jr .check_thres1
 
     .go_up
-    ld a, [SPRITE_0_ADDRESS + OAMA_Y]
-    ; sprites 0-1-2 and 3-4-5 have same Y respectively - $10 off
     sub 8
-    ld [SPRITE_0_ADDRESS + OAMA_Y], a
-    ld [SPRITE_1_ADDRESS + OAMA_Y], a
-    ld [SPRITE_2_ADDRESS + OAMA_Y], a
-    add $10
-    ld [SPRITE_3_ADDRESS + OAMA_Y], a
-    ld [SPRITE_4_ADDRESS + OAMA_Y], a
-    ld [SPRITE_5_ADDRESS + OAMA_Y], a
-    sub $10
+    SetPlayerY a
     
     ; go back down
     .check_thres1
     cp MC_JUMP_THRES
     jr nz, .check_thres2
-        ld a, [rPLAYER]
-        set 3, a
-        ld [rPLAYER], a
+        RegBitOp rPLAYER, PLAYERB_FALL, set ; not sure why this is blue...
         jr .return
 
     ; go back up
     .check_thres2
     cp MC_TOP_Y
     jr nz, .return
-        ld a, [rPLAYER]
-        res 3, a
-        ld [rPLAYER], a
+        RegBitOp rPLAYER, PLAYERB_FALL, res
     
     .return
     ret
 
 PlayerHitHigh:
-    ; hit shield
+    ; reset shield loc
     copy [SPRITE_9_ADDRESS + OAMA_Y], 0
     copy [SPRITE_9_ADDRESS + OAMA_X], 0
 
     ; if on frame 3, run an additional frame
     ; condition
-    ld a, [rGAME]
-    bit 6, a ;check for hold anim
+    ld a, [rPLAYER]
+    bit PLAYERB_HOLD, a
     jr nz, .extend_frame
         UpdatePlayerAnim $C010, $C01C, $90 
         jr .end_frame_update
@@ -159,20 +138,19 @@ PlayerHitHigh:
     .end_frame_update
     ; frame 3-4: ($60) + set shield visible
 
-    call Jump
-    ; may req some pushing/pulling
+    call Jump ; may req some pushing/pulling
     ret
 
 PlayerHitLow:
-    ; hit shield
+    ; reset shield loc
     copy [SPRITE_9_ADDRESS + OAMA_Y], 0
     copy [SPRITE_9_ADDRESS + OAMA_X], 0
 
     ; if on frame 3, run an additional frame
-    ld a, [rGAME]
-    bit 6, a ;check for hold anim
+    ld a, [rPLAYER]
+    bit PLAYERB_HOLD, a
     jr nz, .extend_frame
-        UpdatePlayerAnim $C010, $C01C, $60 ;, $FF; $60
+        UpdatePlayerAnim $C010, $C01C, $60
         jr .end_frame_update
     .extend_frame
         copy [SPRITE_9_ADDRESS + OAMA_Y], MC_TOP_Y + 12
@@ -213,6 +191,7 @@ UpdatePlayer:
     .skip_A
 
     ; IF/ELSE -> if A is set, run animA, if B is set run animB, else run Run
+    ; this if/else structure sucks.
     ld a, [rPLAYER]
     bit PLAYERB_B, a
     jr z, .update_a
@@ -223,10 +202,7 @@ UpdatePlayer:
     jr z, .update_a
         SetPlayerY MC_TOP_Y
         call PlayerHitLow
-
-        ld a, [rPCA_COUNT]
-        inc a
-        ld [rPCA_COUNT], a
+        RegOp rPCA_COUNT, inc
 
         jr .done_update
 
@@ -238,16 +214,13 @@ UpdatePlayer:
     cp a, $3
     jr z, .update_run
         call PlayerHitHigh
-
-        ld a, [rPCA_COUNT]
-        inc a
-        ld [rPCA_COUNT], a
+        RegOp rPCA_COUNT, inc
 
         jr .done_update
     
     .update_run
-        ResRegBit rPLAYER, PLAYERB_B
-        ResRegBit rPLAYER, PLAYERB_A
+        RegBitOp rPLAYER, PLAYERB_B, res
+        RegBitOp rPLAYER, PLAYERB_B, res
     
     ; else,
         ; unset flags, 
@@ -278,8 +251,7 @@ UpdatePlayer:
         res 3, a
         ld [rPLAYER], a
 
-        ; SetPlayerTiles $00 ; don't need this line?
-        UpdatePlayerAnim $C010, $C01C, $30 ;, $FF
+        UpdatePlayerAnim $C010, $C01C, $30
 
     .done_update
     ret

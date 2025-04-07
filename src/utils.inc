@@ -54,6 +54,18 @@ macro ResRegBit
     pop af
 endm
 
+macro RegBitOp
+    ld a, [\1]
+    \3 \2, a
+    ld [\1], a
+endm
+
+; THIS WORKS???
+macro RegOp
+    ld a, [\1]
+    \2 a
+    ld [\1], a
+endm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; LCD control / Graphics

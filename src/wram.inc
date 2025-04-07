@@ -32,7 +32,9 @@ def PLAYERF_A                  equ %00100000
 def PLAYERF_B                  equ %00010000
 def PLAYERF_FALL               equ %00001000
 
+def PLAYERB_HOLD            equ 6
 def PLAYERB_A               equ 5
 def PLAYERB_B               equ 4
+def PLAYERB_FALL            equ 3
 
 endc
