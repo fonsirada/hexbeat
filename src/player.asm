@@ -151,7 +151,7 @@ PlayerHitHigh:
     ld a, [rGAME]
     bit 6, a ;check for hold anim
     jr nz, .extend_frame
-        UpdatePlayerAnim $C010, $C01C, $90 ;, $FF; $60
+        UpdatePlayerAnim $C010, $C01C, $90 
 
         jr .end_frame_update
     .extend_frame
@@ -234,6 +234,7 @@ UpdatePlayer:
     ld a, [PAD_CURR]
     bit PADB_A, a
     jr nz, .done_high
+        ; SetPlayerTiles $70
         call PlayerHitHigh
         jr .done_update
     .done_high
@@ -241,9 +242,17 @@ UpdatePlayer:
     ld a, [PAD_CURR]
     bit PADB_B, a
     jr nz, .done_low
+        ; SetPlayerTiles $40
         call PlayerHitLow
         jr .done_update
     .done_low
+        SetPlayerY MC_TOP_Y
+        
+        ld a, [rPLAYER]
+        res 3, a
+        ld [rPLAYER], a
+
+        ; SetPlayerTiles $00
         UpdatePlayerAnim $C010, $C01C, $30 ;, $FF
 
     .done_update
