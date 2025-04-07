@@ -93,6 +93,7 @@ InitPlayerSpriteData:
 Jump:
     ld a, [rPLAYER]
     bit 3, a
+    ld a, [SPRITE_0_ADDRESS + OAMA_Y]
     jr z, .go_up
         ld a, [SPRITE_0_ADDRESS + OAMA_Y]
         add 8
@@ -264,6 +265,7 @@ UpdatePlayer:
     bit PADB_A, a
     jr nz, .done_high
         ; SetPlayerTiles $70
+        call Jump
         call PlayerHitHigh
         jp .done_update
     .done_high

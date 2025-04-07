@@ -28,16 +28,24 @@ def GRAPHICS_DATA_SIZE              equ (TILES_BYTE_SIZE + TILEMAPS_BYTE_SIZE)
 def GRAPHICS_DATA_ADDRESS_END       equ ($8000)
 def GRAPHICS_DATA_ADDRESS_START     equ (GRAPHICS_DATA_ADDRESS_END - GRAPHICS_DATA_SIZE)
 
+def PALETTE_0                       equ %11100100
+def PALETTE_1                       equ %00011011
+
+def START_SCY                       equ 120
+def WY_OFS                          equ 136
+def LEVEL_SCY                       equ 0
+def UI_Y                            equ 112
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-section "sample", rom0
+section "sample", rom0 ; should this stay as "sample"?
 
 InitGraphics:
     ; init the palettes
-    ld a, %11100100
+    ld a, PALETTE_0
     ld [rBGP], a
     ld [rOBP0], a
-    ld a, %00011011
+    ld a, PALETTE_1
     ld [rOBP1], a
 
     ; init graphics data
@@ -50,85 +58,60 @@ InitGraphics:
     ei
 
     ; set bg to start screen
-    copy [rSCY], 120
+    copy [rSCY], START_SCY
 
     ; hide window offscreen
-    copy [rWX], 7
-    copy [rWY], 136
+    copy [rWX], WX_OFS
+    copy [rWY], WY_OFS
  
 
-    ; set macro data
-    ld a, GAME_BASE ; load settings here
-    ld [rGAME], a ; load (a) into the data 'register'
+    ; set up game and player settings
+    ld a, GAME_BASE 
+    ld [rGAME], a
     ld [rPLAYER], a
     ld [rPCA_COUNT], a
 
     ret
 
+; background scrolling
 UpdateGraphics:
     halt
 
-    ; get the joypad buttons that are being held!
-    ld a, [PAD_CURR]
-
-    ; moved jump call to player.asm -S
-    /*
-    ; jump when 'a' is held
-    bit PADB_A, a
-    jr nz, .done_jumping
-        ; using b as a counter for jump height
-        push af
-        push bc
-        call Jump
-        pop bc
-        copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-        pop af
-    .done_jumping
-    */
-
-    ; if started (screen Y = 0), start bg scrolling
+    ; if started, start bg scrolling
     ld a, [rGAME]
-    bit 0, a
+    bit GAMEB_STARTED, a
     jr z, .end_update
         ld a, [rSCX]
         inc a
         ld [rSCX], a
+
     .end_update
     ret
 
-;;; START SCREEN FUNCTIONALITY
+;;; START SCREEN FUNCTIONALITY - still need this?
 ; storing macro game data in $C004 for now
 ; bits: GAME_START | GAME_END | _ | _ | _ | _ | _ | _ 
 Start:
     halt ; --> is there a better placement to avoid slowing down the game?
 
-    push af
-
     ; check if game started
     ld a, [rGAME]
-    bit 0, a
-    jr nz, .done_starting 
-
-    ; *check indent formatting here
-    ; check if START was pressed
-    ld a, [PAD_CURR]
-    bit PADB_START, a
+    bit GAMEB_STARTED, a
     jr nz, .done_starting
-        ; move window to bottom of the LCD for UI (getting rid of start screen)
-        ld a, 0
-        ld [rSCY], a
-        ld a, 112
-        ld [rWY], a
+        ld a, [PAD_CURR]
+        bit PADB_START, a
+        jr nz, .done_starting
+            ; set up level screen
+            ld a, LEVEL_SCY
+            ld [rSCY], a
+            ld a, UI_Y
+            ld [rWY], a
 
-        call MovePlayerToStart
-        call MoveSpritesToStart
-    
-        ld a, [rGAME] ; TO-DO: make a macro for this
-        set 0, a
-        ld [rGAME], a
+            call MovePlayerToStart
+            call MoveSpritesToStart
+            StartGame
+
     .done_starting
-
-    pop af
     ret
 
 
