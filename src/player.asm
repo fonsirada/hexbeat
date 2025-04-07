@@ -4,6 +4,7 @@ include "src/hardware.inc"
 include "src/utils.inc"
 include "src/joypad.inc"
 include "src/sprites.inc"
+include "src/wram.inc"
 
 section "player", rom0
 
@@ -86,28 +87,11 @@ InitPlayerSpriteData:
 
 ; will be called every frame
 Jump:
-
-
-    ; sprites 0 1 2 and 3 4 5 have same Y respectively - $10 off
-    ld a, [SPRITE_0_ADDRESS + OAMA_Y]
-    ld b, 16
-    .go_up
-        dec a
-        dec a
-        halt
-        ld [SPRITE_0_ADDRESS + OAMA_Y], a
-        ld [SPRITE_1_ADDRESS + OAMA_Y], a
-        ld [SPRITE_2_ADDRESS + OAMA_Y], a
-        add $10
-        ld [SPRITE_3_ADDRESS + OAMA_Y], a
-        ld [SPRITE_4_ADDRESS + OAMA_Y], a
-        ld [SPRITE_5_ADDRESS + OAMA_Y], a
-        sub $10
-        dec b
-        jr nz, .go_up
-    
-    ld b, 16
-    .go_down
+    ld a, [rPLAYER]
+    bit 3, a
+    ; go up when flag is not set, down when set
+    jr z, .go_up
+        ld a, [SPRITE_0_ADDRESS + OAMA_Y]
         inc a
         inc a
         halt 
@@ -119,9 +103,40 @@ Jump:
         ld [SPRITE_4_ADDRESS + OAMA_Y], a
         ld [SPRITE_5_ADDRESS + OAMA_Y], a
         sub $10
-        dec b
-        jr nz, .go_down
+        jr .check_thres1
+
+    .go_up
+    ld a, [SPRITE_0_ADDRESS + OAMA_Y]
+    ; sprites 0 1 2 and 3 4 5 have same Y respectively - $10 off
+    dec a
+    dec a
+    halt
+    ld [SPRITE_0_ADDRESS + OAMA_Y], a
+    ld [SPRITE_1_ADDRESS + OAMA_Y], a
+    ld [SPRITE_2_ADDRESS + OAMA_Y], a
+    add $10
+    ld [SPRITE_3_ADDRESS + OAMA_Y], a
+    ld [SPRITE_4_ADDRESS + OAMA_Y], a
+    ld [SPRITE_5_ADDRESS + OAMA_Y], a
+    sub $10
     
+    .check_thres1
+    cp MC_JUMP_THRES
+    jr nz, .check_thres2
+        ; when you reach threshold, reset flag
+        ld a, [rPLAYER]
+        set 3, a
+        ld [rPLAYER], a
+        jr .return
+
+    .check_thres2
+    cp MC_TOP_Y
+    jr nz, .return
+        ld a, [rPLAYER]
+        res 3, a
+        ld [rPLAYER], a
+    
+    .return
     ret
 
 PlayerHitHigh:
