@@ -124,6 +124,32 @@ Jump:
     
     ret
 
+PlayerHitHigh:
+    ; copy [rGAME], GAME_B
+
+    ; hit shield
+    copy [SPRITE_9_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_9_ADDRESS + OAMA_X], 0
+
+    ; if on frame 3, run an additional frame
+    ; condition
+    ld a, [rGAME]
+    bit 6, a ;check for hold anim
+    jr nz, .extend_frame
+        UpdatePlayerAnim $C010, $C01C, $90 ;, $FF; $60
+
+        jr .end_frame_update
+    .extend_frame
+        copy [SPRITE_9_ADDRESS + OAMA_Y], MC_TOP_Y + 12
+        copy [SPRITE_9_ADDRESS + OAMA_X], 20 + 24
+        copy [rGAME], GAME_BASE
+    .end_frame_update
+    ; frame 1: ($40)
+    ; frame 2: ($50)
+    ; frame 3-4: ($60) + set shield visible
+    ret
+
+
 PlayerHitLow:
     ; copy [rGAME], GAME_B
 
