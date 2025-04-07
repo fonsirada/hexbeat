@@ -134,6 +134,7 @@ PlayerHitLow:
     bit 6, a ;check for hold anim
     jr nz, .extend_frame
         UpdatePlayerAnim $C010, $C01C, $60 ;, $FF; $60
+
         jr .end_frame_update
     .extend_frame
         copy [SPRITE_9_ADDRESS + OAMA_Y], MC_TOP_Y + 12
@@ -145,13 +146,36 @@ PlayerHitLow:
     ; frame 3-4: ($60) + set shield visible
     ret
 
+HandleJoypad:
+    ; uhhh trying a diff thing for now...
+    /*
+    ld a, [PAD_CURR]
+    bit PADB_B, a
+    jr nz, .skip_check
+    ld a, [rGAME]
+        set GAMEB_B, a
+        
+
+    bit PADB_A, a
+        set GAMEB_A, a
+    */
+    ret
+
+
+; problems:
+; need b_anim to run in full after pressing b, not just while holding
+; - also need b_anim to restart if pressing b again
+; - also, [hold] should NOT cause b to run again
+; similarly, restructure jump to run frame-by-frame instead of as its own func
+; - same issues w/ b_anim
+; might need macro to restore run anim sprite addresses after running player anim?
 UpdatePlayer:
     halt 
     halt
     halt
 
     /*
-    ; broken rn :(
+    ; joypad flag handling; broken rn :(
     ld a, [PAD_CURR]
     bit PADB_B, a
     ld a, [rGAME]
@@ -161,6 +185,15 @@ UpdatePlayer:
     bit 4, a
     */
 
+    ; add dual AB press condition here?
+
+    ld a, [PAD_CURR]
+    bit PADB_A, a
+    jr nz, .done_high
+        call PlayerHitHigh
+        jr .done_update
+    .done_high
+
     ld a, [PAD_CURR]
     bit PADB_B, a
     jr nz, .done_low
@@ -168,12 +201,7 @@ UpdatePlayer:
         jr .done_update
     .done_low
         UpdatePlayerAnim $C010, $C01C, $30 ;, $FF
-    ; if [A] pressed, run HighHit macro
-    ; if [B] pressed, run LowHit macro
-    ; else, update run
-    ; *macro to restore run anim sprite addresses
-    ;UpdateRunAnim
-        
+
     .done_update
     ret
 

@@ -85,6 +85,8 @@ MoveSpritesToStart:
     copy [SPRITE_11_ADDRESS + OAMA_X], 0
 
 
+; add per spell location check (if health needs to decrease)
+
 UpdateSprites:
     ; scrolling spell 1
     ld a, [SPRITE_10_ADDRESS + OAMA_X]
@@ -97,6 +99,7 @@ UpdateSprites:
     ld [SPRITE_11_ADDRESS + OAMA_X], a
 
     ret
+
 
 
 export InitSpriteData, InitSprites, UpdateSprites, MoveSpritesToStart

@@ -26,6 +26,9 @@ def GAME_HOLDANIM           equ %01000000
 def GAME_A                  equ %00100000
 def GAME_B                  equ %00010000
 
+def GAMEB_A                 equ 5
+def GAMEB_B                 equ 4
+
 
 ;;;;; stuff from joypad 2 reading ;;;;;
 
