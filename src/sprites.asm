@@ -1,4 +1,9 @@
-; header here
+; 
+; CS-240 World 5: Basic Game Functionality
+;
+; @file sprites.asm
+; @author Sydney Chen, Alfonso Rada
+; @brief storing non-player sprite functions
 
 ; tile conversion commands:
 ; /Users/sydneychen/Desktop/cs240/aseprite/build/bin/aseprite
