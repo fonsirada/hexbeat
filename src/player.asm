@@ -17,7 +17,7 @@ section "player", rom0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-InitPlayer:
+init_player:
     ; MC.00
     copy [SPRITE_0_ADDRESS + OAMA_Y], 0
     copy [SPRITE_0_ADDRESS + OAMA_X], 0
@@ -56,7 +56,7 @@ InitPlayer:
 
     ret
 
-MovePlayerToStart:
+move_player_to_start:
     ; MC.00
     copy [SPRITE_0_ADDRESS + OAMA_Y], MC_TOP_Y
     copy [SPRITE_0_ADDRESS + OAMA_X], 20
@@ -84,7 +84,7 @@ MovePlayerToStart:
     ret
 
 ; put PC sprite ids in WRAM
-InitPlayerSpriteData:
+init_player_sprite_data:
     copy16bit [$C010], [$C011], _OAMRAM
     copy16bit [$C012], [$C013], _OAMRAM + sizeof_OAM_ATTRS * 1
     copy16bit [$C014], [$C015], _OAMRAM + sizeof_OAM_ATTRS * 2
@@ -94,7 +94,7 @@ InitPlayerSpriteData:
 
     ret
 
-Jump:
+jump:
     ld a, [rPLAYER]
     bit PLAYERB_FALL, a
     ld a, [SPRITE_0_ADDRESS + OAMA_Y]
@@ -122,14 +122,14 @@ Jump:
     .return
     ret
 
-PlayerHitHigh:
+player_hit_high:
     ld a, [rPLAYER]
     bit PLAYERB_HOLD, a
 
     jr nz, .extend_frame
         ; go to next frame
         UpdatePlayerAnim $C010, $C01C, $90 
-        call Jump
+        call jump
         jr .end_frame_update
 
     .extend_frame
@@ -141,7 +141,7 @@ PlayerHitHigh:
     .end_frame_update
     ret
 
-PlayerHitLow:
+player_hit_low:
     ld a, [rPLAYER]
     bit PLAYERB_HOLD, a
 
@@ -160,7 +160,7 @@ PlayerHitLow:
     ret
 
 ; updates the player animation based on joypad press
-UpdatePlayer:
+update_player:
     halt 
     halt
     halt
@@ -169,21 +169,21 @@ UpdatePlayer:
     
     ld a, [PAD_CURR]
     bit PADB_B, a
-    jr nz, .skip_B
+    jr nz, .skip_b
         RegBitOp rPLAYER, PLAYERB_B, set
         copy [rPCA_COUNT], $00 
         SetPlayerTiles $30
-    .skip_B
+    .skip_b
     
     ;ProcessInputForAnim PADB_B, PLAYERB_B, $30
     
     ld a, [PAD_CURR]
     bit PADB_A, a
-    jr nz, .skip_A
+    jr nz, .skip_a
         RegBitOp rPLAYER, PLAYERB_A, set
         copy [rPCA_COUNT], $00
         SetPlayerTiles $60
-    .skip_A
+    .skip_a
 
     ; check if current frame should be held
     ld a, [rPCA_COUNT]
@@ -203,7 +203,7 @@ UpdatePlayer:
         cp a, $4
         jr z, .update_a
             SetPlayerY MC_TOP_Y
-            call PlayerHitLow
+            call player_hit_low
             RegOp rPCA_COUNT, inc
 
             jr .done_update
@@ -215,7 +215,7 @@ UpdatePlayer:
         ld a, [rPCA_COUNT]
         cp a, $4
         jr z, .update_run
-            call PlayerHitHigh
+            call player_hit_high
             RegOp rPCA_COUNT, inc
 
             jr .done_update
@@ -236,4 +236,4 @@ UpdatePlayer:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export Jump, UpdatePlayer, InitPlayer, InitPlayerSpriteData, MovePlayerToStart
+export jump, update_player, init_player, init_player_sprite_data, move_player_to_start

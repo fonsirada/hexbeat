@@ -133,7 +133,7 @@ start:
             ld [rWY], a
 
             call move_player_to_start
-            call move_sprites_toStart
+            call move_sprites_to_start
             RegBitOp rGAME, GAMEB_START, set
 
     .done_starting

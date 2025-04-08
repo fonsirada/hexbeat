@@ -15,15 +15,15 @@ section "sprites", rom0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-InitSpriteData:
-    call InitPlayerSpriteData
+init_sprite_data:
+    call init_player_sprite_data
     ; to-do:
     ; - add 'shield' sprites
     ; - add multiple spell sprites
 
     ret
 
-InitSprites:
+init_sprites:
     ; TARGETS
     copy [SPRITE_6_ADDRESS + OAMA_Y], 0
     copy [SPRITE_6_ADDRESS + OAMA_X], 0
@@ -71,7 +71,7 @@ InitSprites:
 
     ret
 
-MoveSpritesToStart:
+move_sprites_to_start:
     ; TARGETS
     copy [SPRITE_6_ADDRESS + OAMA_Y], MC_TOP_Y - 16
     copy [SPRITE_6_ADDRESS + OAMA_X], 20 + 32
@@ -89,7 +89,7 @@ MoveSpritesToStart:
 
 ; add per spell location check (if health needs to decrease)
 
-UpdateSprites:
+update_sprites:
     ; scrolling spell 1
     ld a, [SPRITE_10_ADDRESS + OAMA_X]
     dec a
@@ -106,4 +106,4 @@ UpdateSprites:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export InitSpriteData, InitSprites, UpdateSprites, MoveSpritesToStart
+export init_sprite_data, init_sprites, update_sprites, move_sprites_to_start
