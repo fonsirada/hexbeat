@@ -41,6 +41,7 @@ def MC_JUMP_THRES equ (MC_TOP_Y - 24)
 ;;; PLAYER MACROS
 
 ; updates the Player sprite(s) to the next frame
+; by looping thru sprite locations stored in WRAM
 ; run as: UpdatePlayerAnim (WRAM start address, WRAM end address, ending tileID)
 ; ex: UpdatePlayerAnim $C010, $C01C, $30
 macro UpdatePlayerAnim
@@ -49,7 +50,7 @@ macro UpdatePlayerAnim
     push hl
 
     ; starting address
-    ld hl, \1 ; $C010 ; or, PC_SPRITE_1_LOC
+    ld hl, \1
 
     ; loop through sprites thru WRAM address locs
     .next_tile
@@ -66,36 +67,6 @@ macro UpdatePlayerAnim
     ld a, l
     add a, OAMA_TILEID
     ld l, a
-
-    ; HOLD IS BROKEN; FIGURE OUT WHY.
-    ; hold a frame --> move to start?
-    /*
-    ld a, [rGAME]
-    bit 6, a
-    jr nz, .skip_hold
-        ; end update and reset hold flag
-        ; ld a, [rGAME]
-        xor GAME_HOLDANIM
-        ld [rGAME], a
-
-        jr .end_update
-    .skip_hold
-
-    ; load tile ID into (a)
-    ld a, [hl] 
-
-    ; check if raising hold flag
-    ; cp first tileID w/ given tile ID, if equal, set flag
-    ; if no hold desired, set arbitrarily high 4th param
-    cp a, \4
-    jr nz, .done_hold_check
-        ld a, [rGAME] ; make this a macro
-        xor GAME_HOLDANIM
-        ld [rGAME], a
-    .done_hold_check
-    */
-    ; ld a, \4
-
     ld a, [hl] 
 
     ; check if last frame was reached
@@ -118,7 +89,7 @@ macro UpdatePlayerAnim
     
     ; check if last sprite was reached in WRAM
     ld a, l
-    cp a, low(\2); $1C 
+    cp a, low(\2)
     jr nz, .next_tile
 
     .end_update
