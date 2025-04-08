@@ -15,14 +15,13 @@ section "sprites", rom0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; place sprite locations into WRAM
 init_sprite_data:
     call init_player_sprite_data
-    ; to-do:
-    ; - add 'shield' sprites
-    ; - add multiple spell sprites
 
     ret
 
+; initalize sprites and their attributes
 init_sprites:
     ; TARGETS
     copy [SPRITE_6_ADDRESS + OAMA_Y], 0
@@ -88,17 +87,13 @@ move_sprites_to_start:
 
     ret
 
-; add per spell location check (if health needs to decrease)
 
 update_sprites:
     ; scrolling spell 1
     ld a, [SPRITE_10_ADDRESS + OAMA_X]
-    dec a
-    dec a
-    dec a
-    dec a
+    sub 4
     ld [SPRITE_10_ADDRESS + OAMA_X], a
-    add a, 8
+    add 8
     ld [SPRITE_11_ADDRESS + OAMA_X], a
 
     SetShieldLocations 0, 0, 0, 0

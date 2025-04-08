@@ -49,48 +49,46 @@ macro UpdatePlayerAnim
     push bc
     push hl
 
-    ; starting address
     ld hl, \1
 
     ; loop through sprites thru WRAM address locs
     .next_tile
-    push hl
+        push hl
 
-    ; store sprite address in hl
-    ld b, [hl]
-    inc hl
-    ld c, [hl]
-    ld h, b
-    ld l, c
+        ; store sprite address in hl
+        ld b, [hl]
+        inc hl
+        ld c, [hl]
+        ld h, b
+        ld l, c
 
-    ; get sprite's tileid address
-    ld a, l
-    add a, OAMA_TILEID
-    ld l, a
-    ld a, [hl] 
+        ; get sprite's tileID address
+        ld a, l
+        add a, OAMA_TILEID
+        ld l, a
+        ld a, [hl] 
 
-    ; check if last frame was reached
-    cp a, \3
-    jr c, .load_new_tileid
-        ; reset to first frame
-        sub a, \3
-        jr .finish_load
+        ; change tileID as appropriate
+        cp a, \3
+        jr c, .load_new_tileid
+            sub a, \3
+            jr .finish_tile_load
 
-    .load_new_tileid
-        add a, $10
+        .load_new_tileid
+            add a, $10
 
-    .finish_load
-    ld [hl], a
+        .finish_tile_load
+        ld [hl], a
 
-    ; now going to next sprite in WRAM...
-    pop hl
-    inc hl
-    inc hl
+        ; now going to next sprite in WRAM...
+        pop hl
+        inc hl
+        inc hl
     
-    ; check if last sprite was reached in WRAM
-    ld a, l
-    cp a, low(\2)
-    jr nz, .next_tile
+        ; check if last sprite was reached in WRAM
+        ld a, l
+        cp a, low(\2)
+        jr nz, .next_tile
 
     .end_update
     pop hl
