@@ -38,7 +38,7 @@ def MC_JUMP_THRES equ (MC_TOP_Y - 24)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;; PLAYER MACROS
+;;; PLAYER MACROS ;;;
 
 ; updates the Player sprite(s) to the next frame
 ; by looping thru sprite locations stored in WRAM
@@ -80,7 +80,7 @@ macro UpdatePlayerAnim
         .finish_tile_load
         ld [hl], a
 
-        ; now going to next sprite in WRAM...
+        ; go to next tile in WRAM
         pop hl
         inc hl
         inc hl
@@ -96,6 +96,7 @@ macro UpdatePlayerAnim
     pop af
 endm
 
+; set an input's associated animation flags/registers/tileIDs
 macro ProcessInputForAnim
     ld a, [PAD_CURR]
     bit \1, a
@@ -117,15 +118,6 @@ macro SetPlayerTiles
 
 endm
 
-; set 'shield' sprite locations in form (x1, y1), (x2, y2)
-macro SetShieldLocations
-    copy [SPRITE_8_ADDRESS + OAMA_X], \1
-    copy [SPRITE_8_ADDRESS + OAMA_Y], \2
-    
-    copy [SPRITE_9_ADDRESS + OAMA_X], \3
-    copy [SPRITE_9_ADDRESS + OAMA_Y], \4
-endm
-
 ; set the Player sprite(s)'s X or Y value based on the first sprite
 macro SetPlayerCoord
     ld a, \1
@@ -137,6 +129,17 @@ macro SetPlayerCoord
     ld [SPRITE_4_ADDRESS + \2], a
     ld [SPRITE_5_ADDRESS + \2], a
     sub a, $10
+endm
+
+;;; SPRITE MACROS ;;;
+
+; set 'shield' sprite locations in form (x1, y1), (x2, y2)
+macro SetShieldLocations
+    copy [SPRITE_8_ADDRESS + OAMA_X], \1
+    copy [SPRITE_8_ADDRESS + OAMA_Y], \2
+    
+    copy [SPRITE_9_ADDRESS + OAMA_X], \3
+    copy [SPRITE_9_ADDRESS + OAMA_Y], \4
 endm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
