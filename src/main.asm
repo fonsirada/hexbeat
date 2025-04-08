@@ -3,7 +3,7 @@
 ;
 ; @file main.asm
 ; @author Darren Strash, Sydney Chen, Alfonso Rada
-; @date April 6, 2025
+; @date April 7, 2025
 ;
 ; build with:
 ; make
@@ -20,7 +20,6 @@ entrypoint:
     di
     jp main
     ds ($0150 - @), 0
-
     
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -45,8 +44,7 @@ main:
             call update_graphics
             call update_sprites
             call update_player
+
         .post_graphics
-
         UpdateJoypad
-
         jr .loop

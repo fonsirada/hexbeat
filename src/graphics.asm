@@ -3,6 +3,7 @@
 ;
 ; @file graphics.asm
 ; @author Darren Strash, Sydney Chen, Alfonso Rada
+; @date April 7, 2025
 ; @brief store overall graphics-related functions
 
 include "src/utils.inc"
@@ -27,6 +28,8 @@ def TILEMAPS_BYTE_SIZE              equ (TILEMAPS_COUNT * BYTES_PER_TILEMAP)
 def GRAPHICS_DATA_SIZE              equ (TILES_BYTE_SIZE + TILEMAPS_BYTE_SIZE)
 def GRAPHICS_DATA_ADDRESS_END       equ ($8000)
 def GRAPHICS_DATA_ADDRESS_START     equ (GRAPHICS_DATA_ADDRESS_END - GRAPHICS_DATA_SIZE)
+
+def BG_SCROLL_SPEED                 equ 2
 
 def PALETTE_0                       equ %11100100
 def PALETTE_1                       equ %00011011
@@ -105,7 +108,7 @@ update_graphics:
 
     ; scroll bg
     ld a, [rSCX]
-    add 2
+    add BG_SCROLL_SPEED
     ld [rSCX], a
 
     ret

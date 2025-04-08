@@ -3,6 +3,7 @@
 ;
 ; @file utils.inc
 ; @author Darren Strash, Sydney Chen, Alfonso Rada
+; @date April 7, 2025
 ; @brief store general usage macros
 
 if !def(UTILS_RGBINC)

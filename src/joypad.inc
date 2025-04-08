@@ -2,7 +2,8 @@
 ; CS 240: Storing Joypad state, including pressed/released/etc
 ;
 ; @file joypad.inc
-; @author Darren Strash
+; @author Darren Strash, Sydney Chen, Alfonso Rada
+; @date April 7, 2025
 ; @brief stores joypad handling macros
 
 if !def(JOYPAD_RGBINC)
