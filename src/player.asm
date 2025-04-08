@@ -17,6 +17,19 @@ section "player", rom0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; player sprites
+def SPRITE_0_ADDRESS equ (_OAMRAM)
+def SPRITE_1_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS)
+def SPRITE_2_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 2)
+def SPRITE_3_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 3)
+def SPRITE_4_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 4)
+def SPRITE_5_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 5)
+
+def INITIAL_PLAYER_LOC                  equ 0
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 init_player:
     ; MC.00
     copy [SPRITE_0_ADDRESS + OAMA_Y], 0
