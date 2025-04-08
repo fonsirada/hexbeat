@@ -123,32 +123,25 @@ Jump:
     ret
 
 PlayerHitHigh:
-    ; reset shield loc
-    copy [SPRITE_9_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_9_ADDRESS + OAMA_X], 0
-
     ; if on frame 3, run an additional frame
     ; condition
     ld a, [rPLAYER]
     bit PLAYERB_HOLD, a
     jr nz, .extend_frame
         UpdatePlayerAnim $C010, $C01C, $90 
+        call Jump
         jr .end_frame_update
     .extend_frame
-        copy [SPRITE_9_ADDRESS + OAMA_Y], MC_TOP_Y + 12
-        copy [SPRITE_9_ADDRESS + OAMA_X], 20 + 24
-        copy [rGAME], GAME_BASE
+        copy [SPRITE_8_ADDRESS + OAMA_Y], MC_TOP_Y - 20
+        copy [SPRITE_8_ADDRESS + OAMA_X], 20 + 24
+        RegBitOp rPLAYER, PLAYERB_HOLD, res
     .end_frame_update
     ; frame 3-4: ($60) + set shield visible
 
-    call Jump ; may req some pushing/pulling
+     ; may req some pushing/pulling
     ret
 
 PlayerHitLow:
-    ; reset shield loc
-    copy [SPRITE_9_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_9_ADDRESS + OAMA_X], 0
-
     ; if on frame 3, run an additional frame
     ld a, [rPLAYER]
     bit PLAYERB_HOLD, a
@@ -158,10 +151,9 @@ PlayerHitLow:
     .extend_frame
         copy [SPRITE_9_ADDRESS + OAMA_Y], MC_TOP_Y + 12
         copy [SPRITE_9_ADDRESS + OAMA_X], 20 + 24
-        copy [rGAME], GAME_BASE
+        RegBitOp rPLAYER, PLAYERB_HOLD, res
     .end_frame_update
-    ; frame 1: ($40)
-    ; frame 2: ($50)
+
     ; frame 3-4: ($60) + set shield visible
     ret
 
@@ -193,12 +185,20 @@ UpdatePlayer:
 
     ; IF/ELSE -> if A is set, run animA, if B is set run animB, else run Run
     ; this if/else structure sucks.
+    ld a, [rPCA_COUNT]
+    cp a, $4
+    jr nz, .done_hold_check
+    cp a, $3
+    jr nz, .done_hold_check
+    .raise_hold
+        RegBitOp rPLAYER, PLAYERB_HOLD, set
+    .done_hold_check
+
     ld a, [rPLAYER]
     bit PLAYERB_B, a
     jr z, .update_a
-        ; update B
         ld a, [rPCA_COUNT]
-        cp a, $3
+        cp a, $4
         jr z, .update_a
             SetPlayerY MC_TOP_Y
             call PlayerHitLow
@@ -211,7 +211,7 @@ UpdatePlayer:
         jr z, .update_run
         
         ld a, [rPCA_COUNT]
-        cp a, $3
+        cp a, $4
         jr z, .update_run
             call PlayerHitHigh
             RegOp rPCA_COUNT, inc

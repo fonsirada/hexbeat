@@ -43,8 +43,8 @@ main:
         bit GAMEB_START, a
         jr z, .post_graphics
             call UpdateGraphics
-            call UpdatePlayer
             call UpdateSprites
+            call UpdatePlayer
         .post_graphics
 
         UpdateJoypad

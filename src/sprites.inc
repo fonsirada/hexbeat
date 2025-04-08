@@ -136,7 +136,17 @@ macro SetPlayerTiles
    copy [SPRITE_4_ADDRESS + OAMA_TILEID], \1 + 8
    copy [SPRITE_5_ADDRESS + OAMA_TILEID], \1 + 10
 
-   endm
+endm
+
+macro SetShieldLocations
+    ; reset shield loc
+    copy [SPRITE_8_ADDRESS + OAMA_Y], \1
+    copy [SPRITE_8_ADDRESS + OAMA_X], \2
+    
+    ; reset shield loc
+    copy [SPRITE_9_ADDRESS + OAMA_Y], \3
+    copy [SPRITE_9_ADDRESS + OAMA_X], \4
+endm
 
 ; set the Player sprite(s)'s Y value based on the first sprite
 macro SetPlayerY

@@ -100,6 +100,8 @@ UpdateSprites:
     add a, 8
     ld [SPRITE_11_ADDRESS + OAMA_X], a
 
+    SetShieldLocations 0, 0, 0, 0
+
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
