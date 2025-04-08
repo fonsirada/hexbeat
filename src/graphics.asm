@@ -131,8 +131,8 @@ start:
             ld a, UI_Y
             ld [rWY], a
 
-            call MovePlayerToStart
-            call MoveSpritesToStart
+            call move_player_to_start
+            call move_sprites_toStart
             RegBitOp rGAME, GAMEB_START, set
 
     .done_starting
