@@ -52,8 +52,7 @@ macro RegOp
     ld [\1], a
 endm
 
-
-;;; LCD CONTROL
+;;; LCD CONTROL ;;;
 
 macro DisableLCD
     ; wait for the vblank

@@ -119,26 +119,25 @@ macro SetPlayerTiles
 
 endm
 
+; set 'shield' sprite locations in form (x1, y1), (x2, y2)
 macro SetShieldLocations
-    ; reset shield loc
-    copy [SPRITE_8_ADDRESS + OAMA_Y], \1
-    copy [SPRITE_8_ADDRESS + OAMA_X], \2
+    copy [SPRITE_8_ADDRESS + OAMA_X], \1
+    copy [SPRITE_8_ADDRESS + OAMA_Y], \2
     
-    ; reset shield loc
-    copy [SPRITE_9_ADDRESS + OAMA_Y], \3
-    copy [SPRITE_9_ADDRESS + OAMA_X], \4
+    copy [SPRITE_9_ADDRESS + OAMA_X], \3
+    copy [SPRITE_9_ADDRESS + OAMA_Y], \4
 endm
 
-; set the Player sprite(s)'s Y value based on the first sprite
-macro SetPlayerY
+; set the Player sprite(s)'s X or Y value based on the first sprite
+macro SetPlayerCoord
     ld a, \1
-    ld [SPRITE_0_ADDRESS + OAMA_Y], a
-    ld [SPRITE_1_ADDRESS + OAMA_Y], a
-    ld [SPRITE_2_ADDRESS + OAMA_Y], a
+    ld [SPRITE_0_ADDRESS + \2], a
+    ld [SPRITE_1_ADDRESS + \2], a
+    ld [SPRITE_2_ADDRESS + \2], a
     add a, $10
-    ld [SPRITE_3_ADDRESS + OAMA_Y], a
-    ld [SPRITE_4_ADDRESS + OAMA_Y], a
-    ld [SPRITE_5_ADDRESS + OAMA_Y], a
+    ld [SPRITE_3_ADDRESS + \2], a
+    ld [SPRITE_4_ADDRESS + \2], a
+    ld [SPRITE_5_ADDRESS + \2], a
     sub a, $10
 endm
 

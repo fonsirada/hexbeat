@@ -100,12 +100,12 @@ jump:
     ld a, [SPRITE_0_ADDRESS + OAMA_Y]
     jr z, .go_up
         add 8
-        SetPlayerY a
+        SetPlayerCoord a, OAMA_Y
         jr .check_thres1
 
     .go_up
     sub 8
-    SetPlayerY a
+    SetPlayerCoord a, OAMA_Y
     
     ; go back down
     .check_thres1
@@ -166,29 +166,13 @@ update_player:
     halt
 
     ; set flags from joypad input
-    
-    ld a, [PAD_CURR]
-    bit PADB_B, a
-    jr nz, .skip_b
-        RegBitOp rPLAYER, PLAYERB_B, set
-        copy [rPCA_COUNT], $00 
-        SetPlayerTiles $30
-    .skip_b
-    
-    ;ProcessInputForAnim PADB_B, PLAYERB_B, $30
-    
-    ld a, [PAD_CURR]
-    bit PADB_A, a
-    jr nz, .skip_a
-        RegBitOp rPLAYER, PLAYERB_A, set
-        copy [rPCA_COUNT], $00
-        SetPlayerTiles $60
-    .skip_a
+    ProcessInputForAnim PADB_B, PLAYERB_B, $30
+    ProcessInputForAnim PADB_A, PLAYERB_A, $60
 
     ; check if current frame should be held
     ld a, [rPCA_COUNT]
-    cp a, $4
-    jr nz, .done_hold_check
+    ;cp a, $4
+    ;jr nz, .done_hold_check
     cp a, $3
     jr nz, .done_hold_check
     .raise_hold
@@ -198,11 +182,12 @@ update_player:
     ; determine which player animation to run
     ld a, [rPLAYER]
     bit PLAYERB_B, a
+
     jr z, .update_a
         ld a, [rPCA_COUNT]
         cp a, $4
         jr z, .update_a
-            SetPlayerY MC_TOP_Y
+            SetPlayerCoord MC_TOP_Y, OAMA_Y
             call player_hit_low
             RegOp rPCA_COUNT, inc
 
@@ -224,7 +209,7 @@ update_player:
         RegBitOp rPLAYER, PLAYERB_B, res
         RegBitOp rPLAYER, PLAYERB_B, res
     
-        SetPlayerY MC_TOP_Y
+        SetPlayerCoord MC_TOP_Y, OAMA_Y
         ld a, [rPLAYER]
         res 3, a
         ld [rPLAYER], a

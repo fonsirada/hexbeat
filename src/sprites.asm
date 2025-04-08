@@ -86,6 +86,7 @@ move_sprites_to_start:
     copy [SPRITE_11_ADDRESS + OAMA_Y], MC_TOP_Y - 20
     copy [SPRITE_11_ADDRESS + OAMA_X], 0
 
+    ret
 
 ; add per spell location check (if health needs to decrease)
 
