@@ -10,14 +10,6 @@ def SPRITES_RGBINC equ 1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; PLAYER
-def SPRITE_0_ADDRESS equ (_OAMRAM)
-def SPRITE_1_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS)
-def SPRITE_2_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 2)
-def SPRITE_3_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 3)
-def SPRITE_4_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 4)
-def SPRITE_5_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 5)
-
 ; TARGETS
 def SPRITE_6_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 6)
 def SPRITE_7_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 7)
