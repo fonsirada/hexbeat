@@ -38,6 +38,7 @@ def SPRITE_0_3_LEVEL_X              equ 20
 def SPRITE_1_4_LEVEL_X              equ 28
 def SPRITE_2_5_LEVEL_X              equ 36
 
+; location of 1st player sprite
 def SPRITE_0_A_WRAM_LOCATION        equ $C010
 def SPRITE_0_B_WRAM_LOCATION        equ $C011
 def SPRITE_1_A_WRAM_LOCATION        equ $C012
@@ -50,6 +51,24 @@ def SPRITE_4_A_WRAM_LOCATION        equ $C018
 def SPRITE_4_B_WRAM_LOCATION        equ $C019
 def SPRITE_5_A_WRAM_LOCATION        equ $C01A
 def SPRITE_5_B_WRAM_LOCATION        equ $C01B
+
+def JUMP_INCREMENT                  equ 8
+
+; no more sprites at and including this wram address
+def SPRITE_ANIM_WRAM_THRES          equ $C01C
+; hit high animation stops at this tile
+def SPRITE_HIT_HIGH_THRES_TILEID    equ $90
+; hit low animation stops AND hit high animation begins at this tile
+def SPRITE_HIT_LOW_THRES_TILEID     equ $60
+; run animation stops AND hit low animation begins at this tile
+def SPRITE_RUN_THRES_TILEID         equ $30
+
+def HIT_HIGH_SHIELD_Y               equ MC_TOP_Y - 20
+def HIT_LOW_SHIELD_Y                equ MC_TOP_Y + 12
+def SHIELD_X                        equ 44
+
+def FRAME_TO_HOLD                   equ $3
+def HIT_ANIM_LENGTH                 equ $4
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -132,23 +151,24 @@ init_player_sprite_data:
     ret
 
 jump:
+    ; check if player should be going up or down
     ld a, [rPLAYER]
     bit PLAYERB_FALL, a
     ld a, [SPRITE_0_ADDRESS + OAMA_Y]
     jr z, .go_up
-        add 8
+        add JUMP_INCREMENT
         SetPlayerCoord a, OAMA_Y
         jr .check_thres1
 
     .go_up
-    sub 8
+    sub JUMP_INCREMENT
     SetPlayerCoord a, OAMA_Y
     
     ; go back down
     .check_thres1
     cp MC_JUMP_THRES
     jr nz, .check_thres2
-        RegBitOp rPLAYER, PLAYERB_FALL, set ; not sure why this is blue...
+        RegBitOp rPLAYER, PLAYERB_FALL, set
         jr .return
 
     ; go back up
@@ -156,41 +176,44 @@ jump:
     cp MC_TOP_Y
     jr nz, .return
         RegBitOp rPLAYER, PLAYERB_FALL, res
+
     .return
     ret
 
+; animation for player hit high
 player_hit_high:
     ld a, [rPLAYER]
     bit PLAYERB_HOLD, a
 
     jr nz, .extend_frame
         ; go to next frame
-        UpdatePlayerAnim $C010, $C01C, $90 
+        UpdatePlayerAnim SPRITE_0_A_WRAM_LOCATION, SPRITE_ANIM_WRAM_THRES, SPRITE_HIT_HIGH_THRES_TILEID
         call jump
         jr .end_frame_update
 
     .extend_frame
         ; frame 3-4: ($60) + set shield visible
-        copy [SPRITE_8_ADDRESS + OAMA_Y], MC_TOP_Y - 20
-        copy [SPRITE_8_ADDRESS + OAMA_X], 20 + 24
+        copy [SPRITE_8_ADDRESS + OAMA_Y], HIT_HIGH_SHIELD_Y
+        copy [SPRITE_8_ADDRESS + OAMA_X], SHIELD_X
         RegBitOp rPLAYER, PLAYERB_HOLD, res
 
     .end_frame_update
     ret
 
+; animation for player hit low
 player_hit_low:
     ld a, [rPLAYER]
     bit PLAYERB_HOLD, a
 
     jr nz, .extend_frame
         ; go to next frame
-        UpdatePlayerAnim $C010, $C01C, $60
+        UpdatePlayerAnim SPRITE_0_A_WRAM_LOCATION, SPRITE_ANIM_WRAM_THRES, SPRITE_HIT_LOW_THRES_TILEID
         jr .end_frame_update
 
     .extend_frame
         ; frame 3-4: ($60) + set shield visible
-        copy [SPRITE_9_ADDRESS + OAMA_Y], MC_TOP_Y + 12
-        copy [SPRITE_9_ADDRESS + OAMA_X], 20 + 24
+        copy [SPRITE_9_ADDRESS + OAMA_Y], HIT_LOW_SHIELD_Y
+        copy [SPRITE_9_ADDRESS + OAMA_X], SHIELD_X
         RegBitOp rPLAYER, PLAYERB_HOLD, res
     
         .end_frame_update
@@ -203,26 +226,24 @@ update_player:
     halt
 
     ; set flags from joypad input
-    ProcessInputForAnim PADB_B, PLAYERB_B, $30
-    ProcessInputForAnim PADB_A, PLAYERB_A, $60
+    ProcessInputForAnim PADB_B, PLAYERB_B, SPRITE_RUN_THRES_TILEID
+    ProcessInputForAnim PADB_A, PLAYERB_A, SPRITE_HIT_LOW_THRES_TILEID
 
     ; check if current frame should be held
     ld a, [rPCA_COUNT]
-    ;cp a, $4
-    ;jr nz, .done_hold_check
-    cp a, $3
+    cp FRAME_TO_HOLD
     jr nz, .done_hold_check
     .raise_hold
         RegBitOp rPLAYER, PLAYERB_HOLD, set
     .done_hold_check
 
     ; determine which player animation to run
+    ; 'b' button press
     ld a, [rPLAYER]
     bit PLAYERB_B, a
-
     jr z, .update_a
         ld a, [rPCA_COUNT]
-        cp a, $4
+        cp HIT_ANIM_LENGTH
         jr z, .update_a
             SetPlayerCoord MC_TOP_Y, OAMA_Y
             call player_hit_low
@@ -230,28 +251,28 @@ update_player:
 
             jr .done_update
 
+    ; 'a' button press
     .update_a
         bit PLAYERB_A, a
         jr z, .update_run
         
         ld a, [rPCA_COUNT]
-        cp a, $4
+        cp HIT_ANIM_LENGTH
         jr z, .update_run
             call player_hit_high
             RegOp rPCA_COUNT, inc
 
             jr .done_update
     
+    ; no button press
     .update_run
         RegBitOp rPLAYER, PLAYERB_B, res
         RegBitOp rPLAYER, PLAYERB_B, res
     
         SetPlayerCoord MC_TOP_Y, OAMA_Y
-        ld a, [rPLAYER]
-        res 3, a
-        ld [rPLAYER], a
+        RegBitOp rPLAYER, PLAYERB_FALL, res
 
-        UpdatePlayerAnim $C010, $C01C, $30
+        UpdatePlayerAnim SPRITE_0_A_WRAM_LOCATION, SPRITE_ANIM_WRAM_THRES, SPRITE_RUN_THRES_TILEID
 
     .done_update
     ret
