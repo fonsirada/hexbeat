@@ -18,53 +18,77 @@ section "player", rom0
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; player sprites
-def SPRITE_0_ADDRESS equ (_OAMRAM)
-def SPRITE_1_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS)
-def SPRITE_2_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 2)
-def SPRITE_3_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 3)
-def SPRITE_4_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 4)
-def SPRITE_5_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 5)
+def SPRITE_0_ADDRESS                equ (_OAMRAM)
+def SPRITE_1_ADDRESS                equ (_OAMRAM + sizeof_OAM_ATTRS)
+def SPRITE_2_ADDRESS                equ (_OAMRAM + sizeof_OAM_ATTRS * 2)
+def SPRITE_3_ADDRESS                equ (_OAMRAM + sizeof_OAM_ATTRS * 3)
+def SPRITE_4_ADDRESS                equ (_OAMRAM + sizeof_OAM_ATTRS * 4)
+def SPRITE_5_ADDRESS                equ (_OAMRAM + sizeof_OAM_ATTRS * 5)
 
-def INITIAL_PLAYER_LOC                  equ 0
+def INITIAL_PLAYER_XY               equ 0
+
+def SPRITE_0_TILEID                 equ 0
+def SPRITE_1_TILEID                 equ 2
+def SPRITE_2_TILEID                 equ 4
+def SPRITE_3_TILEID                 equ 6
+def SPRITE_4_TILEID                 equ 8
+def SPRITE_5_TILEID                 equ 10
+
+def SPRITE_0_3_LEVEL_X              equ 20
+def SPRITE_1_4_LEVEL_X              equ 28
+def SPRITE_2_5_LEVEL_X              equ 36
+
+def SPRITE_0_A_WRAM_LOCATION        equ $C010
+def SPRITE_0_B_WRAM_LOCATION        equ $C011
+def SPRITE_1_A_WRAM_LOCATION        equ $C012
+def SPRITE_1_B_WRAM_LOCATION        equ $C013
+def SPRITE_2_A_WRAM_LOCATION        equ $C014
+def SPRITE_2_B_WRAM_LOCATION        equ $C015
+def SPRITE_3_A_WRAM_LOCATION        equ $C016
+def SPRITE_3_B_WRAM_LOCATION        equ $C017
+def SPRITE_4_A_WRAM_LOCATION        equ $C018
+def SPRITE_4_B_WRAM_LOCATION        equ $C019
+def SPRITE_5_A_WRAM_LOCATION        equ $C01A
+def SPRITE_5_B_WRAM_LOCATION        equ $C01B
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 init_player:
     ; MC.00
-    copy [SPRITE_0_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_0_ADDRESS + OAMA_X], 0
-    copy [SPRITE_0_ADDRESS + OAMA_TILEID], 0
+    copy [SPRITE_0_ADDRESS + OAMA_Y], INITIAL_PLAYER_XY
+    copy [SPRITE_0_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
+    copy [SPRITE_0_ADDRESS + OAMA_TILEID], SPRITE_0_TILEID
     copy [SPRITE_0_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
     ; MC.01
-    copy [SPRITE_1_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_1_ADDRESS + OAMA_X], 0
-    copy [SPRITE_1_ADDRESS + OAMA_TILEID], 2
+    copy [SPRITE_1_ADDRESS + OAMA_Y], INITIAL_PLAYER_XY
+    copy [SPRITE_1_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
+    copy [SPRITE_1_ADDRESS + OAMA_TILEID], SPRITE_1_TILEID
     copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
     ; MC.02
-    copy [SPRITE_2_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_2_ADDRESS + OAMA_X], 0
-    copy [SPRITE_2_ADDRESS + OAMA_TILEID], 4
+    copy [SPRITE_2_ADDRESS + OAMA_Y], INITIAL_PLAYER_XY
+    copy [SPRITE_2_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
+    copy [SPRITE_2_ADDRESS + OAMA_TILEID], SPRITE_2_TILEID
     copy [SPRITE_2_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
     ; MC.10
-    copy [SPRITE_3_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_3_ADDRESS + OAMA_X], 0
-    copy [SPRITE_3_ADDRESS + OAMA_TILEID], 6
+    copy [SPRITE_3_ADDRESS + OAMA_Y], INITIAL_PLAYER_XY
+    copy [SPRITE_3_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
+    copy [SPRITE_3_ADDRESS + OAMA_TILEID], SPRITE_3_TILEID
     copy [SPRITE_3_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
     ; MC.11
-    copy [SPRITE_4_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_4_ADDRESS + OAMA_X], 0
-    copy [SPRITE_4_ADDRESS + OAMA_TILEID], 8
+    copy [SPRITE_4_ADDRESS + OAMA_Y], INITIAL_PLAYER_XY
+    copy [SPRITE_4_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
+    copy [SPRITE_4_ADDRESS + OAMA_TILEID], SPRITE_4_TILEID
     copy [SPRITE_4_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
     ; MC.12
-    copy [SPRITE_5_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_5_ADDRESS + OAMA_X], 0
-    copy [SPRITE_5_ADDRESS + OAMA_TILEID], 10
+    copy [SPRITE_5_ADDRESS + OAMA_Y], INITIAL_PLAYER_XY
+    copy [SPRITE_5_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
+    copy [SPRITE_5_ADDRESS + OAMA_TILEID], SPRITE_5_TILEID
     copy [SPRITE_5_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
     ret
@@ -72,38 +96,38 @@ init_player:
 move_player_to_start:
     ; MC.00
     copy [SPRITE_0_ADDRESS + OAMA_Y], MC_TOP_Y
-    copy [SPRITE_0_ADDRESS + OAMA_X], 20
+    copy [SPRITE_0_ADDRESS + OAMA_X], SPRITE_0_3_LEVEL_X
 
     ; MC.01
     copy [SPRITE_1_ADDRESS + OAMA_Y], MC_TOP_Y
-    copy [SPRITE_1_ADDRESS + OAMA_X], 28
+    copy [SPRITE_1_ADDRESS + OAMA_X], SPRITE_1_4_LEVEL_X
 
     ; MC.02
     copy [SPRITE_2_ADDRESS + OAMA_Y], MC_TOP_Y
-    copy [SPRITE_2_ADDRESS + OAMA_X], 36
+    copy [SPRITE_2_ADDRESS + OAMA_X], SPRITE_2_5_LEVEL_X
 
     ; MC.10
     copy [SPRITE_3_ADDRESS + OAMA_Y], MC_BOT_Y
-    copy [SPRITE_3_ADDRESS + OAMA_X], 20
+    copy [SPRITE_3_ADDRESS + OAMA_X], SPRITE_0_3_LEVEL_X
 
     ; MC.11
     copy [SPRITE_4_ADDRESS + OAMA_Y], MC_BOT_Y
-    copy [SPRITE_4_ADDRESS + OAMA_X], 28
+    copy [SPRITE_4_ADDRESS + OAMA_X], SPRITE_1_4_LEVEL_X
 
     ; MC.12
     copy [SPRITE_5_ADDRESS + OAMA_Y], MC_BOT_Y
-    copy [SPRITE_5_ADDRESS + OAMA_X], 36
+    copy [SPRITE_5_ADDRESS + OAMA_X], SPRITE_2_5_LEVEL_X
 
     ret
 
 ; put PC sprite ids in WRAM
 init_player_sprite_data:
-    copy16bit [$C010], [$C011], _OAMRAM
-    copy16bit [$C012], [$C013], _OAMRAM + sizeof_OAM_ATTRS * 1
-    copy16bit [$C014], [$C015], _OAMRAM + sizeof_OAM_ATTRS * 2
-    copy16bit [$C016], [$C017], _OAMRAM + sizeof_OAM_ATTRS * 3
-    copy16bit [$C018], [$C019], _OAMRAM + sizeof_OAM_ATTRS * 4
-    copy16bit [$C01A], [$C01B], _OAMRAM + sizeof_OAM_ATTRS * 5
+    copy16bit [SPRITE_0_A_WRAM_LOCATION], [SPRITE_0_B_WRAM_LOCATION], _OAMRAM
+    copy16bit [SPRITE_1_A_WRAM_LOCATION], [SPRITE_1_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 1
+    copy16bit [SPRITE_2_A_WRAM_LOCATION], [SPRITE_2_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 2
+    copy16bit [SPRITE_3_A_WRAM_LOCATION], [SPRITE_3_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 3
+    copy16bit [SPRITE_4_A_WRAM_LOCATION], [SPRITE_4_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 4
+    copy16bit [SPRITE_5_A_WRAM_LOCATION], [SPRITE_5_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 5
 
     ret
 
