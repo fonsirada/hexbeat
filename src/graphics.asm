@@ -50,7 +50,7 @@ macro LoadGraphicsDataIntoVRAM
         inc de
         ld [hli], a
         ld a, d
-        cp a, high(GRAPHICS_DATA_ADDRESS_END)
+        cp high(GRAPHICS_DATA_ADDRESS_END)
         jr nz, .load_tile\@
 endm
 
