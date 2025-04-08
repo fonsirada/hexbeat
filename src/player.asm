@@ -159,7 +159,6 @@ PlayerHitLow:
         .end_frame_update
     ret
 
-
 ; updates the player animation based on joypad press
 UpdatePlayer:
     halt 
@@ -167,6 +166,7 @@ UpdatePlayer:
     halt
 
     ; set flags from joypad input
+    
     ld a, [PAD_CURR]
     bit PADB_B, a
     jr nz, .skip_B
@@ -174,6 +174,8 @@ UpdatePlayer:
         copy [rPCA_COUNT], $00 
         SetPlayerTiles $30
     .skip_B
+    
+    ;ProcessInputForAnim PADB_B, PLAYERB_B, $30
     
     ld a, [PAD_CURR]
     bit PADB_A, a

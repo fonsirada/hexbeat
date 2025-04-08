@@ -98,6 +98,16 @@ macro UpdatePlayerAnim
     pop af
 endm
 
+macro ProcessInputForAnim
+    ld a, [PAD_CURR]
+    bit \1, a
+    jr nz, .done_process\@
+        RegBitOp rPLAYER, \2, set
+        copy [rPCA_COUNT], $00 
+        SetPlayerTiles \3
+    .done_process\@
+endm
+
 ; set the Player sprite(s)'s tileIDs based on the first sprite
 macro SetPlayerTiles
    copy [SPRITE_0_ADDRESS + OAMA_TILEID], \1
