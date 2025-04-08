@@ -28,23 +28,23 @@ section "main", rom0
 main:
     DisableLCD
 
-    call InitGraphics
-    call InitSpriteData
-    call InitPlayer
-    call InitSprites
+    call init_graphics
+    call init_sprite_data
+    call init_player
+    call init_sprites
     InitJoypad
 
     EnableLCD
 
     .loop
-        call Start
+        call start
 
         ld a, [rGAME]
         bit GAMEB_START, a
         jr z, .post_graphics
-            call UpdateGraphics
-            call UpdateSprites
-            call UpdatePlayer
+            call update_graphics
+            call update_sprites
+            call update_player
         .post_graphics
 
         UpdateJoypad

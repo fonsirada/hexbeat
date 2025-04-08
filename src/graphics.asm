@@ -67,7 +67,7 @@ endm
 
 section "graphics", rom0 
 
-InitGraphics:
+init_graphics:
     ; init the palettes
     ld a, PALETTE_0
     ld [rBGP], a
@@ -100,7 +100,7 @@ InitGraphics:
     ret
 
     
-UpdateGraphics:
+update_graphics:
     halt
 
     ; scroll bg
@@ -111,7 +111,7 @@ UpdateGraphics:
     ret
 
 ; set-up game + remove start screen once START is pressed
-Start:
+start:
     halt
 
     ; check if game started
@@ -137,7 +137,7 @@ Start:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export InitGraphics, UpdateGraphics, Start
+export init_graphics, update_graphics, start
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
