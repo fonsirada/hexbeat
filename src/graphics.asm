@@ -72,7 +72,6 @@ endm
 section "graphics", rom0 
 
 init_graphics:
-    ; init the palettes
     ld a, PALETTE_0
     ld [rBGP], a
     ld [rOBP0], a
@@ -83,15 +82,12 @@ init_graphics:
     InitOAM
     LoadGraphicsDataIntoVRAM
 
-    ; enable the vblank interrupt
     ld a, IEF_VBLANK
     ld [rIE], a
     ei
 
-    ; set bg to start screen
+    ; set bg to start screen & hide window offscreen
     copy [rSCY], START_SCY
-
-    ; hide window offscreen
     copy [rWX], WX_OFS
     copy [rWY], WY_OFS
  
@@ -102,7 +98,6 @@ init_graphics:
     ld [rPCA_COUNT], a
 
     ret
-
     
 update_graphics:
     halt
