@@ -16,9 +16,6 @@ section "sprites", rom0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-def OBJ16_OFFSET           equ 8
-def MC_TOP_Y               equ $80
-
 def TARGET_HIGH_TILEID     equ $4E
 def TARGET_LOW_TILEID      equ $5E
 def SHIELD_HIGH_TILEID     equ $6E
