@@ -3,6 +3,7 @@
 ;
 ; @file sprites.asm
 ; @author Sydney Chen, Alfonso Rada
+; @date April 7, 2025
 ; @brief storing non-player sprite functions
 
 include "src/hardware.inc"

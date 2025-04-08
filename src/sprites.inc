@@ -3,6 +3,7 @@
 ;
 ; @file sprites.inc
 ; @author Sydney Chen, Alfonso Rada
+; @date April 7, 2025
 ; @brief storing all sprite constants and macros
 
 if !def(SPRITES_RGBINC)

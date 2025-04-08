@@ -21,7 +21,7 @@ def PAD_PREV rb 1
 def PAD_PRSS rb 1
 def PAD_RLSE rb 1
 
-;;; ADDITIONAL REGISTERS
+;;; ADDITIONAL REGISTERS ;;;
 def rGAME           rb 1
 def rPLAYER         rb 1
 def rPCA_COUNT      rb 1
