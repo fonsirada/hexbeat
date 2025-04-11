@@ -25,11 +25,21 @@ def SPRITE_11_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 11)
 def SPRITE_12_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 12)
 def SPRITE_13_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 13)
 
+def OBJ16_OFFSET           equ 8
+
 def MC_TOP_Y equ (80)
 def MC_BOT_Y equ (MC_TOP_Y + 16)
 def MC_JUMP_THRES equ (MC_TOP_Y - 24)
 
-def OBJ16_OFFSET           equ 8
+def TARGET_HIGH_Y          equ (MC_TOP_Y - 16)
+def TARGET_LOW_Y           equ (MC_TOP_Y + 16)
+def TARGET_X               equ 50
+
+def SPELL_HIGH_Y           equ (MC_TOP_Y - 20)
+def SPELL_SCROLL_SPEED     equ 4
+
+def HIT_PERF_MIN           equ 50
+def HIT_PERF_MAX           equ (HIT_PERF_MIN + 8)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -135,6 +145,25 @@ macro SetShieldLocations
     
     copy [SPRITE_9_ADDRESS + OAMA_X], \3
     copy [SPRITE_9_ADDRESS + OAMA_Y], \4
+endm
+
+; check 
+macro CheckSpriteRange
+    ; params:
+    ; curr_x, range_min, range_max, flag_bit, flag_binary
+    ; currently hard-coded to a perfect hit
+    ld a, \1
+    cp HIT_PERF_MIN
+        ; fail if less than min
+        jr c, .done_check\@
+    
+        cp HIT_PERF_MAX
+            ; fail if greater than max
+            jr nc, .done_check\@
+
+            RegBitOp rCOLLISION, COLLB_XPERF, set
+
+    .done_check\@
 endm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

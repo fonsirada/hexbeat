@@ -8,6 +8,7 @@
 
 include "src/hardware.inc"
 include "src/utils.inc"
+include "src/wram.inc"
 include "src/sprites.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -24,13 +25,6 @@ def SPELL1A_TILEID         equ $0E
 def SPELL1B_TILEID         equ $1E
 def SPELL2A_TILEID         equ $2E
 def SPELL2B_TILEID         equ $3E
-
-def TARGET_HIGH_Y          equ (MC_TOP_Y - 16)
-def TARGET_LOW_Y           equ (MC_TOP_Y + 16)
-def TARGET_X               equ 50
-
-def SPELL_HIGH_Y           equ (MC_TOP_Y - 20)
-def SPELL_SCROLL_SPEED     equ 4
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -107,6 +101,10 @@ move_sprites_to_start:
     ret
 
 update_sprites:
+    ; custom timing here:
+    CheckTimer rTIMER_OBJ, 1
+    jr nz, .done_update
+
     ; scrolling spell 1
     ld a, [SPRITE_10_ADDRESS + OAMA_X]
     sub SPELL_SCROLL_SPEED
@@ -116,6 +114,42 @@ update_sprites:
 
     SetShieldLocations 0, 0, 0, 0
 
+    call check_collisions
+    .done_update
+    ret
+
+check_collisions:
+    ; load miss flag into rCOLLISION
+    copy [rCOLLISION], COLLF_XMISS
+    
+    ; loop thru all sprites in wram
+    ; ^ add that bit later
+
+    ; TEST w/ 1 SPRITE --> mostly works -S
+    
+    ; check if the current x is within the 'perfect' x range
+    ; set perf fleg if so
+    ; *inconsistent flag raising? -S
+    ld a, [SPRITE_10_ADDRESS + OAMA_X]
+    CheckSpriteRange a ; HIT_PERF_MIN, HIT_PERF_MAX, rCOLLB_XPERF
+
+    ld a, [rCOLLISION]
+    bit COLLB_XPERF, a
+    jr z, .done_check
+        ld a, [PAD_CURR]
+        bit PADB_A, a
+        jr nz, .done_check
+            call handle_collision
+    .done_check
+    ret
+
+handle_collision:
+    ld a, 0
+    ld [SPRITE_10_ADDRESS + OAMA_X], a
+    ld [SPRITE_11_ADDRESS + OAMA_X], a
+    ; note: 2nd tile is visible when setting x = 0
+    ;   could make a 'hide sprite' function?
+    ; set 'inactive' flag?
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

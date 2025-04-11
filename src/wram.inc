@@ -25,6 +25,11 @@ def PAD_RLSE rb 1
 def rGAME           rb 1
 def rPLAYER         rb 1
 def rPCA_COUNT      rb 1
+def rCOLLISION      rb 1
+def rTIMER_BG       rb 1
+def rTIMER_PC       rb 1
+def rTIMER_OBJ      rb 1
+def rTIMER_OBJ2     rb 1
 
 ;;; rGAME
 def GAME_BASE       equ %00000000
@@ -45,6 +50,21 @@ def PLAYERB_HOLD    equ 6
 def PLAYERB_A       equ 5
 def PLAYERB_B       equ 4
 def PLAYERB_FALL    equ 3
+
+;;; rCOLLISION
+def rCOLL_Y         equ %10000000
+; [may want another Y flag here]
+def COLLF_XPERF     equ %00100000
+def COLLF_XGOOD     equ %00010000
+def COLLF_XBAD      equ %00001000
+def COLLF_XMISS     equ %00000100
+; ^ one of these flags should always be set!
+
+def COLLB_Y         equ 7
+def COLLB_XPERF     equ 5
+def COLLB_XGOOD     equ 4
+def COLLB_XBAD      equ 3
+def COLLB_XMISS     equ 2
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

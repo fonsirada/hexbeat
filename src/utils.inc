@@ -52,6 +52,22 @@ macro RegOp
     ld [\1], a
 endm
 
+; graphics macro --> might need to move?
+macro CheckTimer
+    ld a, [\1]
+    cp \2
+endm
+
+macro IncTimer
+    ld a, [\1]
+    cp a, \2
+    jr nz, .finish_update\@
+        ld a, 0 ; or ld a, $FF?
+    .finish_update\@
+    inc a
+    ld [\1], a
+endm
+
 ;;; LCD CONTROL ;;;
 
 macro DisableLCD

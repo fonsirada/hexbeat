@@ -221,9 +221,14 @@ player_hit_low:
 
 ; updates the player animation based on joypad press
 update_player:
+    /*
     halt 
     halt
     halt
+    */
+    
+    CheckTimer rTIMER_PC, 1
+    jp nz, .done_update ; must be jp for now
 
     ; set flags from joypad input
     ProcessInputForAnim PADB_B, PLAYERB_B, SPRITE_RUN_THRES_TILEID

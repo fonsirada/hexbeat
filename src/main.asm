@@ -42,6 +42,10 @@ main:
         ld a, [rGAME]
         bit GAMEB_START, a
         jr z, .post_graphics
+            ; if things break: out of vblank time
+            
+            call update_timers
+
             call update_graphics
             call update_sprites
             call update_player

@@ -91,21 +91,37 @@ init_graphics:
     copy [rWY], WY_OFS
  
     ; set up game and player settings
+    ; there's gotta be a better way to do this -S
     ld a, GAME_BASE 
     ld [rGAME], a
     ld [rPLAYER], a
     ld [rPCA_COUNT], a
+    ld [rCOLLISION], a
+    ld [rTIMER_BG], a ; make an initialize timers func
+    ld [rTIMER_PC], a
+    ld [rTIMER_OBJ], a
+    ld [rTIMER_OBJ2], a
 
     ret
-    
+
 update_graphics:
-    halt
+    ; halt
+    CheckTimer rTIMER_BG, 1
+    jr nz, .done_update
 
-    ; scroll bg
-    ld a, [rSCX]
-    add BG_SCROLL_SPEED
-    ld [rSCX], a
+        ; scroll bg
+        ld a, [rSCX]
+        add BG_SCROLL_SPEED
+        ld [rSCX], a
 
+    .done_update
+
+    ret
+
+update_timers:
+    IncTimer rTIMER_BG, 2
+    IncTimer rTIMER_PC, 8
+    IncTimer rTIMER_OBJ, 2
     ret
 
 ; set-up game + remove start screen once START is pressed
@@ -135,7 +151,7 @@ start:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export init_graphics, update_graphics, start
+export init_graphics, update_graphics, start, update_timers
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
