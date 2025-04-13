@@ -39,7 +39,7 @@ def SPELL_HIGH_Y           equ (MC_TOP_Y - 20)
 def SPELL_SCROLL_SPEED     equ 4
 
 def HIT_PERF_MIN           equ (50 - 8)
-def HIT_PERF_MAX           equ (HIT_PERF_MIN + 8)
+def HIT_PERF_MAX           equ (HIT_PERF_MIN + 16)
 def HIT_MISS_MAX           equ (HIT_PERF_MIN - 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -148,11 +148,7 @@ macro SetShieldLocations
     copy [SPRITE_9_ADDRESS + OAMA_Y], \4
 endm
 
-; check 
-macro CheckSpriteRange
-    ; params:
-    ; curr_x, range_min, range_max, flag_bit, flag_binary
-    ; currently hard-coded to a perfect hit
+macro CheckSpriteRange2 ;testing ver
     ld a, \1
     cp HIT_PERF_MIN
         ; fail if less than min
@@ -162,12 +158,31 @@ macro CheckSpriteRange
             ; fail if greater than max
             jr nc, .done_check\@
                 RegBitOp rCOLLISION, COLLB_XPERF, set
-                jr .done_check ; is this needed?
+                jr .done_check\@ ; is this needed?
+    .done_check\@
+endm
 
+; checks if a given sprite's x val is within a given range
+; this SHOULD work b/c it's just setting WRAM stuff (correctly)
+macro CheckSpriteRange
+    ; params:
+    ; curr_x, range_min, range_max, flag_bit, flag_binary
+    ; currently hard-coded to a perfect hit
+    ld a, \1
+    cp HIT_PERF_MIN
+        ; fail if less than min
+        jr c, .done_check\@
+        cp HIT_PERF_MAX
+            ; fail if greater than max
+            jr nc, .check_miss\@
+                RegBitOp rCOLLISION, COLLB_XPERF, set
+                jr .done_check\@ ; is this needed?
+    
+    .check_miss\@
     cp HIT_MISS_MAX
         jr c, .done_check\@
             RegBitOp rCOLLISION, COLLB_XMISS, res
-
+    
     .done_check\@
 endm
 

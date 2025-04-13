@@ -118,9 +118,9 @@ update_sprites:
     .done_update
     ret
 
+
 check_collisions:
-    ; load miss flag into rCOLLISION
-    ; copy [rCOLLISION], GAME_BASE
+    ; raise miss flag by default
     copy [rCOLLISION], COLLF_XMISS
     
     ; loop thru all sprites in wram
@@ -129,22 +129,20 @@ check_collisions:
     ; TEST w/ 1 SPRITE --> mostly works -S
     
     ; check if the current x is within the 'perfect' x range
-    ; set perf fleg if so
-    ; note: range is off; 8 pix in front of target end
-    ld a, [SPRITE_10_ADDRESS + OAMA_X]
-    CheckSpriteRange a ; HIT_PERF_MIN, HIT_PERF_MAX, rCOLLB_XPERF
+    ; set perf flag if so
+    CheckSpriteRange [SPRITE_10_ADDRESS + OAMA_X]
+    ; [SPRITE_10_ADDRESS + OAMA_X], HIT_PERF_MIN, HIT_PERF_MAX, rCOLLB_XPERF
 
-    ; note: reverse the order so the pad press is the first if/else
-    ld a, [rCOLLISION]
-    bit COLLB_XPERF, a
-    jr z, .check_miss
-        ld a, [PAD_CURR]
-        bit PADB_A, a
-        jr nz, .done_check ; change to .check_miss ?
+    ld a, [PAD_CURR]
+    bit PADB_A, a
+    jr nz, .check_miss
+        ld a, [rCOLLISION]
+        bit COLLB_XPERF, a
+        jr z, .check_miss
             call handle_collision
+            jr .done_check
+    
     .check_miss
-    bit COLLB_XMISS, a
-    jr z, .done_check
         call handle_miss
     .done_check
     ret
@@ -159,14 +157,22 @@ handle_collision:
     ret
 
 handle_miss:
-    ; call condition:
-    ; if sprite x < [threshold], register a miss
+    ; will be called if no button is pressed
+    ; note: change so x val comparison is outside func call
     ; note: eventually flash the player sprite (damage)
+    ld a, [SPRITE_10_ADDRESS + OAMA_X]
+    cp a, 4
+    jr nc, .done
+        ; lower player health
+        ld a, [rPC_HEALTH]
+        dec a
+        ld [rPC_HEALTH], a
 
-    ; lower player health
-    ld a, [rPC_HEALTH]
-    dec a
-    ld [rPC_HEALTH], a
+        cp a, 0
+        jr nz, .done
+            RegBitOp rGAME, GAMEB_END, set
+            ; note: may want to move this if we have diff hazards
+    .done
     ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

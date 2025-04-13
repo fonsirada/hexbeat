@@ -43,6 +43,7 @@ main:
         bit GAMEB_END, a
         jr z, .check_start
             call game_over
+            ; jr [nz?], .loop
             ; check placement of this
 
         .check_start
@@ -51,8 +52,8 @@ main:
             ; if things break: out of vblank time
             
             call update_timers
-
             call update_graphics
+            ; halt
             call update_sprites
             call update_player
 
