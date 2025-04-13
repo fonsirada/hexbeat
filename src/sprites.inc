@@ -38,8 +38,9 @@ def TARGET_X               equ 50
 def SPELL_HIGH_Y           equ (MC_TOP_Y - 20)
 def SPELL_SCROLL_SPEED     equ 4
 
-def HIT_PERF_MIN           equ 50
+def HIT_PERF_MIN           equ (50 - 8)
 def HIT_PERF_MAX           equ (HIT_PERF_MIN + 8)
+def HIT_MISS_MAX           equ (HIT_PERF_MIN - 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -107,7 +108,7 @@ macro ProcessInputForAnim
     bit \1, a
     jr nz, .done_process\@
         RegBitOp rPLAYER, \2, set
-        copy [rPCA_COUNT], $00 
+        copy [rPC_ACOUNT], $00 
         SetPlayerTiles \3
     .done_process\@
 endm
@@ -160,8 +161,12 @@ macro CheckSpriteRange
         cp HIT_PERF_MAX
             ; fail if greater than max
             jr nc, .done_check\@
+                RegBitOp rCOLLISION, COLLB_XPERF, set
+                jr .done_check ; is this needed?
 
-            RegBitOp rCOLLISION, COLLB_XPERF, set
+    cp HIT_MISS_MAX
+        jr c, .done_check\@
+            RegBitOp rCOLLISION, COLLB_XMISS, res
 
     .done_check\@
 endm

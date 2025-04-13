@@ -24,7 +24,8 @@ def PAD_RLSE rb 1
 ;;; ADDITIONAL REGISTERS ;;;
 def rGAME           rb 1
 def rPLAYER         rb 1
-def rPCA_COUNT      rb 1
+def rPC_HEALTH      rb 1
+def rPC_ACOUNT      rb 1
 def rCOLLISION      rb 1
 def rTIMER_BG       rb 1
 def rTIMER_PC       rb 1

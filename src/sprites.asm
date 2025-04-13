@@ -120,6 +120,7 @@ update_sprites:
 
 check_collisions:
     ; load miss flag into rCOLLISION
+    ; copy [rCOLLISION], GAME_BASE
     copy [rCOLLISION], COLLF_XMISS
     
     ; loop thru all sprites in wram
@@ -129,17 +130,22 @@ check_collisions:
     
     ; check if the current x is within the 'perfect' x range
     ; set perf fleg if so
-    ; *inconsistent flag raising? -S
+    ; note: range is off; 8 pix in front of target end
     ld a, [SPRITE_10_ADDRESS + OAMA_X]
     CheckSpriteRange a ; HIT_PERF_MIN, HIT_PERF_MAX, rCOLLB_XPERF
 
+    ; note: reverse the order so the pad press is the first if/else
     ld a, [rCOLLISION]
     bit COLLB_XPERF, a
-    jr z, .done_check
+    jr z, .check_miss
         ld a, [PAD_CURR]
         bit PADB_A, a
-        jr nz, .done_check
+        jr nz, .done_check ; change to .check_miss ?
             call handle_collision
+    .check_miss
+    bit COLLB_XMISS, a
+    jr z, .done_check
+        call handle_miss
     .done_check
     ret
 
@@ -152,6 +158,16 @@ handle_collision:
     ; set 'inactive' flag?
     ret
 
+handle_miss:
+    ; call condition:
+    ; if sprite x < [threshold], register a miss
+    ; note: eventually flash the player sprite (damage)
+
+    ; lower player health
+    ld a, [rPC_HEALTH]
+    dec a
+    ld [rPC_HEALTH], a
+    ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 export init_sprite_data, init_sprites, update_sprites, move_sprites_to_start

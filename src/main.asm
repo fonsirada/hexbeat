@@ -40,6 +40,12 @@ main:
         call start
 
         ld a, [rGAME]
+        bit GAMEB_END, a
+        jr z, .check_start
+            call game_over
+            ; check placement of this
+
+        .check_start
         bit GAMEB_START, a
         jr z, .post_graphics
             ; if things break: out of vblank time
@@ -51,5 +57,6 @@ main:
             call update_player
 
         .post_graphics
+
         UpdateJoypad
         jr .loop

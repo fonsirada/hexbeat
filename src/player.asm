@@ -221,12 +221,6 @@ player_hit_low:
 
 ; updates the player animation based on joypad press
 update_player:
-    /*
-    halt 
-    halt
-    halt
-    */
-    
     CheckTimer rTIMER_PC, 1
     jp nz, .done_update ; must be jp for now
 
@@ -235,7 +229,7 @@ update_player:
     ProcessInputForAnim PADB_A, PLAYERB_A, SPRITE_HIT_LOW_THRES_TILEID
 
     ; check if current frame should be held
-    ld a, [rPCA_COUNT]
+    ld a, [rPC_ACOUNT]
     cp FRAME_TO_HOLD
     jr nz, .done_hold_check
     .raise_hold
@@ -247,12 +241,12 @@ update_player:
     ld a, [rPLAYER]
     bit PLAYERB_B, a
     jr z, .update_a
-        ld a, [rPCA_COUNT]
+        ld a, [rPC_ACOUNT]
         cp HIT_ANIM_LENGTH
         jr z, .update_a
             SetPlayerCoord MC_TOP_Y, OAMA_Y
             call player_hit_low
-            RegOp rPCA_COUNT, inc
+            RegOp rPC_ACOUNT, inc
 
             jr .done_update
 
@@ -261,11 +255,11 @@ update_player:
         bit PLAYERB_A, a
         jr z, .update_run
         
-        ld a, [rPCA_COUNT]
+        ld a, [rPC_ACOUNT]
         cp HIT_ANIM_LENGTH
         jr z, .update_run
             call player_hit_high
-            RegOp rPCA_COUNT, inc
+            RegOp rPC_ACOUNT, inc
 
             jr .done_update
     

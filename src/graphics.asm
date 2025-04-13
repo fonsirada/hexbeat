@@ -95,7 +95,8 @@ init_graphics:
     ld a, GAME_BASE 
     ld [rGAME], a
     ld [rPLAYER], a
-    ld [rPCA_COUNT], a
+    copy [rPC_HEALTH], 10 ; magic number, fix
+    ld [rPC_ACOUNT], a
     ld [rCOLLISION], a
     ld [rTIMER_BG], a ; make an initialize timers func
     ld [rTIMER_PC], a
@@ -149,9 +150,14 @@ start:
     .done_starting
     ret
 
+game_over:
+    ; add visuals/text
+    ; add press enter to restart functionality
+    ret
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export init_graphics, update_graphics, start, update_timers
+export init_graphics, update_graphics, start, game_over, update_timers
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
