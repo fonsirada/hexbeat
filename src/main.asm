@@ -43,7 +43,9 @@ main:
         bit GAMEB_END, a
         jr z, .check_start
             call game_over
+            jr .loop
             ; jr [nz?], .loop
+            ; ^ above should restart game on pressing enter
             ; check placement of this
 
         .check_start

@@ -116,12 +116,35 @@ update_graphics:
         ld [rSCX], a
 
     .done_update
+    ;call update_window
 
     ret
 
+; WIP
+update_window:
+    ; $22 to $2B in the 9C00 map
+    ; $3C (full) | $3D (half) | $3E (empty)
+    ; pseudocode:
+    ; for i in range 10
+    ;   change tile $22 + i to...
+    ;   $3D if i == health
+    ;   $3E if i > health 
+    ld hl, $9C22
+    .loop
+        ld a, l
+        add a, 0
+        ld l, a
+
+        ld [hl], $3C
+        ld [hl], $3D
+        ld [hl], $3E
+    jr .loop
+    
+    ret 
+
 update_timers:
     IncTimer rTIMER_BG, 2
-    IncTimer rTIMER_PC, 8
+    IncTimer rTIMER_PC, 4 ; figure out how to swap between 4 & 8
     IncTimer rTIMER_OBJ, 2
     ret
 
@@ -151,8 +174,11 @@ start:
     ret
 
 game_over:
+
+        
     ; add visuals/text
     ; add press enter to restart functionality
+    .done
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

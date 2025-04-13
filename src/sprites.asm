@@ -94,12 +94,18 @@ move_sprites_to_start:
     ; SPELL 1
     copy [SPRITE_10_ADDRESS + OAMA_Y], SPELL_HIGH_Y
     copy [SPRITE_10_ADDRESS + OAMA_X], 0
-
     copy [SPRITE_11_ADDRESS + OAMA_Y], SPELL_HIGH_Y
     copy [SPRITE_11_ADDRESS + OAMA_X], 0
 
+    ; SPELL 2
+    copy [SPRITE_12_ADDRESS + OAMA_Y], SPELL_LOW_Y
+    copy [SPRITE_10_ADDRESS + OAMA_X], 128
+    copy [SPRITE_13_ADDRESS + OAMA_Y], SPELL_LOW_Y
+    copy [SPRITE_11_ADDRESS + OAMA_X], 128
+
     ret
 
+; note: refactor this to work thru WRAM
 update_sprites:
     ; custom timing here:
     CheckTimer rTIMER_OBJ, 1
@@ -112,13 +118,20 @@ update_sprites:
     add OBJ16_OFFSET
     ld [SPRITE_11_ADDRESS + OAMA_X], a
 
+    ; scrolling spell 2
+    ld a, [SPRITE_12_ADDRESS + OAMA_X]
+    sub SPELL_SCROLL_SPEED
+    ld [SPRITE_12_ADDRESS + OAMA_X], a
+    add OBJ16_OFFSET
+    ld [SPRITE_13_ADDRESS + OAMA_X], a
+
     SetShieldLocations 0, 0, 0, 0
 
     call check_collisions
     .done_update
     ret
 
-
+; TEST w/ 1 SPRITE --> mostly works -S
 check_collisions:
     ; raise miss flag by default
     copy [rCOLLISION], COLLF_XMISS
@@ -126,7 +139,6 @@ check_collisions:
     ; loop thru all sprites in wram
     ; ^ add that bit later
 
-    ; TEST w/ 1 SPRITE --> mostly works -S
     
     ; check if the current x is within the 'perfect' x range
     ; set perf flag if so
@@ -158,7 +170,7 @@ handle_collision:
 
 handle_miss:
     ; will be called if no button is pressed
-    ; note: change so x val comparison is outside func call
+    ; note: change so x val comparison is outside func call?
     ; note: eventually flash the player sprite (damage)
     ld a, [SPRITE_10_ADDRESS + OAMA_X]
     cp a, 4
