@@ -32,10 +32,22 @@ def SPELL2B_TILEID         equ $3E
 init_sprite_data:
     call init_player_sprite_data
 
+    ; put spell flags into WRAM
+    ld a, 0
+    ld [de], a
+    inc de
+
     ; put spell sprite addresses into WRAM
     ld hl, SPELL_WRAM_START
+    ld de, SPELL_FLAG_START
     copy16bit [hli], [hli], SPRITE_10_ADDRESS
+    ld a, 0
+    ld [de], a
+    inc de
     copy16bit [hli], [hli], SPRITE_11_ADDRESS
+    ld a, 0
+    ld [de], a
+    inc de
     copy16bit [hli], [hli], SPRITE_12_ADDRESS
     copy16bit [hli], [hli], SPRITE_13_ADDRESS
     copy16bit [hli], [hli], SPRITE_14_ADDRESS
@@ -44,18 +56,6 @@ init_sprite_data:
     copy16bit [hli], [hli], SPRITE_17_ADDRESS
     
     
-    ; is there a way to make this work...?
-    ; loop ver of spell wram loading
-    /*
-    ld 10, b
-    .load_sprite_address
-        copy16bit [hli], [hli], _OAMRAM + sizeof_OAM_ATTRS * b
-        inc b
-
-        ld a, b
-        cp a, 18
-        jr nz, .load_sprite_address
-    */
     ret
 
 ; initalize sprites and their attributes
@@ -162,6 +162,8 @@ update_sprites:
         ld a, l
         cp a, $3C;$38; $40 ;change here for # of active sprites
         jr nz, .update_spell_sprite
+
+        ; try flag vals to 
 
     SetShieldLocations 0, 0, 0, 0
     .done_update

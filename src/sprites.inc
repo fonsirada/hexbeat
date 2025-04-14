@@ -12,6 +12,8 @@ def SPRITES_RGBINC equ 1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; WRAM
+def SPELL_FLAG_START equ ($C020)
+def SPELL_FLAG_INTERVAL equ (2)
 def SPELL_WRAM_START equ ($C030)
 def SPELL_WRAM_END   equ ($C040)
 
@@ -188,6 +190,13 @@ macro WRAMToOAM
     ld c, [\1]
     ld h, b
     ld l, c
+endm
+
+macro SpawnSpell
+    ; (hl) = sprite address
+    ; (de) = spell flags
+    ; spell y = high or low (see flag)
+    ; spell x = 0
 endm
 
 macro SetSpriteXY

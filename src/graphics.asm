@@ -156,7 +156,7 @@ update_window:
 update_timers:
     IncTimer rTIMER_BG, 1
     IncTimer rTIMER_PC, 3 ; figure out how to swap between 4 & 8
-    IncTimer rTIMER_OBJ, 1
+    IncTimer rTIMER_OBJ, 2
     ret
 
 ; set-up game + remove start screen once START is pressed
@@ -185,9 +185,31 @@ start:
     ret
 
 game_over:
+    halt 
+
+    ; check if game ended
+    ld a, [rGAME]
+    bit GAMEB_END, a
+    jr nz, .done_end
+
+        ld a, [PAD_CURR]
+        bit PADB_START, a
+        jr nz, .done_end
+            ; set up level screen
+            ld a, LEVEL_SCY
+            ld [rSCY], a
+            ld a, UI_Y
+            ld [rWY], a
+
+            call init_graphics
+            call move_player_to_start
+            call move_sprites_to_start
+            RegBitOp rGAME, GAMEB_START, set
+            RegBitOp rGAME, GAMEB_END, res
+
     ; add visuals/text
     ; add press enter to restart functionality
-    .done
+    .done_end
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

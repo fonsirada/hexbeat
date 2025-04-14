@@ -37,13 +37,18 @@ main:
     EnableLCD
 
     .loop
+        ; start handling
         call start
+        bit GAMEB_START, a
+        jr z, .post_graphics
 
+ 
         ld a, [rGAME]
         bit GAMEB_END, a
         jr z, .check_start
-            call game_over
-            jr .loop
+            ;call game_over
+            jr .post_graphics
+        
             ; jr [nz?], .loop
             ; ^ above should restart game on pressing enter
             ; check placement of this

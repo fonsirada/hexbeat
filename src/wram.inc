@@ -64,12 +64,21 @@ def COLLF_XBAD      equ %00001000
 def COLLF_XMISS     equ %00000100
 ; ^ one of these flags should always be set!
 
-def COLLB_YHIGH     equ 7
+def COLLB_YHIGH     equ 7 ; remove this --> going into spell obj
 def COLLB_YLOW      equ 6
 def COLLB_XPERF     equ 5
 def COLLB_XGOOD     equ 4
 def COLLB_XBAD      equ 3
 def COLLB_XMISS     equ 2
+
+;;; SPELL OBJ WRAM FlAGS
+def SPELLF_HIGH     equ %00000010
+def SPELLF_LOW      equ %00000000
+def SPELLF_ON       equ %00000001
+def SPELLF_OFF      equ %00000000
+
+def SPELLB_TIER     equ 1
+def SPELLB_SPAWN    equ 0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
