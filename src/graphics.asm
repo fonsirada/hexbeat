@@ -151,9 +151,9 @@ update_window:
     ret 
 
 update_timers:
-    IncTimer rTIMER_BG, 2
-    IncTimer rTIMER_PC, 4 ; figure out how to swap between 4 & 8
-    IncTimer rTIMER_OBJ, 2
+    IncTimer rTIMER_BG, 1
+    IncTimer rTIMER_PC, 3 ; figure out how to swap between 4 & 8
+    IncTimer rTIMER_OBJ, 1
     ret
 
 ; set-up game + remove start screen once START is pressed
