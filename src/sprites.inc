@@ -11,6 +11,10 @@ def SPRITES_RGBINC equ 1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; WRAM
+def SPELL_WRAM_START equ ($C030)
+def SPELL_WRAM_END   equ ($C040)
+
 ; TARGETS
 def SPRITE_6_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 6)
 def SPRITE_7_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 7)
@@ -24,6 +28,10 @@ def SPRITE_10_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 10)
 def SPRITE_11_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 11)
 def SPRITE_12_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 12)
 def SPRITE_13_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 13)
+def SPRITE_14_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 14)
+def SPRITE_15_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 15)
+def SPRITE_16_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 16)
+def SPRITE_17_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 17)
 
 def OBJ16_OFFSET           equ 8
 
@@ -36,7 +44,7 @@ def TARGET_LOW_Y           equ (MC_TOP_Y + 16)
 def TARGET_X               equ 50
 
 def SPELL_HIGH_Y           equ (TARGET_HIGH_Y - 4)
-def SPELL_LOW_Y           equ (TARGET_LOW_Y - 4)
+def SPELL_LOW_Y            equ (TARGET_LOW_Y - 4)
 def SPELL_SCROLL_SPEED     equ 4
 
 def HIT_PERF_MIN           equ (50 - 8)
@@ -150,7 +158,6 @@ macro SetShieldLocations
 endm
 
 ; checks if a given sprite's x val is within a given range
-; this SHOULD work b/c it's just setting WRAM stuff (correctly)
 macro CheckSpriteRange
     ; params:
     ; curr_x, range_min, range_max, flag_bit, flag_binary
@@ -171,6 +178,17 @@ macro CheckSpriteRange
             RegBitOp rCOLLISION, COLLB_XMISS, res
     
     .done_check\@
+endm
+
+macro WRAMToOAM
+    ;ld hl, \1
+
+    ; store sprite address in hl
+    ld b, [\1]
+    inc hl
+    ld c, [\1]
+    ld h, b
+    ld l, c
 endm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

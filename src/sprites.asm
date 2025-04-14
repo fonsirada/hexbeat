@@ -32,6 +32,30 @@ def SPELL2B_TILEID         equ $3E
 init_sprite_data:
     call init_player_sprite_data
 
+    ; put spell sprite addresses into WRAM
+    ld hl, SPELL_WRAM_START
+    copy16bit [hli], [hli], SPRITE_10_ADDRESS
+    copy16bit [hli], [hli], SPRITE_11_ADDRESS
+    copy16bit [hli], [hli], SPRITE_12_ADDRESS
+    copy16bit [hli], [hli], SPRITE_13_ADDRESS
+    copy16bit [hli], [hli], SPRITE_14_ADDRESS
+    copy16bit [hli], [hli], SPRITE_15_ADDRESS
+    copy16bit [hli], [hli], SPRITE_16_ADDRESS
+    copy16bit [hli], [hli], SPRITE_17_ADDRESS
+    
+    
+    ; is there a way to make this work...?
+    ; loop ver of spell wram loading
+    /*
+    ld 10, b
+    .load_sprite_address
+        copy16bit [hli], [hli], _OAMRAM + sizeof_OAM_ATTRS * b
+        inc b
+
+        ld a, b
+        cp a, 18
+        jr nz, .load_sprite_address
+    */
     ret
 
 ; initalize sprites and their attributes
@@ -81,6 +105,28 @@ init_sprites:
     copy [SPRITE_13_ADDRESS + OAMA_TILEID], SPELL2B_TILEID
     copy [SPRITE_13_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
+    ;--SPELL 3
+    copy [SPRITE_14_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_14_ADDRESS + OAMA_X], 0
+    copy [SPRITE_14_ADDRESS + OAMA_TILEID], SPELL1A_TILEID
+    copy [SPRITE_14_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+
+    copy [SPRITE_15_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_15_ADDRESS + OAMA_X], 0
+    copy [SPRITE_15_ADDRESS + OAMA_TILEID], SPELL1B_TILEID
+    copy [SPRITE_15_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+
+    ;--SPELL 4
+    copy [SPRITE_16_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_16_ADDRESS + OAMA_X], 0
+    copy [SPRITE_16_ADDRESS + OAMA_TILEID], SPELL2A_TILEID
+    copy [SPRITE_16_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+
+    copy [SPRITE_17_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_17_ADDRESS + OAMA_X], 0
+    copy [SPRITE_17_ADDRESS + OAMA_TILEID], SPELL2B_TILEID
+    copy [SPRITE_17_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+
     ret
 
 move_sprites_to_start:
@@ -99,9 +145,9 @@ move_sprites_to_start:
 
     ; SPELL 2
     copy [SPRITE_12_ADDRESS + OAMA_Y], SPELL_LOW_Y
-    copy [SPRITE_10_ADDRESS + OAMA_X], 128
+    copy [SPRITE_12_ADDRESS + OAMA_X], 128
     copy [SPRITE_13_ADDRESS + OAMA_Y], SPELL_LOW_Y
-    copy [SPRITE_11_ADDRESS + OAMA_X], 128
+    copy [SPRITE_13_ADDRESS + OAMA_X], 128
 
     ret
 
@@ -111,23 +157,70 @@ update_sprites:
     CheckTimer rTIMER_OBJ, 1
     jr nz, .done_update
 
-    ; scrolling spell 1
-    ld a, [SPRITE_10_ADDRESS + OAMA_X]
-    sub SPELL_SCROLL_SPEED
-    ld [SPRITE_10_ADDRESS + OAMA_X], a
-    add OBJ16_OFFSET
-    ld [SPRITE_11_ADDRESS + OAMA_X], a
+    ld hl, SPELL_WRAM_START
+    .update_spell_sprite
+        ; preserve hl and store in de
+        push hl
+        ld d, h
+        ld e, l
 
-    ; scrolling spell 2
-    ld a, [SPRITE_12_ADDRESS + OAMA_X]
-    sub SPELL_SCROLL_SPEED
-    ld [SPRITE_12_ADDRESS + OAMA_X], a
-    add OBJ16_OFFSET
-    ld [SPRITE_13_ADDRESS + OAMA_X], a
+        ; load spell_a address into (hl)
+        WRAMToOAM hl
+        ld b, $00
+        ld c, OAMA_X
+        add hl, bc
+
+        ; preserve pt 1
+        ;call check_collisions
+        push hl
+
+        ld a, [hl]
+        
+        ; load in new x val
+        sub SPELL_SCROLL_SPEED
+        ld [hl], a
+
+        add a, OBJ16_OFFSET
+
+        ; load spell_b address into (hl)
+        ld h, d
+        ld l, e
+        inc hl
+        inc hl
+        WRAMToOAM hl
+        ld b, $00
+        ld c, OAMA_X
+        add hl, bc
+        ld [hl], a
+
+        ;/* this method requires an extra halt in main
+        ; preserve pt 2
+        push hl
+
+        ; get 2nd sprite part
+        pop hl
+        ld d, h
+        ld e, l
+
+        ; get 1st sprite part
+        pop hl
+        call check_collisions
+        ;*/
+
+        ; to next spell sprite
+        pop hl
+        inc hl
+        inc hl
+        inc hl
+        inc hl
+        
+        ld a, l
+        cp a, $38; $40
+        jr nz, .update_spell_sprite
 
     SetShieldLocations 0, 0, 0, 0
 
-    call check_collisions
+    ;call check_collisions
     .done_update
     ret
 
@@ -135,19 +228,23 @@ update_sprites:
 check_collisions:
     ; raise miss flag by default
     copy [rCOLLISION], COLLF_XMISS
-    
-    ; loop thru all sprites in wram
-    ; ^ add that bit later
 
-    
     ; check if the current x is within the 'perfect' x range
     ; set perf flag if so
-    CheckSpriteRange [SPRITE_10_ADDRESS + OAMA_X]
+    CheckSpriteRange [hl]
+    ; CheckSpriteRange [SPRITE_10_ADDRESS + OAMA_X]
     ; [SPRITE_10_ADDRESS + OAMA_X], HIT_PERF_MIN, HIT_PERF_MAX, rCOLLB_XPERF
 
     ld a, [PAD_CURR]
+    bit PADB_B, a
+        jr z, .run_check
     bit PADB_A, a
-    jr nz, .check_miss
+        jr nz, .check_miss
+    ; if PADB_B or PADB_A are true, continue
+    ; NOTE: A and B will run this regardless of high/low match
+
+    .run_check 
+    ;jr nz, .check_miss
         ld a, [rCOLLISION]
         bit COLLB_XPERF, a
         jr z, .check_miss
@@ -159,10 +256,13 @@ check_collisions:
     .done_check
     ret
 
+; doesn't work for the bottom sprite --> why?
 handle_collision:
     ld a, 0
-    ld [SPRITE_10_ADDRESS + OAMA_X], a
-    ld [SPRITE_11_ADDRESS + OAMA_X], a
+    ld [hl], a
+    ld [de], a
+    ;ld [SPRITE_10_ADDRESS + OAMA_X], a
+    ;ld [SPRITE_11_ADDRESS + OAMA_X], a
     ; note: 2nd tile is visible when setting x = 0
     ;   could make a 'hide sprite' function?
     ; set 'inactive' flag?
@@ -172,7 +272,7 @@ handle_miss:
     ; will be called if no button is pressed
     ; note: change so x val comparison is outside func call?
     ; note: eventually flash the player sprite (damage)
-    ld a, [SPRITE_10_ADDRESS + OAMA_X]
+    ld a, [hl]; [SPRITE_10_ADDRESS + OAMA_X]
     cp a, 4
     jr nc, .done
         ; lower player health
