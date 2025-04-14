@@ -32,6 +32,30 @@ def SPELL2B_TILEID         equ $3E
 init_sprite_data:
     call init_player_sprite_data
 
+    ; put spell sprite addresses into WRAM
+    ld hl, SPELL_WRAM_START
+    copy16bit [hli], [hli], SPRITE_10_ADDRESS
+    copy16bit [hli], [hli], SPRITE_11_ADDRESS
+    copy16bit [hli], [hli], SPRITE_12_ADDRESS
+    copy16bit [hli], [hli], SPRITE_13_ADDRESS
+    copy16bit [hli], [hli], SPRITE_14_ADDRESS
+    copy16bit [hli], [hli], SPRITE_15_ADDRESS
+    copy16bit [hli], [hli], SPRITE_16_ADDRESS
+    copy16bit [hli], [hli], SPRITE_17_ADDRESS
+    
+    
+    ; is there a way to make this work...?
+    ; loop ver of spell wram loading
+    /*
+    ld 10, b
+    .load_sprite_address
+        copy16bit [hli], [hli], _OAMRAM + sizeof_OAM_ATTRS * b
+        inc b
+
+        ld a, b
+        cp a, 18
+        jr nz, .load_sprite_address
+    */
     ret
 
 ; initalize sprites and their attributes
@@ -73,13 +97,35 @@ init_sprites:
     ;-- SPELL 2
     copy [SPRITE_12_ADDRESS + OAMA_Y], 0
     copy [SPRITE_12_ADDRESS + OAMA_X], 0
-    copy [SPRITE_12_ADDRESS + OAMA_TILEID], SPELL2A_TILEID
+    copy [SPRITE_12_ADDRESS + OAMA_TILEID], SPELL1A_TILEID
     copy [SPRITE_12_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
     copy [SPRITE_13_ADDRESS + OAMA_Y], 0
     copy [SPRITE_13_ADDRESS + OAMA_X], 0
-    copy [SPRITE_13_ADDRESS + OAMA_TILEID], SPELL2B_TILEID
+    copy [SPRITE_13_ADDRESS + OAMA_TILEID], SPELL1B_TILEID
     copy [SPRITE_13_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+
+    ;--SPELL 3
+    copy [SPRITE_14_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_14_ADDRESS + OAMA_X], 0
+    copy [SPRITE_14_ADDRESS + OAMA_TILEID], SPELL2A_TILEID
+    copy [SPRITE_14_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+
+    copy [SPRITE_15_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_15_ADDRESS + OAMA_X], 0
+    copy [SPRITE_15_ADDRESS + OAMA_TILEID], SPELL2B_TILEID
+    copy [SPRITE_15_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+
+    ;--SPELL 4
+    copy [SPRITE_16_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_16_ADDRESS + OAMA_X], 0
+    copy [SPRITE_16_ADDRESS + OAMA_TILEID], SPELL2A_TILEID
+    copy [SPRITE_16_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+
+    copy [SPRITE_17_ADDRESS + OAMA_Y], 0
+    copy [SPRITE_17_ADDRESS + OAMA_X], 0
+    copy [SPRITE_17_ADDRESS + OAMA_TILEID], SPELL2B_TILEID
+    copy [SPRITE_17_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
     ret
 
@@ -111,19 +157,48 @@ update_sprites:
     CheckTimer rTIMER_OBJ, 1
     jr nz, .done_update
 
-    ; scrolling spell 1
-    ld a, [SPRITE_10_ADDRESS + OAMA_X]
-    sub SPELL_SCROLL_SPEED
-    ld [SPRITE_10_ADDRESS + OAMA_X], a
-    add OBJ16_OFFSET
-    ld [SPRITE_11_ADDRESS + OAMA_X], a
+    ld hl, SPELL_WRAM_START
+    .update_spell_sprite
+        ; preserve hl and store in de
+        push hl
+        ld d, h
+        ld e, l
 
-    ; scrolling spell 2
-    ld a, [SPRITE_12_ADDRESS + OAMA_X]
-    sub SPELL_SCROLL_SPEED
-    ld [SPRITE_12_ADDRESS + OAMA_X], a
-    add OBJ16_OFFSET
-    ld [SPRITE_13_ADDRESS + OAMA_X], a
+        ; load spell_a address into (hl)
+        WRAMToOAM hl
+        ld b, $00
+        ld c, OAMA_X
+        add hl, bc
+
+        ld a, [hl]
+        
+        ; load in new x val
+        sub SPELL_SCROLL_SPEED
+        ld [hl], a
+
+        add a, OBJ16_OFFSET
+
+        ; load spell_b address into (hl)
+        ld h, d
+        ld l, e
+        inc hl
+        inc hl
+        WRAMToOAM hl
+        ld b, $00
+        ld c, OAMA_X
+        add hl, bc
+        ld [hl], a
+
+        ; to next spell sprite
+        pop hl
+        inc hl
+        inc hl
+        inc hl
+        inc hl
+        
+        ld a, l
+        cp a, $38; $40
+        jr nz, .update_spell_sprite
 
     SetShieldLocations 0, 0, 0, 0
 
