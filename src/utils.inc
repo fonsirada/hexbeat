@@ -27,15 +27,16 @@ macro copy
 endm
 
 ; copy 16bit reg \2 into 16bit reg \1 using (a)
+; IF THINGS BREAK, UNCOMMENT THE REG PRESERVATION
 macro copy16bit
-    push hl
+    ;push hl
 
     ld a, high(\3)
     ld \1, a
     ld a, low(\3)
     ld \2, a
 
-    pop hl
+    ;pop hl
 endm
 
 ; run a bit operation \3 on address \1 at bit \2 using (a)
