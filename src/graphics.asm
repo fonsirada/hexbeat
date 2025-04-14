@@ -116,30 +116,38 @@ update_graphics:
         ld [rSCX], a
 
     .done_update
-    ;call update_window
+    call update_window
 
     ret
 
 ; WIP
+; $22 to $2B in the 9C00 map
+; $3C (full) | $3D (half) | $3E (empty)
+; note: breaks on last health (full bar instead of half bar)
 update_window:
-    ; $22 to $2B in the 9C00 map
-    ; $3C (full) | $3D (half) | $3E (empty)
-    ; pseudocode:
-    ; for i in range 10
-    ;   change tile $22 + i to...
-    ;   $3D if i == health
-    ;   $3E if i > health 
-    ld hl, $9C22
+    halt
+
+    ld hl, $9C2B
     .loop
         ld a, l
-        add a, 0
-        ld l, a
+        sub a, $21
+        ld b, a
 
-        ld [hl], $3C
-        ld [hl], $3D
-        ld [hl], $3E
-    jr .loop
-    
+        ld a, [rPC_HEALTH]
+        cp a, b
+        jr nz, .check_empty
+            ld [hl], $3D
+            jr .next_hbar_tile
+        .check_empty
+        cp a, b
+        jr nc, .next_hbar_tile
+            ld [hl], $3E
+        .next_hbar_tile
+
+        dec hl
+        ld a, l
+        cp a, $22
+        jr nz, .loop
     ret 
 
 update_timers:
