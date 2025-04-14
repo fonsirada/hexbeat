@@ -203,6 +203,10 @@ handle_collision:
     ld [hl], a
     ld [de], a
     ; set 'inactive' flag?
+
+    ld a, [rGAME_DIFF]
+    inc a
+    ld [rGAME_DIFF], a
     ret
 
 handle_miss:

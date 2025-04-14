@@ -25,6 +25,7 @@ def HOLD_A_COUNTER rb 1
 
 ;;; ADDITIONAL REGISTERS ;;;
 def rGAME           rb 1
+def rGAME_DIFF      rb 1
 def rPLAYER         rb 1
 def rPC_HEALTH      rb 1
 def rPC_ACOUNT      rb 1
@@ -55,15 +56,16 @@ def PLAYERB_B       equ 4
 def PLAYERB_FALL    equ 3
 
 ;;; rCOLLISION
-def rCOLL_Y         equ %10000000
-; [may want another Y flag here]
+def rCOLL_YHIGH     equ %10000000
+def rCOLL_YLOW      equ %01000000
 def COLLF_XPERF     equ %00100000
 def COLLF_XGOOD     equ %00010000
 def COLLF_XBAD      equ %00001000
 def COLLF_XMISS     equ %00000100
 ; ^ one of these flags should always be set!
 
-def COLLB_Y         equ 7
+def COLLB_YHIGH     equ 7
+def COLLB_YLOW      equ 6
 def COLLB_XPERF     equ 5
 def COLLB_XGOOD     equ 4
 def COLLB_XBAD      equ 3

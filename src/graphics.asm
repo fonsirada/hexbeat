@@ -96,11 +96,12 @@ init_graphics:
     ; there's gotta be a better way to do this -S
     ld a, GAME_BASE 
     ld [rGAME], a
+    ld [rGAME_DIFF], a
     ld [rPLAYER], a
-    copy [rPC_HEALTH], 10 ; magic number, fix
+    copy [rPC_HEALTH], 10 ; magic number --> PLAYER_HEALTH
     ld [rPC_ACOUNT], a
     ld [rCOLLISION], a
-    ld [rTIMER_BG], a ; make an initialize timers func
+    ld [rTIMER_BG], a ; make an initialize timers func?
     ld [rTIMER_PC], a
     ld [rTIMER_OBJ], a
     ld [rTIMER_OBJ2], a
