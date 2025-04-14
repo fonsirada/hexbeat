@@ -20,6 +20,8 @@ def PAD_CURR rb 1
 def PAD_PREV rb 1
 def PAD_PRSS rb 1
 def PAD_RLSE rb 1
+def PAD_LHOLD rb 1
+def HOLD_A_COUNTER rb 1
 
 ;;; ADDITIONAL REGISTERS ;;;
 def rGAME           rb 1

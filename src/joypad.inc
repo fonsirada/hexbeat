@@ -13,6 +13,7 @@ include "src/wram.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+def INIT_COUNTER    equ $00
 def NONE_HELD       equ $FF
 def HIGH_NIB_MASK   equ $F0
 def LOW_NIB_MASK    equ $0F
@@ -27,6 +28,9 @@ macro InitJoypad
     ld [PAD_PREV], a
     ld [PAD_RLSE], a
     ld [PAD_PRSS], a
+    ld [PAD_LHOLD], a
+    ld a, INIT_COUNTER
+    ld [HOLD_A_COUNTER], a
 endm
 
 ; read the keypad input into a pad input struct
@@ -66,6 +70,31 @@ macro UpdateJoypad
     ; store the current input
     ld [PAD_CURR], a
 
+    ; compute long hold for 'a' button (previously pressed and STILL being pressed)
+    or a, c
+    bit 0, a
+    ; if a is not being 'held' anymore reset the counter
+    jr nz, .not_held
+        ; if a is being 'held' check if it's been held for at least 5 frames
+        ld a, [HOLD_A_COUNTER]
+        cp 5
+        jr nz, .not_yet
+            ; if it's been held for longer than 5 frames, set flag saying its being long held
+            ld a, 0
+            ld [PAD_LHOLD], a
+            jr .disable_input
+        .not_yet
+        inc a
+        ld [HOLD_A_COUNTER], a
+        jr .disable_input
+
+    .not_held
+    ld a, INIT_COUNTER
+    ld [HOLD_A_COUNTER], a
+    ld a, NONE_HELD
+    ld [PAD_LHOLD], a
+
+    .disable_input
     ; disable input polling
     ld a, P1F_GET_NONE
     ldh [rP1], a

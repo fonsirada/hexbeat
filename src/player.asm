@@ -188,8 +188,11 @@ player_hit_high:
     jr nz, .extend_frame
         ; go to next frame
         UpdatePlayerAnim SPRITE_0_A_WRAM_LOCATION, SPRITE_ANIM_WRAM_THRES, SPRITE_HIT_HIGH_THRES_TILEID
-        call jump
-        jr .end_frame_update
+        ld a, [PAD_LHOLD]
+        cp 0
+        jr z, .end_frame_update
+            call jump
+            jr .end_frame_update
 
     .extend_frame
         ; frame 3-4: ($60) + set shield visible
