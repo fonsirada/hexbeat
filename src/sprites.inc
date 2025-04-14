@@ -130,7 +130,6 @@ macro SetPlayerTiles
    copy [SPRITE_3_ADDRESS + OAMA_TILEID], \1 + 6
    copy [SPRITE_4_ADDRESS + OAMA_TILEID], \1 + 8
    copy [SPRITE_5_ADDRESS + OAMA_TILEID], \1 + 10
-
 endm
 
 ; set the Player sprite(s)'s X or Y value based on the first sprite
@@ -158,10 +157,10 @@ macro SetShieldLocations
 endm
 
 ; checks if a given sprite's x val is within a given range
+; params:
+;   curr_x, range_min, range_max, flag_bit, flag_binary
+; NOTE: currently hard-coded to a perfect hit
 macro CheckSpriteRange
-    ; params:
-    ; curr_x, range_min, range_max, flag_bit, flag_binary
-    ; currently hard-coded to a perfect hit
     ld a, \1
     cp HIT_PERF_MIN
         ; fail if less than min
@@ -170,10 +169,10 @@ macro CheckSpriteRange
             ; fail if greater than max
             jr nc, .check_miss\@
                 RegBitOp rCOLLISION, COLLB_XPERF, set
-                jr .done_check\@ ; is this needed?
+                jr .done_check\@ ; keep bc faster?
     
     .check_miss\@
-    cp HIT_MISS_MAX
+        cp HIT_MISS_MAX
         jr c, .done_check\@
             RegBitOp rCOLLISION, COLLB_XMISS, res
     
@@ -189,6 +188,17 @@ macro WRAMToOAM
     ld c, [\1]
     ld h, b
     ld l, c
+endm
+
+macro SetSpriteXY
+    copy [(_OAMRAM + sizeof_OAM_ATTRS * \1) + OAMA_X], \2
+    copy [(_OAMRAM + sizeof_OAM_ATTRS * \1) + OAMA_Y], \3
+endm
+
+macro SetSpriteData
+    SetSpriteXY \1, \2, \3
+    copy [(_OAMRAM + sizeof_OAM_ATTRS * \1) + OAMA_TILEID], \4
+    copy [(_OAMRAM + sizeof_OAM_ATTRS * \1) + OAMA_FLAGS], \5
 endm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -55,6 +55,7 @@ main:
             
             call update_timers
             call update_graphics
+            halt
             call update_sprites
             halt
             call update_player
@@ -62,4 +63,4 @@ main:
         .post_graphics
 
         UpdateJoypad
-        jr .loop
+        jp .loop

@@ -39,6 +39,8 @@ def WY_OFS                          equ 136
 def LEVEL_SCY                       equ 0
 def UI_Y                            equ 112
 
+def WIN_HEALTH_END                  equ $9C2B
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; load the graphics data from ROM to VRAM
@@ -120,14 +122,12 @@ update_graphics:
 
     ret
 
-; WIP
+
 ; $22 to $2B in the 9C00 map
 ; $3C (full) | $3D (half) | $3E (empty)
-; note: breaks on last health (full bar instead of half bar)
 update_window:
-    halt
+    ld hl, WIN_HEALTH_END
 
-    ld hl, $9C2B
     .loop
         ld a, l
         sub a, $21
@@ -136,17 +136,19 @@ update_window:
         ld a, [rPC_HEALTH]
         cp a, b
         jr nz, .check_empty
+            ; replace with half-filled bar
             ld [hl], $3D
             jr .next_hbar_tile
         .check_empty
         cp a, b
         jr nc, .next_hbar_tile
+            ; replace with empty bar
             ld [hl], $3E
+        
         .next_hbar_tile
-
         dec hl
         ld a, l
-        cp a, $22
+        cp a, $21
         jr nz, .loop
     ret 
 
@@ -182,8 +184,6 @@ start:
     ret
 
 game_over:
-
-        
     ; add visuals/text
     ; add press enter to restart functionality
     .done

@@ -59,101 +59,48 @@ init_sprite_data:
     ret
 
 ; initalize sprites and their attributes
+; format: sprite #, (x, y), tile ID, palette mode
 init_sprites:
     ; TARGETS
-    copy [SPRITE_6_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_6_ADDRESS + OAMA_X], 0
-    copy [SPRITE_6_ADDRESS + OAMA_TILEID], TARGET_HIGH_TILEID
-    copy [SPRITE_6_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-
-    copy [SPRITE_7_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_7_ADDRESS + OAMA_X], 0
-    copy [SPRITE_7_ADDRESS + OAMA_TILEID], TARGET_LOW_TILEID
-    copy [SPRITE_7_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+    SetSpriteData 6, 0, 0, TARGET_HIGH_TILEID, OAMF_PAL0
+    SetSpriteData 7, 0, 0, TARGET_LOW_TILEID, OAMF_PAL0
 
     ; PLAYER 'SHIELD' SPRITES
-    copy [SPRITE_8_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_8_ADDRESS + OAMA_X], 0
-    copy [SPRITE_8_ADDRESS + OAMA_TILEID], SHIELD_HIGH_TILEID
-    copy [SPRITE_8_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-
-    copy [SPRITE_9_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_9_ADDRESS + OAMA_X], 0
-    copy [SPRITE_9_ADDRESS + OAMA_TILEID], SHIELD_LOW_TILEID
-    copy [SPRITE_9_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+    SetSpriteData 8, 0, 0, SHIELD_HIGH_TILEID, OAMF_PAL0
+    SetSpriteData 9, 0, 0, SHIELD_LOW_TILEID, OAMF_PAL0
 
     ; SPELL OBJ SPRITES
-    ;-- SPELL 1
-    copy [SPRITE_10_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_10_ADDRESS + OAMA_X], 0
-    copy [SPRITE_10_ADDRESS + OAMA_TILEID], SPELL1A_TILEID
-    copy [SPRITE_10_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+    SetSpriteData 10, 0, 0, SPELL1A_TILEID, OAMF_PAL0
+    SetSpriteData 11, 0, 0, SPELL1B_TILEID, OAMF_PAL0
 
-    copy [SPRITE_11_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_11_ADDRESS + OAMA_X], 0
-    copy [SPRITE_11_ADDRESS + OAMA_TILEID], SPELL1B_TILEID
-    copy [SPRITE_11_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+    SetSpriteData 12, 0, 0, SPELL2A_TILEID, OAMF_PAL0
+    SetSpriteData 13, 0, 0, SPELL2B_TILEID, OAMF_PAL0
 
-    ;-- SPELL 2
-    copy [SPRITE_12_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_12_ADDRESS + OAMA_X], 0
-    copy [SPRITE_12_ADDRESS + OAMA_TILEID], SPELL2A_TILEID
-    copy [SPRITE_12_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+    SetSpriteData 14, 0, 0, SPELL1A_TILEID, OAMF_PAL0
+    SetSpriteData 15, 0, 0, SPELL1B_TILEID, OAMF_PAL0
 
-    copy [SPRITE_13_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_13_ADDRESS + OAMA_X], 0
-    copy [SPRITE_13_ADDRESS + OAMA_TILEID], SPELL2B_TILEID
-    copy [SPRITE_13_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-
-    ;--SPELL 3
-    copy [SPRITE_14_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_14_ADDRESS + OAMA_X], 0
-    copy [SPRITE_14_ADDRESS + OAMA_TILEID], SPELL1A_TILEID
-    copy [SPRITE_14_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-
-    copy [SPRITE_15_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_15_ADDRESS + OAMA_X], 0
-    copy [SPRITE_15_ADDRESS + OAMA_TILEID], SPELL1B_TILEID
-    copy [SPRITE_15_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-
-    ;--SPELL 4
-    copy [SPRITE_16_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_16_ADDRESS + OAMA_X], 0
-    copy [SPRITE_16_ADDRESS + OAMA_TILEID], SPELL2A_TILEID
-    copy [SPRITE_16_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-
-    copy [SPRITE_17_ADDRESS + OAMA_Y], 0
-    copy [SPRITE_17_ADDRESS + OAMA_X], 0
-    copy [SPRITE_17_ADDRESS + OAMA_TILEID], SPELL2B_TILEID
-    copy [SPRITE_17_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+    SetSpriteData 16, 0, 0, SPELL2A_TILEID, OAMF_PAL0
+    SetSpriteData 17, 0, 0, SPELL2B_TILEID, OAMF_PAL0
 
     ret
 
 move_sprites_to_start:
     ; TARGETS
-    copy [SPRITE_6_ADDRESS + OAMA_Y], TARGET_HIGH_Y
-    copy [SPRITE_6_ADDRESS + OAMA_X], TARGET_X
+    SetSpriteXY 6, TARGET_X, TARGET_HIGH_Y
+    SetSpriteXY 7, TARGET_X, TARGET_LOW_Y
 
-    copy [SPRITE_7_ADDRESS + OAMA_Y], TARGET_LOW_Y
-    copy [SPRITE_7_ADDRESS + OAMA_X], TARGET_X
-
-    ; SPELL 1
-    copy [SPRITE_10_ADDRESS + OAMA_Y], SPELL_HIGH_Y
-    copy [SPRITE_10_ADDRESS + OAMA_X], 0
-    copy [SPRITE_11_ADDRESS + OAMA_Y], SPELL_HIGH_Y
-    copy [SPRITE_11_ADDRESS + OAMA_X], 0
-
-    ; SPELL 2
-    copy [SPRITE_12_ADDRESS + OAMA_Y], SPELL_LOW_Y
-    copy [SPRITE_12_ADDRESS + OAMA_X], 128
-    copy [SPRITE_13_ADDRESS + OAMA_Y], SPELL_LOW_Y
-    copy [SPRITE_13_ADDRESS + OAMA_X], 128
+    ; SPELL OBJs
+    SetSpriteXY 10, 0, SPELL_HIGH_Y
+    SetSpriteXY 11, 0, SPELL_HIGH_Y
+    SetSpriteXY 12, 128, SPELL_LOW_Y
+    SetSpriteXY 13, 128, SPELL_LOW_Y
+    SetSpriteXY 14, 64, SPELL_HIGH_Y
+    SetSpriteXY 15, 64, SPELL_HIGH_Y
 
     ret
 
-; note: refactor this to work thru WRAM
+; NOTE: returns hl and de for handle_collision and handle_miss
 update_sprites:
-    ; custom timing here:
     CheckTimer rTIMER_OBJ, 1
     jr nz, .done_update
 
@@ -171,16 +118,12 @@ update_sprites:
         add hl, bc
 
         ; preserve pt 1
-        ;call check_collisions
         push hl
 
-        ld a, [hl]
-        
         ; load in new x val
+        ld a, [hl]
         sub SPELL_SCROLL_SPEED
         ld [hl], a
-
-        add a, OBJ16_OFFSET
 
         ; load spell_b address into (hl)
         ld h, d
@@ -191,9 +134,12 @@ update_sprites:
         ld b, $00
         ld c, OAMA_X
         add hl, bc
+
+        ; load offset x val for sprite pt 2
+        add a, OBJ16_OFFSET
         ld [hl], a
 
-        ;/* this method requires an extra halt in main
+        ;NOTE: this method requires an extra halt in main
         ; preserve pt 2
         push hl
 
@@ -205,7 +151,6 @@ update_sprites:
         ; get 1st sprite part
         pop hl
         call check_collisions
-        ;*/
 
         ; to next spell sprite
         pop hl
@@ -215,16 +160,13 @@ update_sprites:
         inc hl
         
         ld a, l
-        cp a, $38; $40
+        cp a, $3C;$38; $40 ;change here for # of active sprites
         jr nz, .update_spell_sprite
 
     SetShieldLocations 0, 0, 0, 0
-
-    ;call check_collisions
     .done_update
     ret
 
-; TEST w/ 1 SPRITE --> mostly works -S
 check_collisions:
     ; raise miss flag by default
     copy [rCOLLISION], COLLF_XMISS
@@ -232,7 +174,6 @@ check_collisions:
     ; check if the current x is within the 'perfect' x range
     ; set perf flag if so
     CheckSpriteRange [hl]
-    ; CheckSpriteRange [SPRITE_10_ADDRESS + OAMA_X]
     ; [SPRITE_10_ADDRESS + OAMA_X], HIT_PERF_MIN, HIT_PERF_MAX, rCOLLB_XPERF
 
     ld a, [PAD_CURR]
@@ -256,15 +197,11 @@ check_collisions:
     .done_check
     ret
 
-; doesn't work for the bottom sprite --> why?
+
 handle_collision:
     ld a, 0
     ld [hl], a
     ld [de], a
-    ;ld [SPRITE_10_ADDRESS + OAMA_X], a
-    ;ld [SPRITE_11_ADDRESS + OAMA_X], a
-    ; note: 2nd tile is visible when setting x = 0
-    ;   could make a 'hide sprite' function?
     ; set 'inactive' flag?
     ret
 
