@@ -37,27 +37,23 @@ main:
     EnableLCD
 
     .loop
-        ; start handling
+        ; set up title screen
+        push af
         call start
-        bit GAMEB_START, a
-        jr z, .post_graphics
+        pop af
 
- 
         ld a, [rGAME]
-        bit GAMEB_END, a
-        jr z, .check_start
-            call game_over
-            jr .post_graphics
-        
-            ; jr [nz?], .loop
-            ; ^ above should restart game on pressing enter
-            ; check placement of this
-
-        .check_start
         bit GAMEB_START, a
+        ; if game hasn't been started yet, jump to updatejoypad to read 'start' press
         jr z, .post_graphics
-            ; if things break: out of vblank time
-            
+            bit GAMEB_END, a
+            ; if game has been started, but not ended, just update graphics
+            jr z, .graphics
+                ; if game has been ended, set up game over screen
+                call game_over
+                jr .post_graphics
+
+        .graphics
             call update_timers
             call update_graphics
             halt
@@ -66,6 +62,5 @@ main:
             call update_player
 
         .post_graphics
-
         UpdateJoypad
         jp .loop
