@@ -18,8 +18,9 @@ section "vblank_interrupt", rom0[$0040]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 section "text", rom0
-GAMEOVER_STRING:
-    db "GAME OVER\nPRESS SELECT\nTO RESTART\0"
+GAME_OVER:
+    ; the tile ID's for each character in "GAME OVER\nPRESS SELECT\nTO RESTART"
+    db $FE, $F8, $0C, $FC, $2A, $0E, $1D, $FC, $19, $0A, $0F, $19, $FC, $1A, $1A, $2A, $1A, $FC, $0B, $FC, $FA, $1B, $0A, $1B, $0E, $2A, $19, $FC, $1A, $1B, $F8, $19, $1B
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -36,6 +37,10 @@ def GRAPHICS_DATA_ADDRESS_END       equ ($8000)
 def GRAPHICS_DATA_ADDRESS_START     equ (GRAPHICS_DATA_ADDRESS_END - GRAPHICS_DATA_SIZE)
 
 def BG_SCROLL_SPEED                 equ 2
+def BG_ANIMATION_TIMER              equ 1
+def UPDATE_FRAME                    equ 1
+def PC_ANIMATION_TIMER              equ 3
+def OBJ_ANIMATION_TIMER             equ 2
 
 def PALETTE_0                       equ %11100100
 def PALETTE_1                       equ %00011011
@@ -45,6 +50,25 @@ def START_SCX                       equ 0
 def WY_OFS                          equ 136
 def LEVEL_SCY                       equ 0
 def UI_Y                            equ 112
+
+def PLAYER_HEALTH                   equ 10
+
+def HEALTH_BAR_TILE_OFFSET          equ $21
+def HEALTH_HALF_TILEID              equ $3D
+def HEALTH_EMPTY_TILEID             equ $3E
+def HEALTH_FULL_TILEID              equ $3C
+
+def O_TILE_ID                       equ $0E
+def N_TILE_ID                       equ $0D
+def E_TILE_ID                       equ $FC
+def T_TILE_ID                       equ $1B
+def W_TILE_ID                       equ $1E
+
+; start on row 2 of screen which starts at $9880
+def TEXT_START_LOCATION             equ $9880
+def NEW_LINE                        equ $0A
+def ONE_ROW_LOWER_OFFSET            equ $0016
+def SCREEN_CENTER_OFFSET            equ 8
 
 def WIN_HEALTH_END                  equ $9C2B
 def LEVEL_TEXT_START                equ $9C2E
@@ -95,32 +119,26 @@ init_graphics:
     ld [rIE], a
     ei
 
-    ; set bg to start screen & hide window offscreen
-    ;copy [rSCY], START_SCY
-    ;copy [rWX], WX_OFS
-    ;copy [rWY], WY_OFS
-
     ret
 
 init_registers:
     ; set up game and player settings
-    ; there's gotta be a better way to do this -S
     ld a, GAME_BASE 
     ld [rGAME], a
     ld [rGAME_DIFF], a
     ld [rPLAYER], a
-    copy [rPC_HEALTH], 10 ; magic number --> PLAYER_HEALTH
+    copy [rPC_HEALTH], PLAYER_HEALTH 
     ld [rPC_ACOUNT], a
     ld [rCOLLISION], a
-    ld [rTIMER_BG], a ; make an initialize timers func?
+    ld [rTIMER_BG], a
     ld [rTIMER_PC], a
     ld [rTIMER_OBJ], a
-    copy [rSPELL_COUNT], $38
+    copy [rSPELL_COUNT], LVL1_SPELL_NUM
     ret
 
 update_graphics:
     ; halt
-    CheckTimer rTIMER_BG, 1
+    CheckTimer rTIMER_BG, UPDATE_FRAME
     jr nz, .done_update
 
         ; scroll bg
@@ -145,30 +163,30 @@ update_window:
 
     .loop
         ld a, l
-        sub a, $21
+        sub a, HEALTH_BAR_TILE_OFFSET
         ld b, a
 
         ld a, [rPC_HEALTH]
         cp a, b
         jr nz, .check_empty
             ; replace with half-filled bar
-            ld [hl], $3D
+            ld [hl], HEALTH_HALF_TILEID
             jr .next_hbar_tile
         .check_empty
         cp a, b
         jr nc, .load_full
             ; replace with empty bar
-            ld [hl], $3E
+            ld [hl], HEALTH_EMPTY_TILEID
             jr .next_hbar_tile
 
         .load_full
             ; replace with a full bar
-            ld [hl], $3C
+            ld [hl], HEALTH_FULL_TILEID
         
         .next_hbar_tile
         dec hl
         ld a, l
-        cp a, $21
+        cp a, HEALTH_BAR_TILE_OFFSET
         jr nz, .loop
     ret 
 
@@ -178,29 +196,29 @@ level_text:
     ld a, [rGAME]
     bit GAMEB_LVL2, a
     jr nz, .print_level_2
-        ld [hl], $0E
+        ld [hl], O_TILE_ID
         inc hl
-        ld [hl], $0D
+        ld [hl], N_TILE_ID
         inc hl
-        ld [hl], $FC
+        ld [hl], E_TILE_ID
         inc hl
         jr .done
 
     .print_level_2
-    ld [hl], $1B
+    ld [hl], T_TILE_ID
     inc hl
-    ld [hl], $1E
+    ld [hl], W_TILE_ID
     inc hl
-    ld [hl], $0E
+    ld [hl], O_TILE_ID
     inc hl
 
     .done
     ret
 
 update_timers:
-    IncTimer rTIMER_BG, 1
-    IncTimer rTIMER_PC, 3
-    IncTimer rTIMER_OBJ, 2;1
+    IncTimer rTIMER_BG, BG_ANIMATION_TIMER
+    IncTimer rTIMER_PC, PC_ANIMATION_TIMER
+    IncTimer rTIMER_OBJ, OBJ_ANIMATION_TIMER
     ret
 
 ; reads for START press on the title screen and sets up the level screen
@@ -260,38 +278,25 @@ game_over:
 ; prints the game over text from ROM
 print_text:
     call find_center_tile
-    ld de, GAMEOVER_STRING ; (de) stores where the string is stored in ROM
+    ld de, GAME_OVER 
 
     .print_tiles_loop
-        ; load the ASCII value of the character from the string into a
         ld a, [de]
-        ; if the value is 0, you've reached the end of the string
+        ; check if reached end of string
         cp 0
         jr z, .done
-            ; if the value is $0A, you've reached a newline - change VRAM address to be 1 row lower
-            cp $0A
-            jr nz, .space
-                ld c, $16
-                ld b, $00
+            ; check if reached new-line
+            cp NEW_LINE
+            jr nz, .load_tile
+                ; move text location one row down
+                ld bc, ONE_ROW_LOWER_OFFSET
                 add hl, bc
-                inc de
-                jr .print_tiles_loop
-
-        .space
-            ; if the value is $20, you've reached a ' ' (space) character
-            cp $20
-            jr nz, .letter
-                ; blank tile for ' ' in string
-                ld a, $2A
-                jr .load_tile
-
-        .letter
-            call calculate_tile_id
-
+                jr .next_char
+        
         .load_tile
-            halt
             ld [hl], a
             inc hl
+        .next_char
             inc de
             jr .print_tiles_loop
 
@@ -299,51 +304,20 @@ print_text:
     ret
 
 find_center_tile:
-    ld hl, $9880 ; (hl) stores the VRAM address (tile location) where text will be printed 
-                 ; starting at $9880 since the Y value never changes, start on row 2 which starts at $9880
+    ld hl, TEXT_START_LOCATION 
 
     ld a, [rSCX]
-    ; divide SCX by 8 to get the corresponding background tile column
+    ; get the corresponding background tile column
     srl a
     srl a
     srl a
-    ; add 10 tiles to get to the center of the screen (LCD is 20 tiles wide)
-    add 8
+    ; get to the center of the screen
+    add SCREEN_CENTER_OFFSET
     ld c, a
     ld b, 0
-    ; each tile is 1 byte, so add the X tiles to the VRAM address to find the center tile of the screen
+    ; set VRAM address to center tile of the screen
     add hl, bc
 
-    ret
-
-calculate_tile_id:
-    ; subtracting $41 since $41 is the ASCII for 'A' (offset)
-    sub $41
-    cp 24
-    jr c, .check_block3
-        ; if the difference is >= 24, it's either 'Y' or 'Z' (block 4 in the tilemap)
-        sub 24
-        add $30
-        jr .add_tile_a_offset
-
-    .check_block3
-    cp 16
-    jr c, .check_block2
-        ; if the difference is >= 16, it's between 'Q' and 'X' (block 3 in the tilemap)
-        sub 16
-        add $20
-        jr .add_tile_a_offset
-    
-    .check_block2
-    cp 8
-    jr c, .add_tile_a_offset
-        ; if the difference is >= 8, it's between 'I' and 'P' (block 2 in the tilemap)
-        sub 8
-        add $10
-
-    .add_tile_a_offset
-    ; tile 'A' starts at tile index 248, each block is $10 apart and the tiles in each block are 1 byte > the previous
-    add $F8
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

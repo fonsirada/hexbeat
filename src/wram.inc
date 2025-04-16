@@ -84,6 +84,9 @@ def SPELLF_OFF      equ %00000000
 def SPELLB_TIER     equ 1
 def SPELLB_SPAWN    equ 0
 
+def LVL1_SPELL_NUM         equ $38
+def LVL2_SPELL_NUM         equ $40
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
