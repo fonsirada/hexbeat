@@ -12,10 +12,10 @@ def SPRITES_RGBINC equ 1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; WRAM
-def SPELL_FLAG_START equ ($C020)
+def SPELL_FLAG_START    equ ($C020)
 def SPELL_FLAG_INTERVAL equ (2)
-def SPELL_WRAM_START equ ($C030)
-def SPELL_WRAM_END   equ ($C040)
+def SPELL_WRAM_START    equ ($C030)
+def SPELL_WRAM_END      equ ($C040)
 
 ; TARGETS
 def SPRITE_6_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 6)
@@ -49,9 +49,10 @@ def SPELL_HIGH_Y           equ (TARGET_HIGH_Y - 4)
 def SPELL_LOW_Y            equ (TARGET_LOW_Y - 4)
 def SPELL_SCROLL_SPEED     equ 4
 
-def HIT_PERF_MIN           equ (50 - 8)
+def HIT_PERF_MIN           equ (TARGET_X - 8)
 def HIT_PERF_MAX           equ (HIT_PERF_MIN + 16)
 def HIT_MISS_MAX           equ (HIT_PERF_MIN - 1)
+def DMG_THRES              equ (4)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -161,6 +162,7 @@ endm
 ; checks if a given sprite's x val is within a given range
 ; params:
 ;   curr_x, range_min, range_max, flag_bit, flag_binary
+; ex: CheckSpriteRange [hl], HIT_PERF_MIN, HIT_PERF_MAX, rCOLLB_XPERF
 ; NOTE: currently hard-coded to a perfect hit
 macro CheckSpriteRange
     ld a, \1
@@ -173,6 +175,7 @@ macro CheckSpriteRange
                 RegBitOp rCOLLISION, COLLB_XPERF, set
                 jr .done_check\@ ; keep bc faster?
     
+    ; reset miss flag if outside the threshold
     .check_miss\@
         cp HIT_MISS_MAX
         jr c, .done_check\@
@@ -181,29 +184,42 @@ macro CheckSpriteRange
     .done_check\@
 endm
 
+; given an address in WRAM, get the OAM address there
+; and store in (hl)
 macro WRAMToOAM
     ;ld hl, \1
 
-    ; store sprite address in hl
-    ld b, [\1]
+    ld b, [hl]
     inc hl
-    ld c, [\1]
+    ld c, [hl]
     ld h, b
     ld l, c
 endm
 
+; tbh make this a function
 macro SpawnSpell 
     ; [ (hl) = spell OAM address, (de) = spell flags ]
-    
-    ; spell y = high or low (see flag)
-    ; spell x = 0
+    ld a, \2
+    bit SPELLB_TIER, a
+    jr nz, .set_low\@
+        inc hl ; inc to y attr
+        ld [hl], SPELL_Y_HIGH
+        jr .set_x\@
+    .set_low\@
+        inc hl
+        ld [hl], SPELL_Y_LOW
+    .set_x\@
+    inc hl
+    ld [hl], 0
 endm
 
+; params: sprite number, x val, y val
 macro SetSpriteXY
     copy [(_OAMRAM + sizeof_OAM_ATTRS * \1) + OAMA_X], \2
     copy [(_OAMRAM + sizeof_OAM_ATTRS * \1) + OAMA_Y], \3
 endm
 
+; params: sprite number, x val, y val, tile ID, flags
 macro SetSpriteData
     SetSpriteXY \1, \2, \3
     copy [(_OAMRAM + sizeof_OAM_ATTRS * \1) + OAMA_TILEID], \4

@@ -184,23 +184,37 @@ update_sprites:
     ret
 
 check_collisions:
-    ; raise miss flag by default
+    ; clear flags and raise miss flag
     copy [rCOLLISION], COLLF_XMISS
 
     ; check if the current x is within the 'perfect' x range
-    ; set perf flag if so
-    CheckSpriteRange [hl] ;, HIT_PERF_MIN, HIT_PERF_MAX, rCOLLB_XPERF
+    CheckSpriteRange [hl]
 
-    ld a, [PAD_CURR]
+    ; if B pressed & obj low, try collision
+    ld a, [PAD_PRSS]
     bit PADB_B, a
-        jr z, .run_check
-    bit PADB_A, a
-        jr nz, .check_miss
-    ; if PADB_B or PADB_A are true, continue
-    ; NOTE: A and B will run this regardless of high/low match
+    jr nz, .check_A
+        ; get to Y attr in OAM
+        dec hl
+        ld a, [hl]
+        inc hl
 
-    .run_check 
-    ;jr nz, .check_miss
+        cp a, SPELL_LOW_Y
+        jr nz, .check_miss
+            jr .run_check
+    
+    ; if A pressed & obj high, try collision
+    .check_A
+    bit PADB_A, a
+    jr nz, .check_miss
+        dec hl
+        ld a, [hl]
+        inc hl
+
+        cp a, SPELL_HIGH_Y
+        jr nz, .check_miss
+
+    .run_check
         ld a, [rCOLLISION]
         bit COLLB_XPERF, a
         jr z, .check_miss
@@ -212,30 +226,32 @@ check_collisions:
     .done_check
     ret
 
-
+; runs if player successfully hits a note
+; resets the sprite x value
 handle_collision:
     ld a, 0
     ld [hl], a
     ld [de], a
-    ; set 'inactive' flag?
+    ; note: set 'inactive' flag?
 
     ld a, [rGAME_DIFF]
     inc a
     ld [rGAME_DIFF], a
     ret
 
+; runs if the player misses a note
 handle_miss:
-    ; will be called if no button is pressed
     ; note: change so x val comparison is outside func call?
     ; note: eventually flash the player sprite (damage)
-    ld a, [hl]; [SPRITE_10_ADDRESS + OAMA_X]
-    cp a, 4
+    ld a, [hl]
+    cp a, DMG_THRES
     jr nc, .done
         ; lower player health
         ld a, [rPC_HEALTH]
         dec a
         ld [rPC_HEALTH], a
 
+        ; if health is 0, raise game_end flag
         cp a, 0
         jr nz, .done
             RegBitOp rGAME, GAMEB_END, set
