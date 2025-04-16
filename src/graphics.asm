@@ -17,6 +17,15 @@ section "vblank_interrupt", rom0[$0040]
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+section "text", rom0
+GAMEOVER_STRING:
+    db "GAME OVER\nPRESS SELECT\nTO RESTART\0"
+
+LEVEL_STRING:
+    db "LVL 2"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 def TILES_COUNT                     equ (384)
 def BYTES_PER_TILE                  equ (16)
 def TILES_BYTE_SIZE                 equ (TILES_COUNT * BYTES_PER_TILE)
@@ -35,6 +44,7 @@ def PALETTE_0                       equ %11100100
 def PALETTE_1                       equ %00011011
 
 def START_SCY                       equ 120
+def START_SCX                       equ 0
 def WY_OFS                          equ 136
 def LEVEL_SCY                       equ 0
 def UI_Y                            equ 112
@@ -88,10 +98,13 @@ init_graphics:
     ei
 
     ; set bg to start screen & hide window offscreen
-    copy [rSCY], START_SCY
-    copy [rWX], WX_OFS
-    copy [rWY], WY_OFS
- 
+    ;copy [rSCY], START_SCY
+    ;copy [rWX], WX_OFS
+    ;copy [rWY], WY_OFS
+
+    ret
+
+init_registers:
     ; set up game and player settings
     ; there's gotta be a better way to do this -S
     ld a, GAME_BASE 
@@ -105,7 +118,6 @@ init_graphics:
     ld [rTIMER_PC], a
     ld [rTIMER_OBJ], a
     copy [rSPELL_COUNT], $38
-
     ret
 
 update_graphics:
@@ -124,8 +136,10 @@ update_graphics:
     ret
 
 
-; $22 to $2B in the 9C00 map
-; $3C (full) | $3D (half) | $3E (empty)
+; loop thru the healh bar tiles in window, 
+; and replace according to player health
+; NOTE: tiles $22 to $2B in the 9C00 map
+; NOTE: $3C (full) | $3D (half) | $3E (empty)
 update_window:
     ld hl, WIN_HEALTH_END
 
@@ -142,9 +156,14 @@ update_window:
             jr .next_hbar_tile
         .check_empty
         cp a, b
-        jr nc, .next_hbar_tile
+        jr nc, .load_full
             ; replace with empty bar
             ld [hl], $3E
+            jr .next_hbar_tile
+
+        .load_full
+            ; replace with a full bar
+            ld [hl], $3C
         
         .next_hbar_tile
         dec hl
@@ -155,8 +174,8 @@ update_window:
 
 update_timers:
     IncTimer rTIMER_BG, 1
-    IncTimer rTIMER_PC, 3 ; figure out how to swap between 4 & 8
-    IncTimer rTIMER_OBJ, 2
+    IncTimer rTIMER_PC, 3
+    IncTimer rTIMER_OBJ, 2;1
     ret
 
 ; reads for START press on the title screen and sets up the level screen
@@ -167,6 +186,12 @@ start:
     ld a, [rGAME]
     bit GAMEB_START, a
     jr nz, .return
+        ; move bg and window to start screen positions
+        copy [rSCY], START_SCY
+        copy [rSCX], START_SCX
+        copy [rWX], WX_OFS
+        copy [rWY], WY_OFS
+
         ld a, [PAD_CURR]
         bit PADB_START, a
         ; if START is not pressed, jump to end (main game loop will keep jumping to updatejoypad since game isn't started yet)
@@ -177,7 +202,7 @@ start:
             ld a, UI_Y
             ld [rWY], a
             call move_player_for_level
-            call move_sprites_for_level
+            call init_level_1
             ; set flag that says the game has been started for main loop
             RegBitOp rGAME, GAMEB_START, set
 
@@ -196,18 +221,21 @@ game_over:
     ld a, [PAD_CURR]
     bit PADB_SELECT, a
     jr nz, .done_end
-        ; when SELECT is pressed restart the game
-        call init_graphics
+        ; set bg to start screen & hide window offscreen
+        copy [rSCY], START_SCY
+        copy [rWY], WY_OFS
 
+        call init_registers
+        call init_sprite_data
+        halt
+        call init_player
+        call init_sprites
     .done_end
     pop bc
     pop hl
     pop de
     pop af
     ret
-
-GAMEOVER_STRING:
-    db "GAME OVER\nPRESS SELECT\nTO RESTART\0"
 
 print_text:
     call find_center_tile
@@ -299,7 +327,7 @@ calculate_tile_id:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export init_graphics, update_graphics, start, game_over, update_timers
+export init_graphics, init_registers, update_graphics, start, game_over, update_timers
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

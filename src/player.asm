@@ -64,7 +64,7 @@ def SPRITE_HIT_LOW_THRES_TILEID     equ $60
 def SPRITE_RUN_THRES_TILEID         equ $30
 
 def HIT_HIGH_SHIELD_Y               equ MC_TOP_Y - 20
-def HIT_LOW_SHIELD_Y                equ MC_TOP_Y + 12
+def HIT_LOW_SHIELD_Y                equ MC_TOP_Y + 16;12
 def SHIELD_X                        equ 44
 
 def FRAME_TO_HOLD                   equ $3
@@ -184,18 +184,21 @@ jump:
 player_hit_high:
     ld a, [rPLAYER]
     bit PLAYERB_HOLD, a
-
     jr nz, .extend_frame
-        ; go to next frame
+    
+    ld a, [PAD_LHOLD]
+    cp 0
+    jr z, .extend_frame
         UpdatePlayerAnim SPRITE_0_A_WRAM_LOCATION, SPRITE_ANIM_WRAM_THRES, SPRITE_HIT_HIGH_THRES_TILEID
-        ld a, [PAD_LHOLD]
-        cp 0
-        jr z, .end_frame_update
-            call jump
-            jr .end_frame_update
+        call jump
+        jr .end_frame_update
 
     .extend_frame
-        ; frame 3-4: ($60) + set shield visible
+        ; set player frame to $90
+        SetPlayerTiles SPRITE_HIT_HIGH_THRES_TILEID
+        SetPlayerCoord 60, OAMA_Y
+
+        ; set shield visible
         copy [SPRITE_8_ADDRESS + OAMA_Y], HIT_HIGH_SHIELD_Y
         copy [SPRITE_8_ADDRESS + OAMA_X], SHIELD_X
         RegBitOp rPLAYER, PLAYERB_HOLD, res
@@ -207,19 +210,20 @@ player_hit_high:
 player_hit_low:
     ld a, [rPLAYER]
     bit PLAYERB_HOLD, a
-
     jr nz, .extend_frame
-        ; go to next frame
         UpdatePlayerAnim SPRITE_0_A_WRAM_LOCATION, SPRITE_ANIM_WRAM_THRES, SPRITE_HIT_LOW_THRES_TILEID
         jr .end_frame_update
 
     .extend_frame
+        ; set player frame to $60
+        SetPlayerTiles SPRITE_HIT_LOW_THRES_TILEID
+
         ; frame 3-4: ($60) + set shield visible
         copy [SPRITE_9_ADDRESS + OAMA_Y], HIT_LOW_SHIELD_Y
         copy [SPRITE_9_ADDRESS + OAMA_X], SHIELD_X
         RegBitOp rPLAYER, PLAYERB_HOLD, res
     
-        .end_frame_update
+    .end_frame_update
     ret
 
 ; updates the player animation based on joypad press

@@ -29,14 +29,22 @@ main:
     DisableLCD
 
     call init_graphics
+
+    call init_registers
     call init_sprite_data
     call init_player
     call init_sprites
     InitJoypad
 
     EnableLCD
+    /*
+    .start_screen
+        call start
+        UpdateJoypad
+        jr nz, .start_screen
+    */
 
-    .loop
+    .game_loop
         ; set up title screen
         call start
 
@@ -61,4 +69,4 @@ main:
             call check_level_2
         .post_graphics
         UpdateJoypad
-        jp .loop
+        jp .game_loop

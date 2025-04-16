@@ -81,7 +81,7 @@ init_sprites:
     ret
 
 ; init level 1 targets & two spells
-move_sprites_for_level:
+init_level_1:
     ; TARGETS
     SetSpriteXY 6, TARGET_X, TARGET_HIGH_Y
     SetSpriteXY 7, TARGET_X, TARGET_LOW_Y
@@ -116,6 +116,7 @@ init_level_2:
     SetSpriteXY 17, 168, SPELL_LOW_Y
     ret
 
+; loops thru all active sprites in WRAM and updates them
 ; NOTE: returns hl and de for handle_collision and handle_miss
 update_sprites:
     CheckTimer rTIMER_OBJ, 1
@@ -156,8 +157,7 @@ update_sprites:
         add a, OBJ16_OFFSET
         ld [hl], a
 
-        ;NOTE: this method requires an extra halt in main
-        ; preserve pt 2
+        ; preserve sprite pt 2
         push hl
 
         ; get 2nd sprite part
@@ -169,7 +169,7 @@ update_sprites:
         pop hl
         call check_collisions
 
-        ; to next spell sprite
+        ; to next spell sprite (in WRAM)
         pop hl
         inc hl
         inc hl
@@ -179,8 +179,6 @@ update_sprites:
         ld a, [rSPELL_COUNT]
         cp a, l
         jr nz, .update_spell_sprite
-
-        ; try flag vals to 
 
     SetShieldLocations 0, 0, 0, 0
     .done_update
@@ -263,4 +261,4 @@ handle_miss:
     ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export init_sprite_data, init_sprites, check_level_2, update_sprites, move_sprites_for_level
+export init_sprite_data, init_sprites, init_level_1, check_level_2, update_sprites
