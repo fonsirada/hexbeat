@@ -26,10 +26,10 @@ entrypoint:
 
 section "main", rom0
 main:
+    .initialize_game
     DisableLCD
 
     call init_graphics
-
     call init_registers
     call init_sprite_data
     call init_player
@@ -37,28 +37,25 @@ main:
     InitJoypad
 
     EnableLCD
-    /*
-    .start_screen
-        call start
-        UpdateJoypad
-        jr nz, .start_screen
-    */
 
     .game_loop
         ; set up title screen
         call start
 
+        ; check if game started
         ld a, [rGAME]
         bit GAMEB_START, a
-        ; if game hasn't been started yet, jump to updatejoypad to read 'start' press
         jr z, .post_graphics
+            ; check if game ended
             bit GAMEB_END, a
-            ; if game has been started, but not ended, just update graphics
             jr z, .graphics
-                ; if game has been ended, set up game over screen
+                ; set up game over screen
                 call game_over
-                jr .post_graphics
-
+                ld a, [rGAME]
+                bit GAMEB_END, a
+                jr z, .initialize_game
+                    jr .post_graphics
+        
         .graphics
             call update_timers
             call update_graphics
@@ -67,6 +64,7 @@ main:
             halt
             call update_player
             call check_level_2
+        
         .post_graphics
         UpdateJoypad
         jp .game_loop

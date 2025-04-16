@@ -210,26 +210,21 @@ start:
     pop af
     ret
 
+; print game over text and check if restarted
 game_over:
-    halt 
     push af
     push de
     push hl
     push bc
 
+    halt
     call print_text
+
     ld a, [PAD_CURR]
     bit PADB_SELECT, a
     jr nz, .done_end
-        ; set bg to start screen & hide window offscreen
-        copy [rSCY], START_SCY
-        copy [rWY], WY_OFS
+        RegBitOp rGAME, GAMEB_END, res
 
-        call init_registers
-        call init_sprite_data
-        halt
-        call init_player
-        call init_sprites
     .done_end
     pop bc
     pop hl
@@ -237,6 +232,7 @@ game_over:
     pop af
     ret
 
+; prints the game over text from ROM
 print_text:
     call find_center_tile
     ld de, GAMEOVER_STRING ; (de) stores where the string is stored in ROM
