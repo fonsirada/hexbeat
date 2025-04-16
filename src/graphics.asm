@@ -104,7 +104,7 @@ init_graphics:
     ld [rTIMER_BG], a ; make an initialize timers func?
     ld [rTIMER_PC], a
     ld [rTIMER_OBJ], a
-    ld [rTIMER_OBJ2], a
+    ld [rSPELL_COUNT], a
 
     ret
 
@@ -187,103 +187,102 @@ start:
 
 game_over:
     halt 
-    push hl
-    push de
+    push af
     call game_over_text
-    pop de
-    pop hl
-    ; check if game ended
-    ld a, [rGAME]
-    bit GAMEB_END, a
+
+    ld a, [PAD_CURR]
+    bit PADB_SELECT, a
     jr nz, .done_end
-        ld a, [PAD_CURR]
-        bit PADB_START, a
-        ; fix this (restarting game)
-        jr nz, .done_end
-            ; set up level screen
-            ld a, LEVEL_SCY
-            ld [rSCY], a
-            ld a, UI_Y
-            ld [rWY], a
+        ; when SELECT is pressed restart the game
+        call init_graphics
 
-            call move_player_for_level
-            call move_sprites_for_level
-            RegBitOp rGAME, GAMEB_START, set
-            RegBitOp rGAME, GAMEB_END, res
-
-    ; add visuals/text
-    ; add press enter to restart functionality
     .done_end
+    pop af
     ret
 
 game_over_text:
+    push de
+    push hl
+    push bc
+
     db "GAMEOVER\0"
-    ld de, $08A1 ; where the string is stored in ROM
-    ld hl, $98E0 ; de will store tile address where text will be printed starting at $98E0 since the Y value never changes, 
-                    ;the center tile on the screen will always be on row 7 which starts at $98E0
+    call find_center_tile
 
-    ; calculating the starting tile where text will be printed (center of screen)
-    ld a, [rSCX]
-    ; divide by 8 to get the tile that corresponds to the SCX
-    srl a
-    srl a
-    srl a
-    ; add 10 tiles to get to the center of the screen
-    add 10
-    ld c, a
-    ld b, 0
-    ; set the VRAM address to the tile that is at the center of the screen
-    add hl, bc
-
+    ; print the tile that corresponds to the character in the "GAMEOVER" string
     .print_tiles_loop
-        ; load the tile that corresponds to the character into the corresponding VRAM address
         ; load the ASCII value of the character from the string into a
         ld a, [de]
-        ; if the value of [hl] is 0, you've reached the end of the string
+        ; if the value is 0, you've reached the end of the string
         cp 0
         jr z, .done
+            ; if the value is 20, you've reached a ' ' (space) character - otherwise it's a letter
             cp 20
             jr nz, .letter
-                ; gives blank tile for ' ' in string
+                ; blank tile for ' ' in string
                 ld a, $2A
                 jr .load_tile
 
             .letter
-            ; subtracting $41 since $41 is the ASCII for 'A'
-            sub $41
-            cp 24
-            jr c, .check_block3
-                ; block 4 if >= 24 (y and z)
-                sub 24
-                add $30
-                jr .load_tile
-
-            .check_block3
-            cp 16
-            jr c, .check_block2
-                ; block 3 if >= 16 but < 24 (q - x)
-                ; subtract 16 for the offset
-                sub 16
-                add $20
-                jr .load_tile
-            
-            .check_block2
-            cp 8
-            jr c, .load_tile
-                ; block 2 if >= 8 but < 16 (i - p)
-                ; subtract 8 for the offset
-                sub 8
-                add $10
+            call calculate_tile_id
 
             .load_tile
-            ; tile 'A' is at tile index 248
-            add $F8
             ld [hl], a
             inc hl
             inc de
             jr .print_tiles_loop
 
     .done
+    pop bc
+    pop hl
+    pop de
+    ret
+
+find_center_tile:
+    ld de, $0896 ; (de) stores where the string is stored in ROM
+    ld hl, $98E0 ; (hl) stores the VRAM address (tile location) where text will be printed 
+                 ; starting at $98E0 since the Y value never changes, the center tile on the screen will always be on row 7 which starts at $98E0
+
+    ld a, [rSCX]
+    ; divide SCX by 8 to get the corresponding background tile column
+    srl a
+    srl a
+    srl a
+    ; add 10 tiles to get to the center of the screen (LCD is 20 tiles wide)
+    add 10
+    ld c, a
+    ld b, 0
+    ; each tile is 1 byte, so add the X tiles to the VRAM address to find the center tile of the screen
+    add hl, bc
+    ret
+
+calculate_tile_id:
+    ; subtracting $41 since $41 is the ASCII for 'A' (offset)
+    sub $41
+    cp 24
+    jr c, .check_block3
+        ; if the difference is >= 24, it's either 'Y' or 'Z' (block 4 in the tilemap)
+        sub 24
+        add $30
+        jr .add_tile_a_offset
+
+    .check_block3
+    cp 16
+    jr c, .check_block2
+        ; if the difference is >= 16, it's between 'Q' and 'X' (block 3 in the tilemap)
+        sub 16
+        add $20
+        jr .add_tile_a_offset
+    
+    .check_block2
+    cp 8
+    jr c, .add_tile_a_offset
+        ; if the difference is >= 8, it's between 'I' and 'P' (block 2 in the tilemap)
+        sub 8
+        add $10
+
+    .add_tile_a_offset
+    ; tile 'A' starts at tile index 248, each block is $10 apart and the tiles in each block are 1 byte > the previous
+    add $F8
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
