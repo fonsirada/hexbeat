@@ -187,13 +187,14 @@ start:
 game_over:
     halt 
 
+    /*
     ; check if game ended
     ld a, [rGAME]
     bit GAMEB_END, a
     jr nz, .done_end
 
         ld a, [PAD_CURR]
-        bit PADB_START, a
+        bit PADB_SELECT, a
         jr nz, .done_end
             ; set up level screen
             ld a, LEVEL_SCY
@@ -201,7 +202,6 @@ game_over:
             ld a, UI_Y
             ld [rWY], a
 
-            call init_graphics
             call move_player_to_start
             call move_sprites_to_start
             RegBitOp rGAME, GAMEB_START, set
@@ -210,6 +210,7 @@ game_over:
     ; add visuals/text
     ; add press enter to restart functionality
     .done_end
+    */
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

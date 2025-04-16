@@ -33,28 +33,24 @@ init_sprite_data:
     call init_player_sprite_data
 
     ; put spell flags into WRAM
-    ld a, 0
-    ld [de], a
-    inc de
+    ld hl, SPELL_FLAG_START
+    .load_spell_flag
+        ld a, 0
+        ld [hli], a
+        ld a, l
+        cp a, low(SPELL_WRAM_START)
+        jr nz, .load_spell_flag
 
     ; put spell sprite addresses into WRAM
     ld hl, SPELL_WRAM_START
-    ld de, SPELL_FLAG_START
     copy16bit [hli], [hli], SPRITE_10_ADDRESS
-    ld a, 0
-    ld [de], a
-    inc de
     copy16bit [hli], [hli], SPRITE_11_ADDRESS
-    ld a, 0
-    ld [de], a
-    inc de
     copy16bit [hli], [hli], SPRITE_12_ADDRESS
     copy16bit [hli], [hli], SPRITE_13_ADDRESS
     copy16bit [hli], [hli], SPRITE_14_ADDRESS
     copy16bit [hli], [hli], SPRITE_15_ADDRESS
     copy16bit [hli], [hli], SPRITE_16_ADDRESS
     copy16bit [hli], [hli], SPRITE_17_ADDRESS
-    
     
     ret
 

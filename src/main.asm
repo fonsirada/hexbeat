@@ -46,7 +46,7 @@ main:
         ld a, [rGAME]
         bit GAMEB_END, a
         jr z, .check_start
-            ;call game_over
+            call game_over
             jr .post_graphics
         
             ; jr [nz?], .loop
