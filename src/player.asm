@@ -53,6 +53,7 @@ def SPRITE_5_A_WRAM_LOCATION        equ $C01A
 def SPRITE_5_B_WRAM_LOCATION        equ $C01B
 
 def JUMP_INCREMENT                  equ 8
+def JUMP_HOLD_Y                     equ 60
 
 ; no more sprites at and including this wram address
 def SPRITE_ANIM_WRAM_THRES          equ $C01C
@@ -196,7 +197,7 @@ player_hit_high:
     .extend_frame
         ; set player frame to $90
         SetPlayerTiles SPRITE_HIT_HIGH_THRES_TILEID
-        SetPlayerCoord 60, OAMA_Y
+        SetPlayerCoord JUMP_HOLD_Y, OAMA_Y
 
         ; set shield visible
         copy [SPRITE_8_ADDRESS + OAMA_Y], HIT_HIGH_SHIELD_Y

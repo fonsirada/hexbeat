@@ -26,6 +26,13 @@ def SPELL1B_TILEID         equ $1E
 def SPELL2A_TILEID         equ $2E
 def SPELL2B_TILEID         equ $3E
 
+def SPELL1_SPAWNX          equ 0
+def SPELL2_SPAWNX          equ 120
+def SPELL3_SPAWNX          equ 120
+def SPELL4_SPAWNX          equ 168
+
+def LVL2_SPELL_NUM         equ $40
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; place sprite locations into WRAM
@@ -87,10 +94,10 @@ init_level_1:
     SetSpriteXY 7, TARGET_X, TARGET_LOW_Y
 
     ; SPELL OBJs
-    SetSpriteXY 10, 0, SPELL_HIGH_Y
-    SetSpriteXY 11, 0, SPELL_HIGH_Y
-    SetSpriteXY 12, 120, SPELL_LOW_Y
-    SetSpriteXY 13, 120, SPELL_LOW_Y
+    SetSpriteXY 10, SPELL1_SPAWNX, SPELL_HIGH_Y
+    SetSpriteXY 11, SPELL1_SPAWNX, SPELL_HIGH_Y
+    SetSpriteXY 12, SPELL2_SPAWNX, SPELL_LOW_Y
+    SetSpriteXY 13, SPELL2_SPAWNX, SPELL_LOW_Y
     ret
 
 ; check if the level 2 threshold is passed
@@ -109,11 +116,11 @@ check_level_2:
 ; init level 2's spells (+2)
 init_level_2:
     halt
-    copy [rSPELL_COUNT], $40
-    SetSpriteXY 14, 120, SPELL_HIGH_Y
-    SetSpriteXY 15, 120, SPELL_HIGH_Y
-    SetSpriteXY 16, 168, SPELL_LOW_Y
-    SetSpriteXY 17, 168, SPELL_LOW_Y
+    copy [rSPELL_COUNT], LVL2_SPELL_NUM
+    SetSpriteXY 14, SPELL3_SPAWNX, SPELL_HIGH_Y
+    SetSpriteXY 15, SPELL3_SPAWNX, SPELL_HIGH_Y
+    SetSpriteXY 16, SPELL4_SPAWNX, SPELL_LOW_Y
+    SetSpriteXY 17, SPELL4_SPAWNX, SPELL_LOW_Y
     ret
 
 ; loops thru all active sprites in WRAM and updates them
@@ -184,6 +191,7 @@ update_sprites:
     .done_update
     ret
 
+; check if the given spell obj in (hl) has been hit 
 check_collisions:
     ; clear flags and raise miss flag
     copy [rCOLLISION], COLLF_XMISS
@@ -233,7 +241,6 @@ handle_collision:
     ld a, 0
     ld [hl], a
     ld [de], a
-    ; note: set 'inactive' flag?
 
     ld a, [rGAME_DIFF]
     inc a
@@ -242,8 +249,6 @@ handle_collision:
 
 ; runs if the player misses a note
 handle_miss:
-    ; note: change so x val comparison is outside func call?
-    ; note: eventually flash the player sprite (damage)
     ld a, [hl]
     cp a, DMG_THRES
     jr nc, .done
@@ -256,7 +261,6 @@ handle_miss:
         cp a, 0
         jr nz, .done
             RegBitOp rGAME, GAMEB_END, set
-            ; note: may want to move this if we have diff hazards
     .done
     ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

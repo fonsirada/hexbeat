@@ -180,12 +180,12 @@ update_timers:
 
 ; reads for START press on the title screen and sets up the level screen
 start:
-    halt
     push af
     ; read if START button has been pressed ONLY if the game has NOT been started yet
     ld a, [rGAME]
     bit GAMEB_START, a
     jr nz, .return
+        halt
         ; move bg and window to start screen positions
         copy [rSCY], START_SCY
         copy [rSCX], START_SCX
