@@ -51,19 +51,14 @@ main:
                 call game_over
                 jr .post_graphics
 
-
         .graphics
             call update_timers
             call update_graphics
-            halt
+            ;halt
             call update_sprites
             halt
             call update_player
-
-        ld a, [rGAME_DIFF]
-        cp a, 4
-        jr nz, .post_graphics
-            call init_level_2
+            call check_level_2
         .post_graphics
         UpdateJoypad
         jp .loop

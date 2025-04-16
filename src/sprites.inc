@@ -192,9 +192,9 @@ macro WRAMToOAM
     ld l, c
 endm
 
-macro SpawnSpell
-    ; (hl) = sprite address
-    ; (de) = spell flags
+macro SpawnSpell 
+    ; [ (hl) = spell OAM address, (de) = spell flags ]
+    
     ; spell y = high or low (see flag)
     ; spell x = 0
 endm
