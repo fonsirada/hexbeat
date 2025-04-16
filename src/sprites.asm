@@ -90,9 +90,19 @@ move_sprites_for_level:
     SetSpriteXY 11, 0, SPELL_HIGH_Y
     SetSpriteXY 12, 128, SPELL_LOW_Y
     SetSpriteXY 13, 128, SPELL_LOW_Y
+    /*
     SetSpriteXY 14, 64, SPELL_HIGH_Y
     SetSpriteXY 15, 64, SPELL_HIGH_Y
+    SetSpriteXY 16, 32, SPELL_LOW_Y
+    SetSpriteXY 17, 32, SPELL_LOW_Y
+    */
+    ret
 
+init_level_2:
+    SetSpriteXY 14, 64, SPELL_HIGH_Y
+    SetSpriteXY 15, 64, SPELL_HIGH_Y
+    SetSpriteXY 16, 160, SPELL_LOW_Y
+    SetSpriteXY 17, 160, SPELL_LOW_Y
     ret
 
 ; NOTE: returns hl and de for handle_collision and handle_miss
@@ -156,7 +166,7 @@ update_sprites:
         inc hl
         
         ld a, l
-        cp a, $3C;$38; $40 ;change here for # of active sprites
+        cp a, $40;$3C;$38; $40 ;change here for # of active sprites
         jr nz, .update_spell_sprite
 
         ; try flag vals to 
