@@ -38,9 +38,7 @@ main:
 
     .loop
         ; set up title screen
-        push af
         call start
-        pop af
 
         ld a, [rGAME]
         bit GAMEB_START, a
