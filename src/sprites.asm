@@ -80,7 +80,7 @@ init_sprites:
 
     ret
 
-move_sprites_to_start:
+move_sprites_for_level:
     ; TARGETS
     SetSpriteXY 6, TARGET_X, TARGET_HIGH_Y
     SetSpriteXY 7, TARGET_X, TARGET_LOW_Y
@@ -237,4 +237,4 @@ handle_miss:
     ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export init_sprite_data, init_sprites, update_sprites, move_sprites_to_start
+export init_sprite_data, init_sprites, update_sprites, move_sprites_for_level

@@ -112,7 +112,7 @@ init_player:
 
     ret
 
-move_player_to_start:
+move_player_for_level:
     ; MC.00
     copy [SPRITE_0_ADDRESS + OAMA_Y], MC_TOP_Y
     copy [SPRITE_0_ADDRESS + OAMA_X], SPRITE_0_3_LEVEL_X
@@ -281,4 +281,4 @@ update_player:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export jump, update_player, init_player, init_player_sprite_data, move_player_to_start
+export jump, update_player, init_player, init_player_sprite_data, move_player_for_level

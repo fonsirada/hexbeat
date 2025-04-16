@@ -163,25 +163,25 @@ update_timers:
 start:
     halt
 
-    ; check if game started
+    ; read if START button has been pressed ONLY if the game has NOT been started yet
     ld a, [rGAME]
     bit GAMEB_START, a
-    jr nz, .done_starting
-
+    jr nz, .return
         ld a, [PAD_CURR]
         bit PADB_START, a
-        jr nz, .done_starting
-            ; set up level screen
+        ; if button is not pressed, jump to end (main game loop will keep jumping to updatejoypad since game isn't started yet)
+        jr nz, .return
+            ; if button is pressed, set up the level
             ld a, LEVEL_SCY
             ld [rSCY], a
             ld a, UI_Y
             ld [rWY], a
 
-            call move_player_to_start
-            call move_sprites_to_start
+            call move_player_for_level
+            call move_sprites_for_level
             RegBitOp rGAME, GAMEB_START, set
 
-    .done_starting
+    .return
     ret
 
 game_over:
@@ -205,8 +205,8 @@ game_over:
             ld a, UI_Y
             ld [rWY], a
 
-            call move_player_to_start
-            call move_sprites_to_start
+            call move_player_for_level
+            call move_sprites_for_level
             RegBitOp rGAME, GAMEB_START, set
             RegBitOp rGAME, GAMEB_END, res
 
