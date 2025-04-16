@@ -21,9 +21,6 @@ section "text", rom0
 GAMEOVER_STRING:
     db "GAME OVER\nPRESS SELECT\nTO RESTART\0"
 
-LEVEL_STRING:
-    db "LVL 2"
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 def TILES_COUNT                     equ (384)
@@ -50,6 +47,7 @@ def LEVEL_SCY                       equ 0
 def UI_Y                            equ 112
 
 def WIN_HEALTH_END                  equ $9C2B
+def LEVEL_TEXT_START                equ $9C2E
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -141,6 +139,8 @@ update_graphics:
 ; NOTE: tiles $22 to $2B in the 9C00 map
 ; NOTE: $3C (full) | $3D (half) | $3E (empty)
 update_window:
+    call level_text
+
     ld hl, WIN_HEALTH_END
 
     .loop
@@ -171,6 +171,31 @@ update_window:
         cp a, $21
         jr nz, .loop
     ret 
+
+level_text:
+    ld hl, LEVEL_TEXT_START
+
+    ld a, [rGAME]
+    bit GAMEB_LVL2, a
+    jr nz, .print_level_2
+        ld [hl], $0E
+        inc hl
+        ld [hl], $0D
+        inc hl
+        ld [hl], $FC
+        inc hl
+        jr .done
+
+    .print_level_2
+    ld [hl], $1B
+    inc hl
+    ld [hl], $1E
+    inc hl
+    ld [hl], $0E
+    inc hl
+
+    .done
+    ret
 
 update_timers:
     IncTimer rTIMER_BG, 1
