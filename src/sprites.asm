@@ -31,6 +31,7 @@ def SPELL2_SPAWNX          equ 120
 def SPELL3_SPAWNX          equ 120
 def SPELL4_SPAWNX          equ 168
 
+def LVL1_SPELL_NUM         equ $38
 def LVL2_SPELL_NUM         equ $40
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
