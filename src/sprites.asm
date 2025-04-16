@@ -88,21 +88,29 @@ move_sprites_for_level:
     ; SPELL OBJs
     SetSpriteXY 10, 0, SPELL_HIGH_Y
     SetSpriteXY 11, 0, SPELL_HIGH_Y
-    SetSpriteXY 12, 128, SPELL_LOW_Y
-    SetSpriteXY 13, 128, SPELL_LOW_Y
-    /*
-    SetSpriteXY 14, 64, SPELL_HIGH_Y
-    SetSpriteXY 15, 64, SPELL_HIGH_Y
-    SetSpriteXY 16, 32, SPELL_LOW_Y
-    SetSpriteXY 17, 32, SPELL_LOW_Y
-    */
+    SetSpriteXY 12, 120, SPELL_LOW_Y
+    SetSpriteXY 13, 120, SPELL_LOW_Y
+    ret
+
+check_level_2:
+    ld a, [rGAME_DIFF]
+    cp a, GAME_DIFF_THRES
+    jr nz, .done_check
+        ld a, [rGAME]
+        bit GAMEB_LVL2, a
+        jr nz, .done_check
+            call init_level_2
+            RegBitOp rGAME, GAMEB_LVL2, set
+    .done_check
     ret
 
 init_level_2:
-    SetSpriteXY 14, 64, SPELL_HIGH_Y
-    SetSpriteXY 15, 64, SPELL_HIGH_Y
-    SetSpriteXY 16, 160, SPELL_LOW_Y
-    SetSpriteXY 17, 160, SPELL_LOW_Y
+    halt
+    copy [rSPELL_COUNT], $40
+    SetSpriteXY 14, 120, SPELL_HIGH_Y
+    SetSpriteXY 15, 120, SPELL_HIGH_Y
+    SetSpriteXY 16, 168, SPELL_LOW_Y
+    SetSpriteXY 17, 168, SPELL_LOW_Y
     ret
 
 ; NOTE: returns hl and de for handle_collision and handle_miss
@@ -165,8 +173,8 @@ update_sprites:
         inc hl
         inc hl
         
-        ld a, l
-        cp a, $40;$3C;$38; $40 ;change here for # of active sprites
+        ld a, [rSPELL_COUNT]
+        cp a, l
         jr nz, .update_spell_sprite
 
         ; try flag vals to 
@@ -181,8 +189,7 @@ check_collisions:
 
     ; check if the current x is within the 'perfect' x range
     ; set perf flag if so
-    CheckSpriteRange [hl]
-    ; [SPRITE_10_ADDRESS + OAMA_X], HIT_PERF_MIN, HIT_PERF_MAX, rCOLLB_XPERF
+    CheckSpriteRange [hl] ;, HIT_PERF_MIN, HIT_PERF_MAX, rCOLLB_XPERF
 
     ld a, [PAD_CURR]
     bit PADB_B, a
@@ -237,4 +244,4 @@ handle_miss:
     ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export init_sprite_data, init_sprites, update_sprites, move_sprites_for_level
+export init_sprite_data, init_sprites, check_level_2, update_sprites, move_sprites_for_level

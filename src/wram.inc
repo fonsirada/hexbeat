@@ -39,9 +39,13 @@ def rSPELL_COUNT    rb 1
 def GAME_BASE       equ %00000000
 def GAME_START      equ %00000001
 def GAME_END        equ %00000010
+def GAME_LVL2       equ %00000100
 
 def GAMEB_START     equ 0
 def GAMEB_END       equ 1
+def GAMEB_LVL2      equ 2
+
+def GAME_DIFF_THRES equ 10
 
 ;;; rPLAYER
 def PLAYERF_HIT     equ %10000000
@@ -79,6 +83,8 @@ def SPELLF_OFF      equ %00000000
 
 def SPELLB_TIER     equ 1
 def SPELLB_SPAWN    equ 0
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

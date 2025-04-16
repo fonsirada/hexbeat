@@ -54,11 +54,11 @@ main:
         .graphics
             call update_timers
             call update_graphics
-            halt
+            ;halt
             call update_sprites
             halt
             call update_player
-
+            call check_level_2
         .post_graphics
         UpdateJoypad
         jp .loop
