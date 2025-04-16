@@ -3,7 +3,7 @@
 ;
 ; @file sprites.inc
 ; @author Sydney Chen, Alfonso Rada
-; @date April 7, 2025
+; @date April 16, 2025
 ; @brief storing all sprite constants and macros
 
 if !def(SPRITES_RGBINC)
@@ -37,9 +37,10 @@ def SPRITE_17_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 17)
 
 def OBJ16_OFFSET           equ 8
 
-def MC_TOP_Y equ (80)
-def MC_BOT_Y equ (MC_TOP_Y + 16)
-def MC_JUMP_THRES equ (MC_TOP_Y - 24)
+def MC_TOP_Y               equ (80)
+def MC_BOT_Y               equ (MC_TOP_Y + 16)
+def MC_JUMP_THRES          equ (MC_TOP_Y - 24)
+def MC_VRAM_ANIM_INT       equ $10
 
 def TARGET_HIGH_Y          equ (MC_TOP_Y - 16)
 def TARGET_LOW_Y           equ (MC_TOP_Y + 16)
@@ -93,7 +94,7 @@ macro UpdatePlayerAnim
             jr .finish_tile_load
 
         .load_new_tileid
-            add a, $10
+            add a, MC_VRAM_ANIM_INT
 
         .finish_tile_load
         ld [hl], a
@@ -141,11 +142,11 @@ macro SetPlayerCoord
     ld [SPRITE_0_ADDRESS + \2], a
     ld [SPRITE_1_ADDRESS + \2], a
     ld [SPRITE_2_ADDRESS + \2], a
-    add a, $10
+    add a, MC_VRAM_ANIM_INT
     ld [SPRITE_3_ADDRESS + \2], a
     ld [SPRITE_4_ADDRESS + \2], a
     ld [SPRITE_5_ADDRESS + \2], a
-    sub a, $10
+    sub a, MC_VRAM_ANIM_INT
 endm
 
 ;;; SPRITE MACROS ;;;
@@ -184,11 +185,9 @@ macro CheckSpriteRange
     .done_check\@
 endm
 
-; given an address in WRAM, get the OAM address there
+; given an address in WRAM from (hl), get the OAM address there
 ; and store in (hl)
 macro WRAMToOAM
-    ;ld hl, \1
-
     ld b, [hl]
     inc hl
     ld c, [hl]
@@ -196,7 +195,7 @@ macro WRAMToOAM
     ld l, c
 endm
 
-; tbh make this a function
+; World 7 macro, pls ignore :)
 macro SpawnSpell 
     ; [ (hl) = spell OAM address, (de) = spell flags ]
     ld a, \2
