@@ -188,8 +188,11 @@ start:
 game_over:
     halt 
     push af
-    call game_over_text
+    push de
+    push hl
+    push bc
 
+    call print_text
     ld a, [PAD_CURR]
     bit PADB_SELECT, a
     jr nz, .done_end
@@ -197,50 +200,58 @@ game_over:
         call init_graphics
 
     .done_end
+    pop bc
+    pop hl
+    pop de
     pop af
     ret
 
-game_over_text:
-    push de
-    push hl
-    push bc
+GAMEOVER_STRING:
+    db "GAME OVER\nPRESS SELECT\nTO RESTART\0"
 
-    db "GAMEOVER\0"
+print_text:
     call find_center_tile
+    ld de, GAMEOVER_STRING ; (de) stores where the string is stored in ROM
 
-    ; print the tile that corresponds to the character in the "GAMEOVER" string
     .print_tiles_loop
         ; load the ASCII value of the character from the string into a
         ld a, [de]
         ; if the value is 0, you've reached the end of the string
         cp 0
         jr z, .done
-            ; if the value is 20, you've reached a ' ' (space) character - otherwise it's a letter
-            cp 20
+            ; if the value is $0A, you've reached a newline - change VRAM address to be 1 row lower
+            cp $0A
+            jr nz, .space
+                ld c, $16
+                ld b, $00
+                add hl, bc
+                inc de
+                jr .print_tiles_loop
+
+        .space
+            ; if the value is $20, you've reached a ' ' (space) character
+            cp $20
             jr nz, .letter
                 ; blank tile for ' ' in string
                 ld a, $2A
                 jr .load_tile
 
-            .letter
+        .letter
             call calculate_tile_id
 
-            .load_tile
+        .load_tile
+            halt
             ld [hl], a
             inc hl
             inc de
             jr .print_tiles_loop
 
     .done
-    pop bc
-    pop hl
-    pop de
     ret
 
 find_center_tile:
-    ld de, $0896 ; (de) stores where the string is stored in ROM
-    ld hl, $98E0 ; (hl) stores the VRAM address (tile location) where text will be printed 
-                 ; starting at $98E0 since the Y value never changes, the center tile on the screen will always be on row 7 which starts at $98E0
+    ld hl, $9880 ; (hl) stores the VRAM address (tile location) where text will be printed 
+                 ; starting at $9880 since the Y value never changes, start on row 2 which starts at $9880
 
     ld a, [rSCX]
     ; divide SCX by 8 to get the corresponding background tile column
@@ -248,11 +259,12 @@ find_center_tile:
     srl a
     srl a
     ; add 10 tiles to get to the center of the screen (LCD is 20 tiles wide)
-    add 10
+    add 8
     ld c, a
     ld b, 0
     ; each tile is 1 byte, so add the X tiles to the VRAM address to find the center tile of the screen
     add hl, bc
+
     ret
 
 calculate_tile_id:
