@@ -1,5 +1,5 @@
 ; 
-; CS-240 World 5: Basic Game Functionality
+; CS-240 World 6: Fully Functional Draft
 ;
 ; @file sprites.inc
 ; @author Sydney Chen, Alfonso Rada
@@ -174,7 +174,7 @@ macro CheckSpriteRange
             ; fail if greater than max
             jr nc, .check_miss\@
                 RegBitOp rCOLLISION, COLLB_XPERF, set
-                jr .done_check\@ ; keep bc faster?
+                jr .done_check\@
     
     ; reset miss flag if outside the threshold
     .check_miss\@
@@ -201,7 +201,7 @@ macro SpawnSpell
     ld a, \2
     bit SPELLB_TIER, a
     jr nz, .set_low\@
-        inc hl ; inc to y attr
+        inc hl
         ld [hl], SPELL_Y_HIGH
         jr .set_x\@
     .set_low\@

@@ -1,9 +1,9 @@
 ;
-; CS-240 World 5: Basic Game Functionality
+; CS-240 World 6: Fully functional draft
 ;
 ; @file main.asm
 ; @author Darren Strash, Sydney Chen, Alfonso Rada
-; @date April 7, 2025
+; @date April 16, 2025
 ; @brief control overall program loop
 ;
 ; build with:
@@ -39,7 +39,6 @@ main:
     EnableLCD
 
     .game_loop
-        ; set up title screen
         call start
 
         ; check if game started
@@ -56,7 +55,7 @@ main:
                 jr z, .initialize_game
                     jr .post_graphics
         
-        .graphics
+            .graphics
             call update_timers
             call update_graphics
             halt

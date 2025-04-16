@@ -1,9 +1,9 @@
 ; 
-; CS 240: Storing Joypad state, including pressed/released/etc
+; CS 240 World 6: Fully functional draft
 ;
 ; @file wram.inc
 ; @author Darren Strash, Sydney Chen, Alfonso Rada
-; @date April 7, 2025
+; @date April 16, 2025
 ; @brief a place to store all WRAM variables
 
 if !def(WRAM_RGBINC)
@@ -68,7 +68,7 @@ def COLLF_XBAD      equ %00001000
 def COLLF_XMISS     equ %00000100
 ; ^ one of these flags should always be set!
 
-def COLLB_YHIGH     equ 7 ; remove this --> going into spell obj
+def COLLB_YHIGH     equ 7
 def COLLB_YLOW      equ 6
 def COLLB_XPERF     equ 5
 def COLLB_XGOOD     equ 4
@@ -86,8 +86,6 @@ def SPELLB_SPAWN    equ 0
 
 def LVL1_SPELL_NUM         equ $38
 def LVL2_SPELL_NUM         equ $40
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

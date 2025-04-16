@@ -1,8 +1,9 @@
 ; 
-; CS-240 World 5: Basic Game Functionality
+; CS-240 World 6: Fully functional draft
 ;
 ; @file player.asm
 ; @author Sydney Chen, Alfonso Rada
+; @date April 16, 2025
 ; @brief storing player functions
 
 include "src/hardware.inc"
@@ -65,7 +66,7 @@ def SPRITE_HIT_LOW_THRES_TILEID     equ $60
 def SPRITE_RUN_THRES_TILEID         equ $30
 
 def HIT_HIGH_SHIELD_Y               equ MC_TOP_Y - 20
-def HIT_LOW_SHIELD_Y                equ MC_TOP_Y + 16;12
+def HIT_LOW_SHIELD_Y                equ MC_TOP_Y + 16
 def SHIELD_X                        equ 44
 
 def FRAME_TO_HOLD                   equ $3
@@ -195,14 +196,14 @@ player_hit_high:
         jr .end_frame_update
 
     .extend_frame
-        ; set player frame to $90
-        SetPlayerTiles SPRITE_HIT_HIGH_THRES_TILEID
-        SetPlayerCoord JUMP_HOLD_Y, OAMA_Y
+    ; set player frame to $90
+    SetPlayerTiles SPRITE_HIT_HIGH_THRES_TILEID
+    SetPlayerCoord JUMP_HOLD_Y, OAMA_Y
 
-        ; set shield visible
-        copy [SPRITE_8_ADDRESS + OAMA_Y], HIT_HIGH_SHIELD_Y
-        copy [SPRITE_8_ADDRESS + OAMA_X], SHIELD_X
-        RegBitOp rPLAYER, PLAYERB_HOLD, res
+    ; set shield visible
+    copy [SPRITE_8_ADDRESS + OAMA_Y], HIT_HIGH_SHIELD_Y
+    copy [SPRITE_8_ADDRESS + OAMA_X], SHIELD_X
+    RegBitOp rPLAYER, PLAYERB_HOLD, res
 
     .end_frame_update
     ret
@@ -216,13 +217,13 @@ player_hit_low:
         jr .end_frame_update
 
     .extend_frame
-        ; set player frame to $60
-        SetPlayerTiles SPRITE_HIT_LOW_THRES_TILEID
+    ; set player frame to $60
+    SetPlayerTiles SPRITE_HIT_LOW_THRES_TILEID
 
-        ; frame 3-4: ($60) + set shield visible
-        copy [SPRITE_9_ADDRESS + OAMA_Y], HIT_LOW_SHIELD_Y
-        copy [SPRITE_9_ADDRESS + OAMA_X], SHIELD_X
-        RegBitOp rPLAYER, PLAYERB_HOLD, res
+    ; frame 3-4: ($60) + set shield visible
+    copy [SPRITE_9_ADDRESS + OAMA_Y], HIT_LOW_SHIELD_Y
+    copy [SPRITE_9_ADDRESS + OAMA_X], SHIELD_X
+    RegBitOp rPLAYER, PLAYERB_HOLD, res
     
     .end_frame_update
     ret
@@ -230,7 +231,8 @@ player_hit_low:
 ; updates the player animation based on joypad press
 update_player:
     CheckTimer rTIMER_PC, 1
-    jp nz, .done_update ; must be jp for now
+    ; must be jp for now
+    jp nz, .done_update 
 
     ; set flags from joypad input
     ProcessInputForAnim PADB_B, PLAYERB_B, SPRITE_RUN_THRES_TILEID
@@ -245,7 +247,6 @@ update_player:
     .done_hold_check
 
     ; determine which player animation to run
-    ; 'b' button press
     ld a, [rPLAYER]
     bit PLAYERB_B, a
     jr z, .update_a
@@ -258,7 +259,6 @@ update_player:
 
             jr .done_update
 
-    ; 'a' button press
     .update_a
         bit PLAYERB_A, a
         jr z, .update_run

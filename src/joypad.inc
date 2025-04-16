@@ -1,9 +1,9 @@
 ; 
-; CS-240 World 5: Basic Game Functionality
+; CS-240 World 6: Fully functional draft
 ;
 ; @file joypad.inc
 ; @author Darren Strash, Sydney Chen, Alfonso Rada
-; @date April 7, 2025
+; @date April 16, 2025
 ; @brief stores joypad handling macros
 
 if !def(JOYPAD_RGBINC)
@@ -73,13 +73,12 @@ macro UpdateJoypad
     ; compute long hold for 'a' button (previously pressed and STILL being pressed)
     or a, c
     bit 0, a
-    ; if a is not being 'held' anymore reset the counter
     jr nz, .not_held
-        ; if a is being 'held' check if it's been held for at least 5 frames
+        ; check if it's been held for at least 5 frames
         ld a, [HOLD_A_COUNTER]
         cp 5
         jr nz, .not_yet
-            ; if it's been held for longer than 5 frames, set flag saying its being long held
+            ; set flag saying its being long held
             ld a, 0
             ld [PAD_LHOLD], a
             jr .disable_input
@@ -88,6 +87,7 @@ macro UpdateJoypad
         ld [HOLD_A_COUNTER], a
         jr .disable_input
 
+    ; reset hold counter
     .not_held
     ld a, INIT_COUNTER
     ld [HOLD_A_COUNTER], a

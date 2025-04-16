@@ -1,9 +1,9 @@
 ; 
-; CS-240 World 5: Basic Game Functionality
+; CS-240 World 6: Fully functional draft
 ;
 ; @file graphics.asm
 ; @author Darren Strash, Sydney Chen, Alfonso Rada
-; @date April 7, 2025
+; @date April 16, 2025
 ; @brief store overall graphics-related functions
 
 include "src/utils.inc"
@@ -20,7 +20,8 @@ section "vblank_interrupt", rom0[$0040]
 section "text", rom0
 GAME_OVER:
     ; the tile ID's for each character in "GAME OVER\nPRESS SELECT\nTO RESTART"
-    db $FE, $F8, $0C, $FC, $2A, $0E, $1D, $FC, $19, $0A, $0F, $19, $FC, $1A, $1A, $2A, $1A, $FC, $0B, $FC, $FA, $1B, $0A, $1B, $0E, $2A, $19, $FC, $1A, $1B, $F8, $19, $1B
+    db $FE, $F8, $0C, $FC, $2A, $0E, $1D, $FC, $19, $0A, $0F, $19, $FC, $1A, $1A,\
+    $2A, $1A, $FC, $0B, $FC, $FA, $1B, $0A, $1B, $0E, $2A, $19, $FC, $1A, $1B, $F8, $19, $1B
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -67,6 +68,7 @@ def W_TILE_ID                       equ $1E
 ; start on row 2 of screen which starts at $9880
 def TEXT_START_LOCATION             equ $9880
 def NEW_LINE                        equ $0A
+def END_OF_STRING                   equ 0
 def ONE_ROW_LOWER_OFFSET            equ $0016
 def SCREEN_CENTER_OFFSET            equ 8
 
@@ -137,7 +139,6 @@ init_registers:
     ret
 
 update_graphics:
-    ; halt
     CheckTimer rTIMER_BG, UPDATE_FRAME
     jr nz, .done_update
 
@@ -148,48 +149,43 @@ update_graphics:
 
     .done_update
     call update_window
-
     ret
 
-
-; loop thru the healh bar tiles in window, 
-; and replace according to player health
-; NOTE: tiles $22 to $2B in the 9C00 map
-; NOTE: $3C (full) | $3D (half) | $3E (empty)
+; display level text, loop thru the healh bar tiles and replace according to player health
 update_window:
     call level_text
 
     ld hl, WIN_HEALTH_END
-
     .loop
         ld a, l
         sub a, HEALTH_BAR_TILE_OFFSET
         ld b, a
 
         ld a, [rPC_HEALTH]
-        cp a, b
+        cp b
         jr nz, .check_empty
-            ; replace with half-filled bar
+            ; half full
             ld [hl], HEALTH_HALF_TILEID
             jr .next_hbar_tile
+
         .check_empty
-        cp a, b
+        cp b
         jr nc, .load_full
-            ; replace with empty bar
             ld [hl], HEALTH_EMPTY_TILEID
             jr .next_hbar_tile
 
         .load_full
-            ; replace with a full bar
-            ld [hl], HEALTH_FULL_TILEID
+        ld [hl], HEALTH_FULL_TILEID
         
         .next_hbar_tile
         dec hl
         ld a, l
-        cp a, HEALTH_BAR_TILE_OFFSET
+        cp HEALTH_BAR_TILE_OFFSET
         jr nz, .loop
+
     ret 
 
+; prints text on UI (window) that displays current level - ONE for 1, TWO for 2
 level_text:
     ld hl, LEVEL_TEXT_START
 
@@ -221,15 +217,13 @@ update_timers:
     IncTimer rTIMER_OBJ, OBJ_ANIMATION_TIMER
     ret
 
-; reads for START press on the title screen and sets up the level screen
+; reads START press on the title screen and sets up the level screen
 start:
-    push af
-    ; read if START button has been pressed ONLY if the game has NOT been started yet
+    ; only reads for START press if the game has NOT been started yet
     ld a, [rGAME]
     bit GAMEB_START, a
     jr nz, .return
         halt
-        ; move bg and window to start screen positions
         copy [rSCY], START_SCY
         copy [rSCX], START_SCX
         copy [rWX], WX_OFS
@@ -237,20 +231,17 @@ start:
 
         ld a, [PAD_CURR]
         bit PADB_START, a
-        ; if START is not pressed, jump to end (main game loop will keep jumping to updatejoypad since game isn't started yet)
         jr nz, .return
-            ; if START is pressed, set up the level
+            ; sets up level 1
             ld a, LEVEL_SCY
             ld [rSCY], a
             ld a, UI_Y
             ld [rWY], a
             call move_player_for_level
             call init_level_1
-            ; set flag that says the game has been started for main loop
             RegBitOp rGAME, GAMEB_START, set
 
     .return
-    pop af
     ret
 
 ; print game over text and check if restarted
@@ -263,6 +254,7 @@ game_over:
     halt
     call print_text
 
+    ; restart functionality
     ld a, [PAD_CURR]
     bit PADB_SELECT, a
     jr nz, .done_end
@@ -275,34 +267,34 @@ game_over:
     pop af
     ret
 
-; prints the game over text from ROM
+; prints the game over text using the tile ID's stored in ROM
 print_text:
     call find_center_tile
     ld de, GAME_OVER 
 
     .print_tiles_loop
         ld a, [de]
-        ; check if reached end of string
-        cp 0
+        cp END_OF_STRING
         jr z, .done
-            ; check if reached new-line
             cp NEW_LINE
             jr nz, .load_tile
-                ; move text location one row down
+                ; move text location one row down, if new-line
                 ld bc, ONE_ROW_LOWER_OFFSET
                 add hl, bc
                 jr .next_char
         
-        .load_tile
+            .load_tile
             ld [hl], a
             inc hl
-        .next_char
+
+            .next_char
             inc de
             jr .print_tiles_loop
 
     .done
     ret
 
+; loads (hl) with the VRAM address that corresponds to the tile on the center of the screen
 find_center_tile:
     ld hl, TEXT_START_LOCATION 
 
@@ -311,11 +303,11 @@ find_center_tile:
     srl a
     srl a
     srl a
-    ; get to the center of the screen
+    ; get the center of the screen
     add SCREEN_CENTER_OFFSET
     ld c, a
     ld b, 0
-    ; set VRAM address to center tile of the screen
+    ; set VRAM address to center tile
     add hl, bc
 
     ret
