@@ -88,8 +88,8 @@ move_sprites_for_level:
     ; SPELL OBJs
     SetSpriteXY 10, 0, SPELL_HIGH_Y
     SetSpriteXY 11, 0, SPELL_HIGH_Y
-    SetSpriteXY 12, 128, SPELL_LOW_Y
-    SetSpriteXY 13, 128, SPELL_LOW_Y
+    SetSpriteXY 12, 120, SPELL_LOW_Y
+    SetSpriteXY 13, 120, SPELL_LOW_Y
     /*
     SetSpriteXY 14, 64, SPELL_HIGH_Y
     SetSpriteXY 15, 64, SPELL_HIGH_Y
@@ -99,10 +99,12 @@ move_sprites_for_level:
     ret
 
 init_level_2:
-    SetSpriteXY 14, 64, SPELL_HIGH_Y
-    SetSpriteXY 15, 64, SPELL_HIGH_Y
-    SetSpriteXY 16, 160, SPELL_LOW_Y
-    SetSpriteXY 17, 160, SPELL_LOW_Y
+    halt
+    SetSpriteXY 14, 80, SPELL_HIGH_Y
+    SetSpriteXY 15, 80, SPELL_HIGH_Y
+    SetSpriteXY 16, 168, SPELL_LOW_Y
+    SetSpriteXY 17, 168, SPELL_LOW_Y
+    copy [rSPELL_COUNT], $40
     ret
 
 ; NOTE: returns hl and de for handle_collision and handle_miss
@@ -165,8 +167,9 @@ update_sprites:
         inc hl
         inc hl
         
-        ld a, l
-        cp a, $40;$3C;$38; $40 ;change here for # of active sprites
+        ;ld a, l
+        ld a, [rSPELL_COUNT]
+        cp a, l;$3C;$38; $40 ;change here for # of active sprites
         jr nz, .update_spell_sprite
 
         ; try flag vals to 
@@ -237,4 +240,4 @@ handle_miss:
     ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export init_sprite_data, init_sprites, update_sprites, move_sprites_for_level
+export init_sprite_data, init_sprites, init_level_2, update_sprites, move_sprites_for_level

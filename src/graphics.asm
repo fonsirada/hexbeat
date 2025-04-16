@@ -104,7 +104,7 @@ init_graphics:
     ld [rTIMER_BG], a ; make an initialize timers func?
     ld [rTIMER_PC], a
     ld [rTIMER_OBJ], a
-    ld [rTIMER_OBJ2], a
+    copy [rSPELL_COUNT], $38
 
     ret
 
