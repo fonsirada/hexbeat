@@ -159,29 +159,30 @@ update_timers:
     IncTimer rTIMER_OBJ, 2
     ret
 
-; set-up game + remove start screen once START is pressed
+; reads for START press on the title screen and sets up the level screen
 start:
     halt
-
+    push af
     ; read if START button has been pressed ONLY if the game has NOT been started yet
     ld a, [rGAME]
     bit GAMEB_START, a
     jr nz, .return
         ld a, [PAD_CURR]
         bit PADB_START, a
-        ; if button is not pressed, jump to end (main game loop will keep jumping to updatejoypad since game isn't started yet)
+        ; if START is not pressed, jump to end (main game loop will keep jumping to updatejoypad since game isn't started yet)
         jr nz, .return
-            ; if button is pressed, set up the level
+            ; if START is pressed, set up the level
             ld a, LEVEL_SCY
             ld [rSCY], a
             ld a, UI_Y
             ld [rWY], a
-
             call move_player_for_level
             call move_sprites_for_level
+            ; set flag that says the game has been started for main loop
             RegBitOp rGAME, GAMEB_START, set
 
     .return
+    pop af
     ret
 
 game_over:
