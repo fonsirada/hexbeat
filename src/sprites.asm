@@ -80,6 +80,7 @@ init_sprites:
 
     ret
 
+; init level 1 targets & two spells
 move_sprites_for_level:
     ; TARGETS
     SetSpriteXY 6, TARGET_X, TARGET_HIGH_Y
@@ -92,6 +93,7 @@ move_sprites_for_level:
     SetSpriteXY 13, 120, SPELL_LOW_Y
     ret
 
+; check if the level 2 threshold is passed
 check_level_2:
     ld a, [rGAME_DIFF]
     cp a, GAME_DIFF_THRES
@@ -104,6 +106,7 @@ check_level_2:
     .done_check
     ret
 
+; init level 2's spells (+2)
 init_level_2:
     halt
     copy [rSPELL_COUNT], $40
