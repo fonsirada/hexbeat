@@ -48,10 +48,10 @@ def TARGET_X               equ 50
 
 def SPELL_HIGH_Y           equ (TARGET_HIGH_Y - 4)
 def SPELL_LOW_Y            equ (TARGET_LOW_Y - 4)
-def SPELL_SCROLL_SPEED     equ 4
+def SPELL_SCROLL_SPEED     equ 3
 
-def HIT_PERF_MIN           equ (TARGET_X - 8)
-def HIT_PERF_MAX           equ (HIT_PERF_MIN + 16)
+def HIT_PERF_MIN           equ (TARGET_X - 16)
+def HIT_PERF_MAX           equ (HIT_PERF_MIN + 24)
 def HIT_MISS_MAX           equ (HIT_PERF_MIN - 1)
 def DMG_THRES              equ (4)
 

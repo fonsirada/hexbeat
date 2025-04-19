@@ -124,6 +124,8 @@ init_level_2:
 ; loops thru all active sprites in WRAM and updates them
 ; NOTE: returns hl and de for handle_collision and handle_miss
 update_sprites:
+    push hl
+
     CheckTimer rTIMER_OBJ, 1
     jr nz, .done_update
 
@@ -187,6 +189,8 @@ update_sprites:
 
     SetShieldLocations 0, 0, 0, 0
     .done_update
+    pop hl
+
     ret
 
 ; check if the given spell obj in (hl) has been hit 
