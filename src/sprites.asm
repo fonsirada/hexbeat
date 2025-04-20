@@ -48,14 +48,14 @@ init_sprite_data:
 
     ; put spell sprite addresses into WRAM
     ld hl, SPELL_WRAM_START
-    copy16bit [hli], [hli], SPRITE_10_ADDRESS
-    copy16bit [hli], [hli], SPRITE_11_ADDRESS
-    copy16bit [hli], [hli], SPRITE_12_ADDRESS
-    copy16bit [hli], [hli], SPRITE_13_ADDRESS
-    copy16bit [hli], [hli], SPRITE_14_ADDRESS
-    copy16bit [hli], [hli], SPRITE_15_ADDRESS
-    copy16bit [hli], [hli], SPRITE_16_ADDRESS
-    copy16bit [hli], [hli], SPRITE_17_ADDRESS
+    Copy16BitVal [hli], [hli], SPRITE_10_ADDRESS
+    Copy16BitVal [hli], [hli], SPRITE_11_ADDRESS
+    Copy16BitVal [hli], [hli], SPRITE_12_ADDRESS
+    Copy16BitVal [hli], [hli], SPRITE_13_ADDRESS
+    Copy16BitVal [hli], [hli], SPRITE_14_ADDRESS
+    Copy16BitVal [hli], [hli], SPRITE_15_ADDRESS
+    Copy16BitVal [hli], [hli], SPRITE_16_ADDRESS
+    Copy16BitVal [hli], [hli], SPRITE_17_ADDRESS
     
     ret
 
@@ -137,7 +137,7 @@ update_sprites:
         ld e, l
 
         ; load spell_a address into (hl)
-        WRAMToOAM hl
+        WRAMToOAM bc
         ld b, $00
         ld c, OAMA_X
         add hl, bc
@@ -145,25 +145,30 @@ update_sprites:
         ; preserve pt 1
         push hl
 
-        ; load in new x val
-        ld a, [hl]
-        sub SPELL_SCROLL_SPEED
-        ld [hl], a
+        ;CheckTimer rTIMER_OBJ, 1
+        ;jr nz, .done_anim_update
+        ; putting above here fixes input drops, but
+        ; has issues w/ health updating...
+            ; load in new x val
+            ld a, [hl]
+            sub SPELL_SCROLL_SPEED
+            ld [hl], a
 
-        ; load spell_b address into (hl)
-        ld h, d
-        ld l, e
-        inc hl
-        inc hl
-        WRAMToOAM hl
-        ld b, $00
-        ld c, OAMA_X
-        add hl, bc
+            ; load spell_b address into (hl)
+            ld h, d
+            ld l, e
+            inc hl
+            inc hl
+            WRAMToOAM bc
+            ld b, $00
+            ld c, OAMA_X
+            add hl, bc
 
-        ; load offset x val for sprite pt 2
-        add a, OBJ16_OFFSET
-        ld [hl], a
+            ; load offset x val for sprite pt 2
+            add a, OBJ16_OFFSET
+            ld [hl], a
 
+        .done_anim_update
         ; preserve sprite pt 2
         push hl
 
@@ -187,10 +192,94 @@ update_sprites:
         cp a, l
         jr nz, .update_spell_sprite
 
-    SetShieldLocations 0, 0, 0, 0
+    ;SetShieldLocations 0, 0, 0, 0 ; moved to update_player
     .done_update
     pop hl
 
+    ret
+
+; working ver w/ new sprite system
+update_sprites2:
+    CheckTimer rTIMER_OBJ, 1
+    jr nz, .done_update
+
+    ld hl, SPELL_WRAM_START
+    .update_spell_sprite
+        ;;;;;;; TO DO ;;;;;;;;;
+        ; in this loop, per sprite:
+        ; if spawn = 1, spawn sprite & reset flag
+
+        ; - update x val
+        ; - if sprite is "on", check collision
+        ; - if sprite reaches 0, turn "off" (y val to 0)
+        ;;;;;;;;;;;;;;;;;;;;;;;
+
+        ; preserve OG WRAM address 
+        push hl
+        
+        ; get flags in (d) and address in (hl)
+        GetSpriteFlags d
+        WRAMToOAM bc
+
+        ; HANDLE SPELL SPAWNING ;
+
+
+        ; SPELL MOVEMENT ;
+        ; update sprite pt 1
+        ; get sprite pt 1's x val address
+        ld bc, ($0000 + OAMA_X)
+        add hl, bc
+        push hl
+        ld a, [hl]
+
+            ; HANDLE SPELL DESPAWNING ;
+            /*
+            cp a, 0
+            jr nz, .update_x1_movement
+                ld a, d
+                xor a, SPELLF_ON
+                ; set y-val to 0
+                dec hl
+                ld [hl], 0
+                inc hl
+                ;jr .to_next_sprite
+            */
+            ; find diff place...
+
+        .update_x1_movement
+        ; update sprite pt 1's x val
+        sub SPELL_SCROLL_SPEED
+        ld [hl], a
+
+        ; go to sprite pt 2's x val address
+        ld bc, ($0004) ; sprite memory offset
+        add hl, bc
+
+        .update_x2_movement
+        ; update sprite pt 2's x val
+        add a, OBJ16_OFFSET
+        ld [hl], a
+        
+        pop hl
+
+        ; SPELL COLLISION
+        ; need sprite x-val address in (hl)
+        bit SPELLB_ON, b
+        jr z, .to_next_sprite
+            call check_collisions
+
+        .to_next_sprite
+        ; restore and move to next WRAM loc
+        pop hl
+        SetSpriteFlags b
+        ld bc, ($0004) ; sprite memory offset
+        add hl, bc ; note: this add method is 1 cycle faster than inc-ing
+
+        ld a, [rSPELL_COUNT]
+        cp a, l
+        jr nz, .update_spell_sprite
+    .done_update
+    ;SetShieldLocations 0, 0, 0, 0 
     ret
 
 ; check if the given spell obj in (hl) has been hit 
@@ -242,7 +331,9 @@ check_collisions:
 handle_collision:
     ld a, 0
     ld [hl], a
-    ld [de], a
+    ld bc, $0004 ; try de if being weird
+    add hl, bc
+    ld [hl], a
 
     ld a, [rGAME_DIFF]
     inc a
@@ -254,6 +345,7 @@ handle_miss:
     ld a, [hl]
     cp a, DMG_THRES
     jr nc, .done
+    ;jr nc, .done
         ; lower player health
         ld a, [rPC_HEALTH]
         dec a
@@ -267,4 +359,4 @@ handle_miss:
     ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export init_sprite_data, init_sprites, init_level_1, check_level_2, update_sprites
+export init_sprite_data, init_sprites, init_level_1, check_level_2, update_sprites, update_sprites2

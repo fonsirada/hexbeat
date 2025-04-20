@@ -187,12 +187,40 @@ endm
 
 ; given an address in WRAM from (hl), get the OAM address there
 ; and store in (hl)
+; NEW: store the address at (hl) in a given 16bit register
+; OLD: hardcoded to use bc as the transfer reg
+; note: this change lowk doesn't matter lol
 macro WRAMToOAM
-    ld b, [hl]
+    ld high(\1), [hl]
     inc hl
-    ld c, [hl]
-    ld h, b
-    ld l, c
+    ld low(\1), [hl]
+    ld h, high(\1)
+    ld l, low(\1)
+endm
+
+; store the flags of sprite @ (hl) in a given reg
+macro GetSpriteFlags
+    push hl
+            
+    ; do (hl) - $10
+    ld a, l
+    sub a, $10
+    ld l, a
+
+    ld \1, [hl]
+    pop hl
+endm
+
+macro SetSpriteFlags
+    push hl
+            
+    ; do (hl) - $10
+    ld a, l
+    sub a, $10
+    ld l, a
+
+    ld [hl], \1
+    pop hl
 endm
 
 ; World 7 macro, pls ignore :)

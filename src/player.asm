@@ -143,12 +143,12 @@ move_player_for_level:
 
 ; put PC sprite ids in WRAM
 init_player_sprite_data:
-    copy16bit [SPRITE_0_A_WRAM_LOCATION], [SPRITE_0_B_WRAM_LOCATION], _OAMRAM
-    copy16bit [SPRITE_1_A_WRAM_LOCATION], [SPRITE_1_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 1
-    copy16bit [SPRITE_2_A_WRAM_LOCATION], [SPRITE_2_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 2
-    copy16bit [SPRITE_3_A_WRAM_LOCATION], [SPRITE_3_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 3
-    copy16bit [SPRITE_4_A_WRAM_LOCATION], [SPRITE_4_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 4
-    copy16bit [SPRITE_5_A_WRAM_LOCATION], [SPRITE_5_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 5
+    Copy16BitVal [SPRITE_0_A_WRAM_LOCATION], [SPRITE_0_B_WRAM_LOCATION], _OAMRAM
+    Copy16BitVal [SPRITE_1_A_WRAM_LOCATION], [SPRITE_1_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 1
+    Copy16BitVal [SPRITE_2_A_WRAM_LOCATION], [SPRITE_2_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 2
+    Copy16BitVal [SPRITE_3_A_WRAM_LOCATION], [SPRITE_3_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 3
+    Copy16BitVal [SPRITE_4_A_WRAM_LOCATION], [SPRITE_4_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 4
+    Copy16BitVal [SPRITE_5_A_WRAM_LOCATION], [SPRITE_5_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 5
 
     ret
 
@@ -233,6 +233,7 @@ update_player:
     CheckTimer rTIMER_PC, 1
     ; must be jp for now
     jp nz, .done_update 
+    SetShieldLocations 0, 0, 0, 0
 
     ; set flags from joypad input
     ProcessInputForAnim PADB_B, PLAYERB_B, SPRITE_RUN_THRES_TILEID
