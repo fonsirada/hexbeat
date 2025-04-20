@@ -41,7 +41,6 @@ main:
     EnableLCD
 
     .game_loop
-    call UpdateSample
     call start
 
     ; check if game started
@@ -55,6 +54,7 @@ main:
         ;call update_player
 
     .post_graphics
+    call UpdateSample
     UpdateJoypad
     jp .game_loop
 

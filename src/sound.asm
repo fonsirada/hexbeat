@@ -9,7 +9,7 @@ include "src/utils.inc"
 section "sound", rom0
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-rsset _RAM
+rsset (_RAM + $30) ; change this location at some point
 
 def WRAM_PAD_INPUT                  rb 0 ;sizeof_PAD_INPUT
 def WRAM_FRAME_COUNTER              rb 1
