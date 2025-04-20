@@ -40,7 +40,7 @@ init_sprite_data:
     ; put spell flags into WRAM
     ld hl, SPELL_FLAG_START
     .load_spell_flag
-        ld a, 0
+        ld a, SPELLF_ON;%00000001;0
         ld [hli], a
         ld a, l
         cp a, low(SPELL_WRAM_START)
@@ -221,7 +221,22 @@ update_sprites2:
         GetSpriteFlags d
         WRAMToOAM bc
 
+        ; spell off/on check
+
+        ; ---- SPELL IS OFF... ---- ;
         ; HANDLE SPELL SPAWNING ;
+        ; currently pseudocode...
+        ; (assume spawn flag is determined somehow)
+        ; call check_spawn
+        ; bit SPELLB_SPAWN, b
+        ; jr z, .skip_spawn
+        ;    spawn according to x or y val
+        ;    set SPELLB_ON flag
+        ;    res SPELLB_SPAWN flag
+        ; .skip_spawn
+
+        ; spell off handling
+
 
 
         ; SPELL MOVEMENT ;
@@ -233,20 +248,35 @@ update_sprites2:
         ld a, [hl]
 
             ; HANDLE SPELL DESPAWNING ;
-            /*
-            cp a, 0
-            jr nz, .update_x1_movement
+            ; if x < 2:
+            ; set off
+            ; set sp1 y val to 0
+            ; set sp2 y val to 0
+            
+            cp a, 2
+            jr nc, .update_x_movement
+                /*
+                push hl
+
+                ; unflag ON
                 ld a, d
                 xor a, SPELLF_ON
+                ld d, a
+
                 ; set y-val to 0
                 dec hl
                 ld [hl], 0
-                inc hl
-                ;jr .to_next_sprite
-            */
-            ; find diff place...
+                
+                ld bc, ($0004) ; sprite memory offset
+                add hl, bc
+                ld [hl], 0
+                
+                pop hl
+                jr .to_next_sprite
+                */
+            
 
-        .update_x1_movement
+        .update_x_movement
         ; update sprite pt 1's x val
         sub SPELL_SCROLL_SPEED
         ld [hl], a
@@ -255,7 +285,6 @@ update_sprites2:
         ld bc, ($0004) ; sprite memory offset
         add hl, bc
 
-        .update_x2_movement
         ; update sprite pt 2's x val
         add a, OBJ16_OFFSET
         ld [hl], a
@@ -264,14 +293,14 @@ update_sprites2:
 
         ; SPELL COLLISION
         ; need sprite x-val address in (hl)
-        bit SPELLB_ON, b
+        bit SPELLB_ON, d
         jr z, .to_next_sprite
             call check_collisions
 
         .to_next_sprite
         ; restore and move to next WRAM loc
         pop hl
-        SetSpriteFlags b
+        SetSpriteFlags d
         ld bc, ($0004) ; sprite memory offset
         add hl, bc ; note: this add method is 1 cycle faster than inc-ing
 
