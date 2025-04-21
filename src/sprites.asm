@@ -209,7 +209,10 @@ update_sprites2:
         ; in this loop, per sprite:
         ; if spawn = 1, spawn sprite & reset flag
 
-        ; - set off flag on collision
+        ; - BUG: dmg triggers twice - FIXED
+        ; - BUG: spawn flag weirdness - FIXED
+
+        ; NOTE: for testing, see CheckSpawn macro
         ;;;;;;;;;;;;;;;;;;;;;;;
 
         ; preserve OG WRAM address 
@@ -226,7 +229,7 @@ update_sprites2:
         ; ---- SPELL IS OFF... ---- ;
             ; HANDLE SPELL SPAWNING ;
             CheckSpawn d
-            bit SPELLB_SPAWN, b
+            bit SPELLB_SPAWN, d
             jr z, .skip_spawn
                 SpawnSpell d
                 ld a, d
@@ -234,6 +237,7 @@ update_sprites2:
                 ld d, a
             .skip_spawn
             jr .to_next_sprite
+
 
         ; ---- SPELL IS ON... ---- ;
         .spell_on
@@ -247,7 +251,7 @@ update_sprites2:
 
             ; HANDLE SPELL DESPAWNING ;
             ; if x < 2:
-            cp a, 2
+            cp a, DMG_THRES;2
             jr nc, .update_x_movement
                 ; unflag ON
                 ld a, d
@@ -354,12 +358,19 @@ check_collisions:
 ; resets the sprite x value
 ; note: only called in check_collisions
 handle_collision:
+    ; set off flag
+    ld a, d
+    res SPELLB_ON, d
+    ld d, a
+
+    ; set x val to 0
     ld a, 0
     ld [hl], a
     ld bc, $0004 ; try de if being weird
     add hl, bc
     ld [hl], a
 
+    ; increase game diff counter
     ld a, [rGAME_DIFF]
     inc a
     ld [rGAME_DIFF], a

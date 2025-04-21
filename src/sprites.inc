@@ -225,7 +225,7 @@ endm
 
 macro CheckSpawn
     ld a, [rSPELL_COUNT]
-    cp a, $38
+    cp a, $38 ;set to $38 to spawn until lvl 2 is reached
     jr nz, .done_spawn\@
         set SPELLB_SPAWN, d
     .done_spawn\@
