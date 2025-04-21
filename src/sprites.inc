@@ -223,21 +223,30 @@ macro SetSpriteFlags
     pop hl
 endm
 
-; World 7 macro, pls ignore :)
+macro CheckSpawn
+    ld a, [rSPELL_COUNT]
+    cp a, $38
+    jr nz, .done_spawn\@
+        set SPELLB_SPAWN, d
+    .done_spawn\@
+endm
+
+; given sprite address (hl) and flags as param (in d)
+; spawns a spell according to its tier flag
+; note: assumes that spell's pt 2 will update in main func
 macro SpawnSpell 
-    ; [ (hl) = spell OAM address, (de) = spell flags ]
-    ld a, \2
+    ; [ (hl) = spell OAM address, (d) = spell flags ]
+    ld a, \1
     bit SPELLB_TIER, a
-    jr nz, .set_low\@
-        inc hl
-        ld [hl], SPELL_Y_HIGH
+    jr z, .set_low\@
+        ld [hl], SPELL_HIGH_Y
         jr .set_x\@
     .set_low\@
-        inc hl
-        ld [hl], SPELL_Y_LOW
+        ld [hl], SPELL_LOW_Y
     .set_x\@
     inc hl
-    ld [hl], 0
+    ld [hl], 168 ; mag num
+    dec hl
 endm
 
 ; params: sprite number, x val, y val

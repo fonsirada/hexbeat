@@ -26,7 +26,7 @@ def SPELL1B_TILEID         equ $1E
 def SPELL2A_TILEID         equ $2E
 def SPELL2B_TILEID         equ $3E
 
-def SPELL1_SPAWNX          equ 0
+def SPELL1_SPAWNX          equ 168
 def SPELL2_SPAWNX          equ 120
 def SPELL3_SPAWNX          equ 120
 def SPELL4_SPAWNX          equ 168
@@ -209,9 +209,7 @@ update_sprites2:
         ; in this loop, per sprite:
         ; if spawn = 1, spawn sprite & reset flag
 
-        ; - update x val
-        ; - if sprite is "on", check collision
-        ; - if sprite reaches 0, turn "off" (y val to 0)
+        ; - set off flag on collision
         ;;;;;;;;;;;;;;;;;;;;;;;
 
         ; preserve OG WRAM address 
@@ -221,24 +219,24 @@ update_sprites2:
         GetSpriteFlags d
         WRAMToOAM bc
 
-        ; spell off/on check
-
+        ; SPELL OFF/ON
+        bit SPELLB_ON, d
+        jr nz, .spell_on
+            
         ; ---- SPELL IS OFF... ---- ;
-        ; HANDLE SPELL SPAWNING ;
-        ; currently pseudocode...
-        ; (assume spawn flag is determined somehow)
-        ; call check_spawn
-        ; bit SPELLB_SPAWN, b
-        ; jr z, .skip_spawn
-        ;    spawn according to x or y val
-        ;    set SPELLB_ON flag
-        ;    res SPELLB_SPAWN flag
-        ; .skip_spawn
+            ; HANDLE SPELL SPAWNING ;
+            CheckSpawn d
+            bit SPELLB_SPAWN, b
+            jr z, .skip_spawn
+                SpawnSpell d
+                ld a, d
+                xor a, SPELLF_ON | SPELLF_SPAWN
+                ld d, a
+            .skip_spawn
+            jr .to_next_sprite
 
-        ; spell off handling
-
-
-
+        ; ---- SPELL IS ON... ---- ;
+        .spell_on
         ; SPELL MOVEMENT ;
         ; update sprite pt 1
         ; get sprite pt 1's x val address
@@ -249,20 +247,13 @@ update_sprites2:
 
             ; HANDLE SPELL DESPAWNING ;
             ; if x < 2:
-            ; set off
-            ; set sp1 y val to 0
-            ; set sp2 y val to 0
-            
             cp a, 2
             jr nc, .update_x_movement
-                /*
-                push hl
-
                 ; unflag ON
                 ld a, d
                 xor a, SPELLF_ON
                 ld d, a
-
+                
                 ; set y-val to 0
                 dec hl
                 ld [hl], 0
@@ -271,24 +262,28 @@ update_sprites2:
                 add hl, bc
                 ld [hl], 0
                 
-                pop hl
+                pop hl ; matches w/ spell movement push
                 jr .to_next_sprite
-                */
-            
-
+                
         .update_x_movement
         ; update sprite pt 1's x val
         sub SPELL_SCROLL_SPEED
         ld [hl], a
 
-        ; go to sprite pt 2's x val address
-        ld bc, ($0004) ; sprite memory offset
-        add hl, bc
+        dec hl
+        ld e, [hl]
+        inc hl
 
+        ; update sprite pt 2's y val
+        ld bc, ($0003)
+        add hl, bc
+        ld [hl], e
+        
         ; update sprite pt 2's x val
         add a, OBJ16_OFFSET
+        inc hl
         ld [hl], a
-        
+
         pop hl
 
         ; SPELL COLLISION
@@ -357,6 +352,7 @@ check_collisions:
 
 ; runs if player successfully hits a note
 ; resets the sprite x value
+; note: only called in check_collisions
 handle_collision:
     ld a, 0
     ld [hl], a
