@@ -39,6 +39,10 @@ init_sprite_data:
 
     ; put spell flags into WRAM
     ld hl, SPELL_FLAG_START
+    ld [hl], %00000101
+    inc hl
+    ld [hl], %00000001
+    inc hl
     .load_spell_flag
         ld a, SPELLF_ON;%00000001;0
         ld [hli], a
@@ -122,84 +126,9 @@ init_level_2:
     ret
 
 ; loops thru all active sprites in WRAM and updates them
-; NOTE: returns hl and de for handle_collision and handle_miss
-update_sprites:
-    push hl
-
-    CheckTimer rTIMER_OBJ, 1
-    jr nz, .done_update
-
-    ld hl, SPELL_WRAM_START
-    .update_spell_sprite
-        ; preserve hl and store in de
-        push hl
-        ld d, h
-        ld e, l
-
-        ; load spell_a address into (hl)
-        WRAMToOAM bc
-        ld b, $00
-        ld c, OAMA_X
-        add hl, bc
-
-        ; preserve pt 1
-        push hl
-
-        ;CheckTimer rTIMER_OBJ, 1
-        ;jr nz, .done_anim_update
-        ; putting above here fixes input drops, but
-        ; has issues w/ health updating...
-            ; load in new x val
-            ld a, [hl]
-            sub SPELL_SCROLL_SPEED
-            ld [hl], a
-
-            ; load spell_b address into (hl)
-            ld h, d
-            ld l, e
-            inc hl
-            inc hl
-            WRAMToOAM bc
-            ld b, $00
-            ld c, OAMA_X
-            add hl, bc
-
-            ; load offset x val for sprite pt 2
-            add a, OBJ16_OFFSET
-            ld [hl], a
-
-        .done_anim_update
-        ; preserve sprite pt 2
-        push hl
-
-        ; get 2nd sprite part
-        pop hl
-        ld d, h
-        ld e, l
-
-        ; get 1st sprite part
-        pop hl
-        call check_collisions
-
-        ; to next spell sprite (in WRAM)
-        pop hl
-        inc hl
-        inc hl
-        inc hl
-        inc hl
-        
-        ld a, [rSPELL_COUNT]
-        cp a, l
-        jr nz, .update_spell_sprite
-
-    ;SetShieldLocations 0, 0, 0, 0 ; moved to update_player
-    .done_update
-    pop hl
-
-    ret
-
+; NOTE: returns hl and d for handle_collision and handle_miss
 ; working ver w/ new sprite system
-update_sprites2:
+update_sprites:
     CheckTimer rTIMER_OBJ, 1
     jr nz, .done_update
 
@@ -250,8 +179,7 @@ update_sprites2:
         ld a, [hl]
 
             ; HANDLE SPELL DESPAWNING ;
-            ; if x < 2:
-            cp a, DMG_THRES;2
+            cp a, DMG_THRES
             jr nc, .update_x_movement
                 ; unflag ON
                 ld a, d
@@ -374,6 +302,7 @@ handle_collision:
     ld a, [rGAME_DIFF]
     inc a
     ld [rGAME_DIFF], a
+
     ret
 
 ; runs if the player misses a note
@@ -381,7 +310,10 @@ handle_miss:
     ld a, [hl]
     cp a, DMG_THRES
     jr nc, .done
-    ;jr nc, .done
+        ; start player flash
+        ld a, PC_DMG_COUNT
+        ld [rTIMER_DMG], a
+        
         ; lower player health
         ld a, [rPC_HEALTH]
         dec a
@@ -395,4 +327,4 @@ handle_miss:
     ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export init_sprite_data, init_sprites, init_level_1, check_level_2, update_sprites, update_sprites2
+export init_sprite_data, init_sprites, init_level_1, check_level_2, update_sprites

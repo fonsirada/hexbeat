@@ -74,6 +74,7 @@ macro UpdatePlayerAnim
     .next_tile
         push hl
 
+        ;; LOAD TILE ID ;;
         ; store sprite address in hl
         ld b, [hl]
         inc hl
@@ -98,6 +99,19 @@ macro UpdatePlayerAnim
 
         .finish_tile_load
         ld [hl], a
+
+        ;; FLASH PALETTE ;;
+        ld a, [rTIMER_DMG]
+        cp a, 0
+        jr z, .done_flash
+            dec a
+            ld [rTIMER_DMG], a
+
+            inc hl
+            ld a, [hl]
+            xor a, OAMF_PAL1
+            ld [hl], a
+        .done_flash
 
         ; go to next tile in WRAM
         pop hl

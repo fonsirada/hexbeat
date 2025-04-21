@@ -34,6 +34,8 @@ def rTIMER_BG       rb 1
 def rTIMER_PC       rb 1
 def rTIMER_OBJ      rb 1
 def rSPELL_COUNT    rb 1
+def rTIMER_DMG      equ $C01F
+def PC_DMG_COUNT equ (4 * 6)
 
 ;;; rGAME
 def GAME_BASE       equ %00000000
