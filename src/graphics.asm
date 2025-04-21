@@ -135,6 +135,7 @@ init_registers:
     ld [rTIMER_BG], a
     ld [rTIMER_PC], a
     ld [rTIMER_OBJ], a
+    ld [rTIMER_DMG], a
     copy [rSPELL_COUNT], LVL1_SPELL_NUM
     ret
 
@@ -251,7 +252,6 @@ game_over:
     push hl
     push bc
 
-    halt
     call print_text
 
     ; restart functionality
@@ -273,6 +273,7 @@ print_text:
     ld de, GAME_OVER 
 
     .print_tiles_loop
+        halt
         ld a, [de]
         cp END_OF_STRING
         jr z, .done
