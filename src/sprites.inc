@@ -135,7 +135,6 @@ macro ProcessInputForAnim
     bit \1, a
     jr nz, .done_process\@
         RegBitOp rPLAYER, \2, set
-        copy [rPC_ACOUNT], $00 
         SetPlayerTiles \3
     .done_process\@
 endm
