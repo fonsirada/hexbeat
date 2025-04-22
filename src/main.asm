@@ -26,40 +26,40 @@ entrypoint:
 
 section "main", rom0
 
-; temp main while testing sound implementation
-main:
-    DisableLCD
+; ; temp main while testing sound implementation
+; main:
+;     DisableLCD
 
-    call init_sound
-    call init_graphics
-    call init_registers
-    call init_sprite_data
-    call init_player
-    call init_sprites
-    InitJoypad
+;     call init_sound
+;     call init_graphics
+;     call init_registers
+;     call init_sprite_data
+;     call init_player
+;     call init_sprites
+;     InitJoypad
 
-    EnableLCD
+;     EnableLCD
 
-    .game_loop
-    call start
+;     .game_loop
+;     call start
 
-    ; check if game started
-    ld a, [rGAME]
-    bit GAMEB_START, a
-    jr z, .post_graphics
-        ;call UpdateSample ;try here?
-        call update_timers
-        ;call update_graphics
-        ;halt
-        ;call update_player
+;     ; check if game started
+;     ld a, [rGAME]
+;     bit GAMEB_START, a
+;     jr z, .post_graphics
+;         ;call UpdateSample ;try here?
+;         call update_timers
+;         ;call update_graphics
+;         ;halt
+;         ;call update_player
 
-    .post_graphics
-    call UpdateSample
-    UpdateJoypad
-    jp .game_loop
+;     .post_graphics
+;     call UpdateSample
+;     UpdateJoypad
+;     jp .game_loop
 
 
-/*
+
 main:
     .initialize_game
     DisableLCD
@@ -102,4 +102,3 @@ main:
         .post_graphics
         UpdateJoypad
         jp .game_loop
-*/

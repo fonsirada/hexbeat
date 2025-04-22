@@ -185,15 +185,15 @@ jump:
 ; animation for player hit high
 player_hit_high:
     ld a, [rPLAYER]
-    bit PLAYERB_HOLD, a
+    bit PLAYERB_HOLD, a ; checks to hold last frame of animation a second longer
     jr nz, .extend_frame
-    
-    ld a, [PAD_LHOLD]
-    cp 0
-    jr z, .extend_frame
-        UpdatePlayerAnim SPRITE_0_A_WRAM_LOCATION, SPRITE_ANIM_WRAM_THRES, SPRITE_HIT_HIGH_THRES_TILEID
-        call jump
-        jr .end_frame_update
+        ; if the long hold is happening - don't update player animation
+        ld a, [PAD_LHOLD] 
+        or a
+        jr z, .extend_frame
+            UpdatePlayerAnim SPRITE_0_A_WRAM_LOCATION, SPRITE_ANIM_WRAM_THRES, SPRITE_HIT_HIGH_THRES_TILEID
+            call jump
+            jr .end_frame_update
 
     .extend_frame
     ; set player frame to $90
@@ -239,48 +239,54 @@ update_player:
     ProcessInputForAnim PADB_B, PLAYERB_B, SPRITE_RUN_THRES_TILEID
     ProcessInputForAnim PADB_A, PLAYERB_A, SPRITE_HIT_LOW_THRES_TILEID
 
-    ; check if current frame should be held
+    ; check if current frame should be held (4th frame)
     ld a, [rPC_ACOUNT]
     cp FRAME_TO_HOLD
     jr nz, .done_hold_check
-    .raise_hold
         RegBitOp rPLAYER, PLAYERB_HOLD, set
-    .done_hold_check
 
-    ; determine which player animation to run
+    .done_hold_check
+    ; animation for B Button Press - player hit low
     ld a, [rPLAYER]
     bit PLAYERB_B, a
     jr z, .update_a
         ld a, [rPC_ACOUNT]
         cp HIT_ANIM_LENGTH
-        jr z, .update_a
-            SetPlayerCoord MC_TOP_Y, OAMA_Y
-            call player_hit_low
-            RegOp rPC_ACOUNT, inc
+        ; reset ACOUNT to 0 if full animation and extra frame hold has been reached
+        jr nz, .update_anim_b
+            copy [rPC_ACOUNT], 0
+            jr .update_a
 
-            jr .done_update
+        .update_anim_b
+        SetPlayerCoord MC_TOP_Y, OAMA_Y
+        call player_hit_low
+        RegOp rPC_ACOUNT, inc
+        ; have to use jp instead here
+        jp .done_update 
 
+    ; animation for A Button Press - player hit high
     .update_a
-        bit PLAYERB_A, a
-        jr z, .update_run
-        
+    bit PLAYERB_A, a
+    jr z, .update_run
         ld a, [rPC_ACOUNT]
         cp HIT_ANIM_LENGTH
-        jr z, .update_run
-            call player_hit_high
-            RegOp rPC_ACOUNT, inc
+        jr nz, .update_anim_a
+            copy [rPC_ACOUNT], 0
+            jr .update_run
 
-            jr .done_update
+        .update_anim_a
+        SetPlayerCoord JUMP_HOLD_Y, OAMA_Y
+        call player_hit_high
+        RegOp rPC_ACOUNT, inc
+        jr .done_update
     
-    ; no button press
+    ; no button press - player runs
     .update_run
-        RegBitOp rPLAYER, PLAYERB_B, res
-        RegBitOp rPLAYER, PLAYERB_B, res
-    
-        SetPlayerCoord MC_TOP_Y, OAMA_Y
-        RegBitOp rPLAYER, PLAYERB_FALL, res
-
-        UpdatePlayerAnim SPRITE_0_A_WRAM_LOCATION, SPRITE_ANIM_WRAM_THRES, SPRITE_RUN_THRES_TILEID
+    RegBitOp rPLAYER, PLAYERB_B, res
+    RegBitOp rPLAYER, PLAYERB_A, res
+    RegBitOp rPLAYER, PLAYERB_FALL, res
+    SetPlayerCoord MC_TOP_Y, OAMA_Y
+    UpdatePlayerAnim SPRITE_0_A_WRAM_LOCATION, SPRITE_ANIM_WRAM_THRES, SPRITE_RUN_THRES_TILEID
 
     .done_update
     ret
