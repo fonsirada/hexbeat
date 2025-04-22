@@ -27,39 +27,53 @@ entrypoint:
 section "main", rom0
 
 ; ; temp main while testing sound implementation
-; main:
-;     DisableLCD
+main:
+    .initialize_game
+    DisableLCD
 
-;     call init_sound
-;     call init_graphics
-;     call init_registers
-;     call init_sprite_data
-;     call init_player
-;     call init_sprites
-;     InitJoypad
+    call init_sound
+    call init_graphics
+    call init_registers
+    call init_sprite_data
+    call init_player
+    call init_sprites
+    InitJoypad
 
-;     EnableLCD
+    EnableLCD
 
-;     .game_loop
-;     call start
+    .game_loop
+    call start
 
-;     ; check if game started
-;     ld a, [rGAME]
-;     bit GAMEB_START, a
-;     jr z, .post_graphics
-;         ;call UpdateSample ;try here?
-;         call update_timers
-;         ;call update_graphics
-;         ;halt
-;         ;call update_player
+    ; check if game started
+    ld a, [rGAME]
+    bit GAMEB_START, a
+    jr z, .post_graphics
+        ; check if game ended
+        bit GAMEB_END, a
+        jr z, .graphics
+            ; set up game over screen
+            call game_over
+            ld a, [rGAME]
+            bit GAMEB_END, a
+            jr z, .initialize_game
+                jr .post_graphics
+                
+        .graphics
+        call update_timers
+        call update_graphics
+        halt
+        call update_sprites
+        halt
+        call update_player
+        call check_level_2
 
-;     .post_graphics
-;     call UpdateSample
-;     UpdateJoypad
-;     jp .game_loop
+    .post_graphics
+    call UpdateSample ; swap to update_sound eventually
+    UpdateJoypad
+    jp .game_loop
 
 
-
+/*
 main:
     .initialize_game
     DisableLCD
@@ -102,3 +116,4 @@ main:
         .post_graphics
         UpdateJoypad
         jp .game_loop
+*/

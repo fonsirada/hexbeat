@@ -23,15 +23,26 @@ println "WRAM usage: {d:WRAM_USAGE} bytes"
 assert WRAM_USAGE <= $2000, "Too many bytes used in WRAM"
 
 ; ROM usage
-def TIME_BETWEEN_NOTES          equ 10;(20)
+def TIME_BETWEEN_NOTES          equ 8;(20)
+;equ %1100000
 
-Notes:
-;continuous notes
-;dw $060b, $0642, $0672, $0689, $06b2, $06d6, $06f7, $0706
-;dw $06f7, $06d6, $06b2, $0689, $0672, $0642, $060b, $0000
-dw $89c6, $89c6, $89c6, $89c6, $89c6, $89c6, $89c6, $89c6
-dw $89c6, $b2c6, $c4c6, $c4c6, $89c6, $b2c6, $c4c6, $b2c6
-dw $89c6, $b2c6, $c4c6, $c4c6, $89c6, $b2c6, $c4c6, $b2c6
+Ch1_Notes:
+;continuous example notes (scale)
+dw $060b, $0642, $0672, $0689, $06b2, $06d6, $06f7, $0706
+;dw $c689, $c6b2, $c6c4, $c6c4, $c689, $c6b2, $c6c4, $c6b2
+
+Ch2_Notes:
+; full_test notes (???)
+; B3,  C4,  C#4, D4
+; OH MY GOD ARE THEY SWAPPED. THEY ARE. BRUH.
+;dw $EDC5, $0BC6, $27C6, $42C6, $5BC6, $0BC6, $27C6, $42C6
+
+; music draft 1:
+; bass? ; g2, g#2
+;dw $c2c7, $c2c7, $c312, $c312, $c2c7, $c2c7, $c312, $c312
+; melody
+dw $c689, $c6b2, $c6c4, $c6c4, $c689, $c6b2, $c6c4, $c6b2
+dw $8689, $86b2, $86c4, $86c4, $8689, $86b2, $86c4, $86b2
 dw $0000
 
 
@@ -42,7 +53,7 @@ dw $0000
 init_sound:
     ; init the WRAM state
     ;InitJoypad WRAM_PAD_INPUT
-    copy [WRAM_FRAME_COUNTER], 0; $FF ;$FF to disable
+    copy [WRAM_FRAME_COUNTER], $FF ;$FF to disable, 0 to enable
     xor a
     ld [WRAM_NOTE_INDEX], a
 
@@ -52,16 +63,23 @@ init_sound:
     ; high nibble = left speaker vol
     ; low nibble = right speaker vol
     copy [rNR50], $77
-    
+
     copy [rNR51], $FF
     ; use sound mixing settings to inc difficulty?
 
     ret
 
+update_sound:
+    halt
+    ; update joypad
+
+    ret
+
+
 UpdateSample:
     halt
 
-    UpdateJoypad WRAM_PAD_INPUT
+    ;UpdateJoypad WRAM_PAD_INPUT
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     ; skip counter check if the counter is disabled (equals $FF)
@@ -83,28 +101,38 @@ UpdateSample:
             ld e, a
 
             ; load note + note index
-            ld hl, Notes
+            ld hl, Ch2_Notes
             add hl, de
 
             ; get note; if note is 0, stop sound
             ld a, [hli]
             or a, a
             jr nz, .stop_sound
-                ;copy [rNR12], $00
-                ;copy [rNR14], $C0
-                copy [rNR22], $00
-                copy [rNR24], $C0
+                ld a, 0
+                ld [WRAM_NOTE_INDEX], a
+                ; play infinitely??
+                ; find where that fade is coming from...
+                
+                ; copy [rNR12], $00
+                ; copy [rNR14], $C0
+
+                ; copy [rNR22], $00
+                ; copy [rNR24], $C0
                 ld a, $FF
                 ld [WRAM_FRAME_COUNTER], a
                 jr .play_notes
             .stop_sound
 
-            ;ld [rNR13], a
-            ;ld a, [hli]
-            ;ld [rNR14], a
             ld [rNR23], a
             ld a, [hli]
             ld [rNR24], a
+
+            ;; channel 1 notes are broken rn
+            ; ld hl, Ch1_Notes
+            ; add hl, de
+            ; ld [rNR13], a
+            ; ld a, [hli]
+            ; ld [rNR14], a
 
             copy [WRAM_FRAME_COUNTER], TIME_BETWEEN_NOTES
         .sound_switch
@@ -112,6 +140,7 @@ UpdateSample:
     .play_notes
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ; NOTE: move this to a seperate func
 
     ; start playing notes when start is pressed
     ld a, [PAD_CURR]
@@ -120,22 +149,29 @@ UpdateSample:
         xor a
         ld [WRAM_NOTE_INDEX], a
 
-        /*
+        ;;; CHANNEL 1 ;;;
         copy [rNR10], $00
         copy [rNR11], $80
         copy [rNR12], $F0
-        */
 
+        ; ld hl, Ch1_Notes
+        ; ld a, [hli]
+        ; ld [rNR13], a
+        ; ld a, [hl]
+        ; or a, $80
+        ; ld [rNR14], a
+        
+        ;;; CHANNEL 2 ;;;
         ; high nibble = duty (0, 4, 8, C)
         ; low nibble = length (00-3F)
         copy [rNR21], $80 
 
         ; high nibble = volume (0-F)
         ; low nibble = envelope (down, 0-7; up, 8-F)
-        copy [rNR22], $F0
+        copy [rNR22], $F6;$F0
 
         ; init first note & start sound
-        ld hl, Notes
+        ld hl, Ch2_Notes
         ld a, [hli]
         ld [rNR23], a
         ld a, [hl]
@@ -149,4 +185,4 @@ UpdateSample:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export init_sound, UpdateSample
+export init_sound, update_sound, UpdateSample
