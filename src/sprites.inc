@@ -50,8 +50,8 @@ def SPELL_HIGH_Y           equ (TARGET_HIGH_Y - 4)
 def SPELL_LOW_Y            equ (TARGET_LOW_Y - 4)
 def SPELL_SCROLL_SPEED     equ 3
 
-def HIT_PERF_MIN           equ (TARGET_X - 16)
-def HIT_PERF_MAX           equ (HIT_PERF_MIN + 24)
+def HIT_PERF_MIN           equ (TARGET_X - 4)
+def HIT_PERF_MAX           equ (TARGET_X + 8 + 4)
 def HIT_MISS_MAX           equ (HIT_PERF_MIN - 1)
 def DMG_THRES              equ (4)
 
@@ -198,6 +198,24 @@ macro CheckSpriteRange
     .done_check\@
 endm
 
+; calls:
+; CheckSpriteRange [hl], HIT_PERF_MIN, HIT_PERF_MAX, rCOLLB_XPERF
+; CheckSpriteRange [hl], HIT_BAD_MIN, HIT_BAD_MAX, rCOLLB_XBAD
+; CheckSpriteRange [hl], HIT_MISS_MIN, HIT_MISS_MAX, rCOLLB_XMISS
+macro CheckSpriteRangeWIP
+    ld a, \1
+    cp \2
+        ; fail if less than min
+        jr c, .done_check\@
+        cp \3
+            ; fail if greater than max
+            jr nc, .check_miss\@
+                ld a, rCOLLISION
+                set \4, a ; repl 'set' w/ \5?
+                ld [rCOLLISION], a
+    .done_check\@
+endm
+
 ; given an address in WRAM from (hl), get the OAM address there
 ; and store in (hl)
 ; NEW: store the address at (hl) in a given 16bit register
@@ -236,12 +254,36 @@ macro SetSpriteFlags
     pop hl
 endm
 
+;set to $38 to spawn until lvl 2 is reached
+;set to like, $0 to continuously spawn
+; macro CheckSpawn
+;     ld a, [rSPELL_COUNT]
+;     cp a, $0 ; change this val
+;     xor a
+;     jr nz, .done_spawn\@
+;         set SPELLB_SPAWN, d
+;     .done_spawn\@
+; endm
+
 macro CheckSpawn
-    ld a, [rSPELL_COUNT]
-    cp a, $38 ;set to $38 to spawn until lvl 2 is reached
-    jr nz, .done_spawn\@
-        set SPELLB_SPAWN, d
-    .done_spawn\@
+; NOTE: flags in (d) and address in (hl)
+    ;  indicator for "note spawned" ?
+    ;  for check_spawn --> if WRAM_FRAME_COUNTER = ~38, time to spawn
+    ;  get first "off" sprite, and set that one based on Mapping byte info
+    ;  then flag note_spawned & exit check loop
+    ;  upon exit, unflag note_spawned
+    ld a, [WRAM_FRAME_COUNTER]
+    xor a, 20  ;ideally ~38 ; spawn timing, VERY 1 to 1
+    jr nz, .no_spawn\@
+        ld a, [rGAME]
+        bit GAMEB_SPAWN, a
+        jr nz, .no_spawn\@
+            ; SET SPELL OBJ FLAGS:
+
+            set SPELLB_SPAWN, d
+            set GAMEB_SPAWN, a
+            ld [rGAME], a
+    .no_spawn\@
 endm
 
 ; given sprite address (hl) and flags as param (in d)

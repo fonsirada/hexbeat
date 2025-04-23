@@ -33,6 +33,17 @@ def SPELL4_SPAWNX          equ 168
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+Mapping:
+    ;; theory crafting ;;
+    ;  "sliding window"
+    ;  indicator for "note spawned" ?
+    ;  for check_spawn --> if WRAM_FRAME_COUNTER = ~38, time to spawn
+    ;  get first "off" sprite, and set that one based on Mapping byte info
+    ;  then flag note_spawned & exit check loop
+    ;  upon exit, unflag note_spawned
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ; place sprite locations into WRAM
 init_sprite_data:
     call init_player_sprite_data
@@ -130,16 +141,14 @@ init_level_2:
 ; working ver w/ new sprite system
 update_sprites:
     CheckTimer rTIMER_OBJ, 1
-    jr nz, .done_update
+    jp nz, .done_update
+    ; jr nz, .done_update
 
     ld hl, SPELL_WRAM_START
     .update_spell_sprite
         ;;;;;;; TO DO ;;;;;;;;;
         ; in this loop, per sprite:
         ; if spawn = 1, spawn sprite & reset flag
-
-        ; - BUG: dmg triggers twice - FIXED
-        ; - BUG: spawn flag weirdness - FIXED
 
         ; NOTE: for testing, see CheckSpawn macro
         ;;;;;;;;;;;;;;;;;;;;;;;
@@ -233,8 +242,10 @@ update_sprites:
 
         ld a, [rSPELL_COUNT]
         cp a, l
-        jr nz, .update_spell_sprite
+        ;jr nz, .update_spell_sprite
+        jp nz, .update_spell_sprite
     .done_update
+    RegBitOp rGAME, GAMEB_SPAWN, res
     ;SetShieldLocations 0, 0, 0, 0 
     ret
 
@@ -276,6 +287,10 @@ check_collisions:
         jr z, .check_miss
             call handle_collision
             jr .done_check
+        bit COLLB_XBAD, a
+        jr z, .check_miss
+            call handle_collision ; change col type
+            jr .done_check
     
     .check_miss
         call handle_miss
@@ -313,7 +328,7 @@ handle_miss:
         ; start player flash
         ld a, PC_DMG_COUNT
         ld [rTIMER_DMG], a
-        
+
         ; lower player health
         ld a, [rPC_HEALTH]
         dec a
