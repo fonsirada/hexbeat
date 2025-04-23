@@ -15,6 +15,13 @@ include "src/hardware.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+rsset (_RAM + $40) ; change this location at some point
+
+def WRAM_PAD_INPUT                  rb 0 ;sizeof_PAD_INPUT
+def WRAM_FRAME_COUNTER              rb 1
+def WRAM_NOTE_INDEX                 rb 1
+def WRAM_END                        rb 0
+
 rsset _RAM
 def PAD_CURR rb 1
 def PAD_PREV rb 1
@@ -42,12 +49,16 @@ def GAME_BASE       equ %00000000
 def GAME_START      equ %00000001
 def GAME_END        equ %00000010
 def GAME_LVL2       equ %00000100
+def GAME_LVL3       equ %00001000
+def GAMEF_SPAWN     equ %10000000 ; move/change where this flag is?
 
 def GAMEB_START     equ 0
 def GAMEB_END       equ 1
 def GAMEB_LVL2      equ 2
 
-def GAME_DIFF_THRES equ 10
+def GAMEB_SPAWN     equ 7
+
+def GAME_DIFF_THRES equ 16 ; 10
 
 ;;; rPLAYER
 def PLAYERF_HIT     equ %10000000
