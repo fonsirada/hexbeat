@@ -41,17 +41,9 @@ Mapping:
 dw $0100, $0000, $0101, $0000, $0100, $0101, $0101, $0100
 dw $0000, $0000, $0101, $0101, $0100, $0101, $0100, $0101
 dw $0000
-    ;; theory crafting ;;
-    ;  "sliding window"
-    ;  indicator for "note spawned" ?
-    ;  for check_spawn --> if WRAM_FRAME_COUNTER = ~38, time to spawn
-    ;  get first "off" sprite, and set that one based on Mapping byte info
-    ;  then flag note_spawned & exit check loop
-    ;  upon exit, unflag note_spawned
 
-; one byte: note spawn type (high or low) & length
-; upper: spawn type (1 = high, 0 = low)
-; lower: length (0 = skip, 1 = quarter?)
+; format: $__ __ = $(spawn?)(high/low)
+; eg. $0100 = spawn note, spawn low
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
