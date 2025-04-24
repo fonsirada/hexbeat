@@ -138,7 +138,7 @@ init_registers:
     ld [rTIMER_PC], a
     ld [rTIMER_OBJ], a
     ld [rTIMER_DMG], a
-    copy [rSPELL_COUNT], LVL1_SPELL_NUM
+    copy [rSPELL_COUNT], LVL2_SPELL_NUM;LVL1_SPELL_NUM
     ret
 
 update_graphics:
