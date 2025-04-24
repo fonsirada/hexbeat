@@ -50,9 +50,15 @@ def SPELL_HIGH_Y           equ (TARGET_HIGH_Y - 4)
 def SPELL_LOW_Y            equ (TARGET_LOW_Y - 4)
 def SPELL_SCROLL_SPEED     equ 3
 
-def HIT_PERF_MIN           equ (TARGET_X - 16)
-def HIT_PERF_MAX           equ (HIT_PERF_MIN + 24)
-def HIT_MISS_MAX           equ (HIT_PERF_MIN - 1)
+; TIMING
+def HIT_PERF_MIN           equ (TARGET_X - 2)
+def HIT_PERF_MAX           equ (TARGET_X + 8 + 2)
+def HIT_GOOD_MIN           equ (TARGET_X - 8)
+def HIT_GOOD_MAX           equ (TARGET_X + 8 + 8)
+def HIT_BAD_MIN            equ (TARGET_X - 20)
+def HIT_BAD_MAX            equ (TARGET_X + 8 + 20)
+def HIT_MISS_MAX           equ (HIT_BAD_MIN - 1)
+def HIT_MISS_MIN           equ (0)
 def DMG_THRES              equ (4)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -198,6 +204,21 @@ macro CheckSpriteRange
     .done_check\@
 endm
 
+
+macro CheckSpriteRangeWIP
+    ld a, \1
+    cp \2
+        ; fail if less than min
+        jr c, .done_check\@
+        cp \3
+            ; fail if greater than max
+            jr nc, .done_check\@
+                ld a, [rCOLLISION]
+                set \4, a ; repl 'set' w/ \5?
+                ld [rCOLLISION], a
+    .done_check\@
+endm
+
 ; given an address in WRAM from (hl), get the OAM address there
 ; and store in (hl)
 ; NEW: store the address at (hl) in a given 16bit register
@@ -234,14 +255,6 @@ macro SetSpriteFlags
 
     ld [hl], \1
     pop hl
-endm
-
-macro CheckSpawn
-    ld a, [rSPELL_COUNT]
-    cp a, $38 ;set to $38 to spawn until lvl 2 is reached
-    jr nz, .done_spawn\@
-        set SPELLB_SPAWN, d
-    .done_spawn\@
 endm
 
 ; given sprite address (hl) and flags as param (in d)

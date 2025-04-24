@@ -13,6 +13,8 @@ include "src/sprites.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 section "vblank_interrupt", rom0[$0040]
+    ;ld hl, WRAM_FRAME_COUNTER
+    ;dec [hl]
     reti
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -41,7 +43,7 @@ def BG_SCROLL_SPEED                 equ 2
 def BG_ANIMATION_TIMER              equ 1
 def UPDATE_FRAME                    equ 1
 def PC_ANIMATION_TIMER              equ 3
-def OBJ_ANIMATION_TIMER             equ 2
+def OBJ_ANIMATION_TIMER             equ 1
 
 def PALETTE_0                       equ %11100100
 def PALETTE_1                       equ %00011011
