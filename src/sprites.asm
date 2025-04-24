@@ -38,8 +38,9 @@ Mapping:
 ;dw $0000, $0000, $1111, $0000, $0000, $0000, $0000, $0000
 ;dw $0000
 ;dw $0100, $0100, $0100, $0100, $0100, $0100, $0100, $0100
-dw $0100, $0000, $0101, $0000, $0100, $0101, $0101, $0100
-dw $0000, $0000, $0101, $0101, $0100, $0101, $0100, $0101
+dw $0100, $0101, $0101, $0100, $0100, $0101, $0101, $0100
+dw $0100, $0000, $0101, $0000, $0100, $0000, $0101, $0000
+dw $0000, $0000, $0101, $0000, $0000, $0101, $0000, $0000
 dw $0000
 
 ; format: $__ __ = $(spawn?)(high/low)
@@ -301,7 +302,7 @@ check_collisions:
         .check_bad
         bit COLLB_XBAD, a
         jr z, .check_miss
-            call handle_bad_collision ; MAY HAVE ISSUES W/ INPUT SPILLOVER
+            ;call handle_bad_collision ;ISSUES W/ INPUT SPILLOVER
             jr .done_check
     
     .check_miss
@@ -381,7 +382,7 @@ check_spawn:
     ;push de
 
     ld a, [WRAM_FRAME_COUNTER]
-    xor a, 20  ;ideally ~38 ; spawn timing, VERY 1 to 1
+    xor a, 10  ;ideally ~38 ; spawn timing, VERY 1 to 1
     jr nz, .no_spawn
         ld a, [rGAME]
         bit GAMEB_SPAWN, a
