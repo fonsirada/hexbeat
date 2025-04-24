@@ -258,7 +258,11 @@ check_collisions:
     copy [rCOLLISION], COLLF_XMISS
 
     ; check if the current x is within the 'perfect' x range
-    CheckSpriteRange [hl]
+    ;CheckSpriteRange [hl] ; old ver
+    CheckSpriteRangeWIP [hl], HIT_PERF_MIN, HIT_PERF_MAX, COLLB_XPERF
+    ;CheckSpriteRange [hl], HIT_GOOD_MIN, HIT_GOOD_MAX, COLLB_XGOOD
+    CheckSpriteRangeWIP [hl], HIT_BAD_MIN, HIT_BAD_MAX, COLLB_XBAD
+    CheckSpriteRangeWIP [hl], HIT_MISS_MIN, HIT_MISS_MAX, COLLB_XMISS
 
     ; if B pressed & obj low, try collision
     ld a, [PAD_PRSS]
@@ -287,12 +291,17 @@ check_collisions:
     .run_check
         ld a, [rCOLLISION]
         bit COLLB_XPERF, a
-        jr z, .check_miss
+        jr z, .check_good
             call handle_collision
             jr .done_check
+        .check_good
+        bit COLLB_XGOOD, a
+        jr z, .check_bad
+            ; add call here?
+        .check_bad
         bit COLLB_XBAD, a
         jr z, .check_miss
-            call handle_collision ; change col type
+            call handle_bad_collision
             jr .done_check
     
     .check_miss
@@ -321,6 +330,29 @@ handle_collision:
     inc a
     ld [rGAME_DIFF], a
 
+    ret
+
+handle_bad_collision:
+    ; set off flag
+    ld a, d
+    res SPELLB_ON, d
+    ld d, a
+
+    ; set x val to 0
+    ld a, 0
+    ld [hl], a
+    ld bc, $0004 ; try de if being weird
+    add hl, bc
+    ld [hl], a
+
+    ; decrease health
+    ld a, [rPC_HEALTH]
+    dec a
+    ld [rPC_HEALTH], a
+    cp a, 0
+        jr nz, .done
+            RegBitOp rGAME, GAMEB_END, set
+    .done
     ret
 
 ; runs if the player misses a note

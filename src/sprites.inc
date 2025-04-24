@@ -50,9 +50,15 @@ def SPELL_HIGH_Y           equ (TARGET_HIGH_Y - 4)
 def SPELL_LOW_Y            equ (TARGET_LOW_Y - 4)
 def SPELL_SCROLL_SPEED     equ 3
 
-def HIT_PERF_MIN           equ (TARGET_X - 4)
-def HIT_PERF_MAX           equ (TARGET_X + 8 + 4)
-def HIT_MISS_MAX           equ (HIT_PERF_MIN - 1)
+; TIMING
+def HIT_PERF_MIN           equ (TARGET_X - 2)
+def HIT_PERF_MAX           equ (TARGET_X + 8 + 2)
+def HIT_GOOD_MIN           equ (TARGET_X - 8)
+def HIT_GOOD_MAX           equ (TARGET_X + 8 + 8)
+def HIT_BAD_MIN            equ (TARGET_X - 20)
+def HIT_BAD_MAX            equ (TARGET_X + 8 + 20)
+def HIT_MISS_MAX           equ (HIT_BAD_MIN - 1)
+def HIT_MISS_MIN           equ (0)
 def DMG_THRES              equ (4)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -200,8 +206,13 @@ endm
 
 ; calls:
 ; CheckSpriteRange [hl], HIT_PERF_MIN, HIT_PERF_MAX, rCOLLB_XPERF
+; CheckSpriteRange [hl], HIT_GOOD_MIN, HIT_GOOD_MAX, rCOLLB_XGOOD
 ; CheckSpriteRange [hl], HIT_BAD_MIN, HIT_BAD_MAX, rCOLLB_XBAD
 ; CheckSpriteRange [hl], HIT_MISS_MIN, HIT_MISS_MAX, rCOLLB_XMISS
+; perf range = -4 / +4
+; good range = -8 / +8
+; bad range = -20 / +20
+; miss range = (0, 4)
 macro CheckSpriteRangeWIP
     ld a, \1
     cp \2
@@ -209,8 +220,8 @@ macro CheckSpriteRangeWIP
         jr c, .done_check\@
         cp \3
             ; fail if greater than max
-            jr nc, .check_miss\@
-                ld a, rCOLLISION
+            jr nc, .done_check\@
+                ld a, [rCOLLISION]
                 set \4, a ; repl 'set' w/ \5?
                 ld [rCOLLISION], a
     .done_check\@
@@ -252,38 +263,6 @@ macro SetSpriteFlags
 
     ld [hl], \1
     pop hl
-endm
-
-;set to $38 to spawn until lvl 2 is reached
-;set to like, $0 to continuously spawn
-; macro CheckSpawn
-;     ld a, [rSPELL_COUNT]
-;     cp a, $0 ; change this val
-;     xor a
-;     jr nz, .done_spawn\@
-;         set SPELLB_SPAWN, d
-;     .done_spawn\@
-; endm
-
-macro CheckSpawn
-; NOTE: flags in (d) and address in (hl)
-    ;  indicator for "note spawned" ?
-    ;  for check_spawn --> if WRAM_FRAME_COUNTER = ~38, time to spawn
-    ;  get first "off" sprite, and set that one based on Mapping byte info
-    ;  then flag note_spawned & exit check loop
-    ;  upon exit, unflag note_spawned
-    ld a, [WRAM_FRAME_COUNTER]
-    xor a, 20  ;ideally ~38 ; spawn timing, VERY 1 to 1
-    jr nz, .no_spawn\@
-        ld a, [rGAME]
-        bit GAMEB_SPAWN, a
-        jr nz, .no_spawn\@
-            ; SET SPELL OBJ FLAGS:
-
-            set SPELLB_SPAWN, d
-            set GAMEB_SPAWN, a
-            ld [rGAME], a
-    .no_spawn\@
 endm
 
 ; given sprite address (hl) and flags as param (in d)

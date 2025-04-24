@@ -44,6 +44,7 @@ def rSPELL_COUNT    rb 1
 def rTIMER_DMG      equ $C01F
 def PC_DMG_COUNT equ (4 * 6)
 
+
 ;;; rGAME
 def GAME_BASE       equ %00000000
 def GAME_START      equ %00000001
@@ -80,6 +81,7 @@ def COLLF_XGOOD     equ %00010000
 def COLLF_XBAD      equ %00001000
 def COLLF_XMISS     equ %00000100
 ; ^ one of these flags should always be set!
+
 
 def COLLB_YHIGH     equ 7
 def COLLB_YLOW      equ 6
