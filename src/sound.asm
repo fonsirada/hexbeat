@@ -36,13 +36,12 @@ dw $060b, $0642, $0672, $0689, $06b2, $06d6, $06f7, $0706
 Ch2_Notes:
 ; full_test notes (???)
 ; B3,  C4,  C#4, D4
-; OH MY GOD ARE THEY SWAPPED. THEY ARE. BRUH.
 ;dw $EDC5, $0BC6, $27C6, $42C6, $5BC6, $0BC6, $27C6, $42C6
 
 ; music draft 1:
 ; bass? ; g2, g#2
 ;dw $c2c7, $c2c7, $c312, $c312, $c2c7, $c2c7, $c312, $c312
-; melody
+; melody (r24 then r23)
 dw $c689, $c6b2, $c6c4, $c6c4, $c689, $c6b2, $c6c4, $c6b2
 dw $8689, $86b2, $86c4, $86c4, $8689, $86b2, $86c4, $86b2
 dw $0000
@@ -74,8 +73,6 @@ init_sound:
     ret
 
 update_music:
-    ;halt
-
     ;; go to next note ;;
     ; skip counter check if the counter is disabled (equals $FF)
     ld a, $FF
@@ -131,7 +128,7 @@ update_music:
         bit PADB_START, a
         jr nz, .started_notes
             ; play note (load in note to channels)
-            ld [WRAM_NOTE_INDEX], a
+            ;ld [WRAM_NOTE_INDEX], a
 
             ;; CHANNEL 1 ;;
 

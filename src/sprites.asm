@@ -34,6 +34,13 @@ def SPELL4_SPAWNX          equ 168
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 Mapping:
+;dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
+;dw $0000, $0000, $1111, $0000, $0000, $0000, $0000, $0000
+;dw $0000
+;dw $0100, $0100, $0100, $0100, $0100, $0100, $0100, $0100
+dw $0100, $0000, $0101, $0000, $0100, $0101, $0101, $0100
+dw $0000, $0000, $0101, $0101, $0100, $0101, $0100, $0101
+dw $0000
     ;; theory crafting ;;
     ;  "sliding window"
     ;  indicator for "note spawned" ?
@@ -41,6 +48,10 @@ Mapping:
     ;  get first "off" sprite, and set that one based on Mapping byte info
     ;  then flag note_spawned & exit check loop
     ;  upon exit, unflag note_spawned
+
+; one byte: note spawn type (high or low) & length
+; upper: spawn type (1 = high, 0 = low)
+; lower: length (0 = skip, 1 = quarter?)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -50,12 +61,12 @@ init_sprite_data:
 
     ; put spell flags into WRAM
     ld hl, SPELL_FLAG_START
-    ld [hl], %00000101
-    inc hl
-    ld [hl], %00000001
-    inc hl
+    ; ld [hl], %00000101
+    ; inc hl
+    ; ld [hl], %00000001
+    ; inc hl
     .load_spell_flag
-        ld a, SPELLF_ON;%00000001;0
+        ld a, %00000000;SPELLF_ON;%00000001;0
         ld [hli], a
         ld a, l
         cp a, low(SPELL_WRAM_START)
@@ -109,8 +120,8 @@ init_level_1:
     ; SPELL OBJs
     SetSpriteXY 10, SPELL1_SPAWNX, SPELL_HIGH_Y
     SetSpriteXY 11, SPELL1_SPAWNX, SPELL_HIGH_Y
-    SetSpriteXY 12, SPELL2_SPAWNX, SPELL_LOW_Y
-    SetSpriteXY 13, SPELL2_SPAWNX, SPELL_LOW_Y
+    SetSpriteXY 12, SPELL1_SPAWNX, SPELL_LOW_Y
+    SetSpriteXY 13, SPELL1_SPAWNX, SPELL_LOW_Y
     ret
 
 ; check if the level 2 threshold is passed
@@ -130,8 +141,8 @@ check_level_2:
 init_level_2:
     halt
     copy [rSPELL_COUNT], LVL2_SPELL_NUM
-    SetSpriteXY 14, SPELL3_SPAWNX, SPELL_HIGH_Y
-    SetSpriteXY 15, SPELL3_SPAWNX, SPELL_HIGH_Y
+    SetSpriteXY 14, SPELL4_SPAWNX, SPELL_HIGH_Y
+    SetSpriteXY 15, SPELL4_SPAWNX, SPELL_HIGH_Y
     SetSpriteXY 16, SPELL4_SPAWNX, SPELL_LOW_Y
     SetSpriteXY 17, SPELL4_SPAWNX, SPELL_LOW_Y
     ret
@@ -166,7 +177,7 @@ update_sprites:
             
         ; ---- SPELL IS OFF... ---- ;
             ; HANDLE SPELL SPAWNING ;
-            CheckSpawn d
+            call check_spawn ;CheckSpawn d
             bit SPELLB_SPAWN, d
             jr z, .skip_spawn
                 SpawnSpell d
@@ -339,6 +350,51 @@ handle_miss:
         jr nz, .done
             RegBitOp rGAME, GAMEB_END, set
     .done
+    ret
+
+check_spawn:
+    push hl
+    ;push de
+
+    ld a, [WRAM_FRAME_COUNTER]
+    xor a, 20  ;ideally ~38 ; spawn timing, VERY 1 to 1
+    jr nz, .no_spawn
+        ld a, [rGAME]
+        bit GAMEB_SPAWN, a
+        jr nz, .no_spawn
+            ;; SET SPELL OBJ FLAGS ;;
+            ; get first note
+            ld a, [WRAM_NOTE_INDEX]
+            sla a
+            ld b, 0
+            ld c, a
+    
+            ; load note + note index
+            ld hl, Mapping
+            add hl, bc
+
+            ;; SET OBJ FLAGS ;;
+            ; if a = 1, set spawn low
+            ld a, [hli]
+            xor a, $00
+            jr nz, .check_length
+                ld a, d
+                xor a, SPELLF_HIGH
+                ; set SPELLB_TIER, a
+                ld d, a
+            .check_length
+            ld a, [hl]
+            xor a, $00
+            jr z, .load_flags
+                set SPELLB_SPAWN, d
+                ld a, [rGAME]
+                set GAMEB_SPAWN, a
+                ld [rGAME], a ; may be needed below
+            
+            ;; LOAD NEW SET OF FLAGS ;;
+            .load_flags
+    .no_spawn
+    pop hl
     ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

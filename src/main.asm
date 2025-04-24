@@ -31,6 +31,7 @@ main:
     DisableLCD
 
     call init_graphics
+    call init_sound
     call init_registers
     call init_sprite_data
     call init_player
