@@ -204,15 +204,7 @@ macro CheckSpriteRange
     .done_check\@
 endm
 
-; calls:
-; CheckSpriteRange [hl], HIT_PERF_MIN, HIT_PERF_MAX, rCOLLB_XPERF
-; CheckSpriteRange [hl], HIT_GOOD_MIN, HIT_GOOD_MAX, rCOLLB_XGOOD
-; CheckSpriteRange [hl], HIT_BAD_MIN, HIT_BAD_MAX, rCOLLB_XBAD
-; CheckSpriteRange [hl], HIT_MISS_MIN, HIT_MISS_MAX, rCOLLB_XMISS
-; perf range = -4 / +4
-; good range = -8 / +8
-; bad range = -20 / +20
-; miss range = (0, 4)
+
 macro CheckSpriteRangeWIP
     ld a, \1
     cp \2

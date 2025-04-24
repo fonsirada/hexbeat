@@ -301,7 +301,7 @@ check_collisions:
         .check_bad
         bit COLLB_XBAD, a
         jr z, .check_miss
-            call handle_bad_collision
+            call handle_bad_collision ; MAY HAVE ISSUES W/ INPUT SPILLOVER
             jr .done_check
     
     .check_miss
