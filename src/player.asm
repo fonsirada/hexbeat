@@ -152,54 +152,20 @@ init_player_sprite_data:
 
     ret
 
-jump:
-    ; check if player should be going up or down
-    ld a, [rPLAYER]
-    bit PLAYERB_FALL, a
-    ld a, [SPRITE_0_ADDRESS + OAMA_Y]
-    jr z, .go_up
-        add JUMP_INCREMENT
-        SetPlayerCoord a, OAMA_Y
-        jr .check_thres1
-
-    .go_up
-    sub JUMP_INCREMENT
-    SetPlayerCoord a, OAMA_Y
-    
-    ; go back down
-    .check_thres1
-    cp MC_JUMP_THRES
-    jr nz, .check_thres2
-        RegBitOp rPLAYER, PLAYERB_FALL, set
-        jr .return
-
-    ; go back up
-    .check_thres2
-    cp MC_TOP_Y
-    jr nz, .return
-        RegBitOp rPLAYER, PLAYERB_FALL, res
-
-    .return
-    ret
-
 ; animation for player hit high
 player_hit_high:
     ld a, [rPLAYER]
-    bit PLAYERB_HOLD, a ; checks to hold last frame of animation a second longer
+    bit PLAYERB_LHOLD, a
     jr nz, .extend_frame
-        ; if the long hold is happening - don't update player animation
-        ld a, [PAD_LHOLD] 
-        or a
-        jr z, .extend_frame
+        bit PLAYERB_HOLD, a ; checks to hold last frame of animation a second longer
+        jr nz, .extend_frame
             UpdatePlayerAnim SPRITE_0_A_WRAM_LOCATION, SPRITE_ANIM_WRAM_THRES, SPRITE_HIT_HIGH_THRES_TILEID
-            call jump
             jr .end_frame_update
 
     .extend_frame
     ; set player frame to $90
     SetPlayerTiles SPRITE_HIT_HIGH_THRES_TILEID
     SetPlayerCoord JUMP_HOLD_Y, OAMA_Y
-
     ; set shield visible
     copy [SPRITE_8_ADDRESS + OAMA_Y], HIT_HIGH_SHIELD_Y
     copy [SPRITE_8_ADDRESS + OAMA_X], SHIELD_X
@@ -284,7 +250,6 @@ update_player:
     .update_run
     RegBitOp rPLAYER, PLAYERB_B, res
     RegBitOp rPLAYER, PLAYERB_A, res
-    RegBitOp rPLAYER, PLAYERB_FALL, res
     SetPlayerCoord MC_TOP_Y, OAMA_Y
     UpdatePlayerAnim SPRITE_0_A_WRAM_LOCATION, SPRITE_ANIM_WRAM_THRES, SPRITE_RUN_THRES_TILEID
 
