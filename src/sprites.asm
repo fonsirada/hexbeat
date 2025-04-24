@@ -38,10 +38,13 @@ Mapping:
 ;dw $0000, $0000, $1111, $0000, $0000, $0000, $0000, $0000
 ;dw $0000
 ;dw $0100, $0100, $0100, $0100, $0100, $0100, $0100, $0100
-dw $0100, $0101, $0101, $0100, $0100, $0101, $0101, $0100
 dw $0100, $0000, $0101, $0000, $0100, $0000, $0101, $0000
-dw $0000, $0000, $0101, $0000, $0000, $0101, $0000, $0000
+dw $0000, $0100, $0101, $0000, $0101, $0101, $0000, $0100
 dw $0000
+; dw $0100, $0101, $0101, $0100, $0100, $0101, $0101, $0100
+; dw $0100, $0000, $0101, $0000, $0100, $0000, $0101, $0000
+; dw $0000, $0000, $0101, $0000, $0000, $0101, $0000, $0000
+; dw $0000
 
 ; format: $__ __ = $(spawn?)(high/low)
 ; eg. $0100 = spawn note, spawn low
@@ -117,10 +120,22 @@ init_level_1:
     SetSpriteXY 13, SPELL1_SPAWNX, SPELL_LOW_Y
     ret
 
+; init level 2's spells (+2)
+init_level_2:
+    halt
+    copy [rSPELL_COUNT], LVL2_SPELL_NUM
+    SetSpriteXY 14, SPELL4_SPAWNX, SPELL_HIGH_Y
+    SetSpriteXY 15, SPELL4_SPAWNX, SPELL_HIGH_Y
+    SetSpriteXY 16, SPELL4_SPAWNX, SPELL_LOW_Y
+    SetSpriteXY 17, SPELL4_SPAWNX, SPELL_LOW_Y
+    ret
+
+; init level 3's spells
+
 ; check if the level 2 threshold is passed
 check_level_2:
     ld a, [rGAME_DIFF]
-    cp a, GAME_DIFF_THRES
+    cp a, GAME_DIFF_THRES_LVL2
     jr nz, .done_check
         ld a, [rGAME]
         bit GAMEB_LVL2, a
@@ -130,14 +145,22 @@ check_level_2:
     .done_check
     ret
 
-; init level 2's spells (+2)
-init_level_2:
-    halt
-    copy [rSPELL_COUNT], LVL2_SPELL_NUM
-    SetSpriteXY 14, SPELL4_SPAWNX, SPELL_HIGH_Y
-    SetSpriteXY 15, SPELL4_SPAWNX, SPELL_HIGH_Y
-    SetSpriteXY 16, SPELL4_SPAWNX, SPELL_LOW_Y
-    SetSpriteXY 17, SPELL4_SPAWNX, SPELL_LOW_Y
+check_boss_level:
+    ld a, [rGAME_DIFF]
+    cp GAME_DIFF_THRES_WIN
+    jr nz, .check_boss_level_thres
+        RegBitOp rGAME, GAMEB_END, set
+        jr .done_check
+
+    .check_boss_level_thres
+    cp GAME_DIFF_THRES_BOSSLVL
+    jr nz, .done_check
+        ld a, [rGAME]
+        bit GAMEB_BOSSLVL, a
+        jr nz, .done_check
+            ;call init_level_3
+            RegBitOp rGAME, GAMEB_BOSSLVL, set
+    .done_check
     ret
 
 ; loops thru all active sprites in WRAM and updates them
@@ -423,4 +446,4 @@ check_spawn:
     ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export init_sprite_data, init_sprites, init_level_1, check_level_2, update_sprites
+export init_sprite_data, init_sprites, init_level_1, check_level_2, check_boss_level, update_sprites
