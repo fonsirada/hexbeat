@@ -14,9 +14,10 @@ def SPRITES_RGBINC equ 1
 ; WRAM
 def SPELL_FLAG_START    equ ($C020)
 def SPELL_FLAG_INTERVAL equ (2)
-def SPELLF_WRAM_OFFSET  equ $10 ;$20
-def SPELL_WRAM_START    equ ($C030) ;$C040
-def SPELL_WRAM_END      equ ($C040) ;$C050
+def SPELLF_WRAM_OFFSET  equ $20;$10 ;$20
+def SPELL_WRAM_START    equ $C040;($C030) ;$C040
+def SPELL_WRAM_END      equ $C050;($C040) ;$C050
+; note: debug update sprites
 
 ; TARGETS
 def SPRITE_6_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 6)
