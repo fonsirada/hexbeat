@@ -27,16 +27,12 @@ macro copy
 endm
 
 ; copy 16bit reg \2 into 16bit reg \1 using (a)
-; IF THINGS BREAK, UNCOMMENT THE REG PRESERVATION
+; IF THINGS BREAK, REG PRESERVATION!
 macro Copy16BitVal
-    ;push hl
-
     ld a, high(\3)
     ld \1, a
     ld a, low(\3)
     ld \2, a
-
-    ;pop hl
 endm
 
 macro Copy16Bit
@@ -75,7 +71,7 @@ macro IncTimer
     ld a, [\1]
     cp a, \2
     jr nz, .finish_update\@
-        ld a, 0 ; or ld a, $FF?
+        ld a, 0
     .finish_update\@
     inc a
     ld [\1], a
