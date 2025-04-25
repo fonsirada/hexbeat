@@ -1,9 +1,9 @@
 ; 
-; CS-240 World 6: Fully functional draft
+; CS-240 World 7: Feature complete game
 ;
 ; @file sprites.asm
 ; @author Sydney Chen, Alfonso Rada
-; @date April 16, 2025
+; @date April 24, 2025
 ; @brief storing non-player sprite functions
 
 include "src/hardware.inc"
@@ -28,6 +28,8 @@ def SPELL2B_TILEID         equ $3E
 
 def SPAWN_DELAY            equ 10
 def COLLISION_OFFSET       equ $0004
+def SPRITE_MEM_OFFSET      equ $0004
+def SPRITE_P2_Y            equ $0003
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; NOTE FORMAT:
@@ -52,7 +54,7 @@ init_sprite_data:
     ; put spell flags into WRAM
     ld hl, SPELL_FLAG_START
     .load_spell_flag
-        ld a, SPELLF_OFF ; SPELLF_ON
+        ld a, SPELLF_OFF
         ld [hli], a
         ld a, l
         cp a, low(SPELL_WRAM_START)
@@ -212,11 +214,11 @@ update_sprites:
                 dec hl
                 ld [hl], 0
                 
-                ld bc, ($0004) ; sprite memory offset
+                ld bc, SPRITE_MEM_OFFSET
                 add hl, bc
                 ld [hl], 0
                 
-                pop hl ; matches w/ spell movement push
+                pop hl
                 jr .to_next_sprite
                 
         .update_x_movement
@@ -229,7 +231,7 @@ update_sprites:
         inc hl
 
         ; update sprite pt 2's y val
-        ld bc, ($0003)
+        ld bc, SPRITE_P2_Y
         add hl, bc
         ld [hl], e
         
@@ -250,8 +252,8 @@ update_sprites:
         ; restore and move to next WRAM loc
         pop hl
         SetSpriteFlags d
-        ld bc, ($0004) ; sprite memory offset
-        add hl, bc ; note: this add method is 1 cycle faster than inc-ing
+        ld bc, SPRITE_MEM_OFFSET
+        add hl, bc
 
         ld a, [rSPELL_COUNT]
         cp a, l

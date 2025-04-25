@@ -1,5 +1,5 @@
 ; 
-; CS-240 World 6: Fully Functional Draft
+; CS-240 World 7: Feature complete game
 ;
 ; @file sprites.inc
 ; @author Sydney Chen, Alfonso Rada
