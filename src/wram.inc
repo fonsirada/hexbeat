@@ -63,7 +63,7 @@ def GAMEB_SPAWN     equ 7
 
 def GAME_DIFF_THRES_LVL2    equ 16
 def GAME_DIFF_THRES_BOSSLVL equ 32
-def GAME_DIFF_THRES_WIN     equ 48
+def GAME_DIFF_THRES_WIN     equ 64
 
 ;;; rPLAYER
 def PLAYERF_HIT     equ %10000000

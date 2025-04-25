@@ -151,6 +151,7 @@ check_boss_level:
             ld a, low(Boss_Level)
             ld [WRAM_NOTEMAP], a
             ld [WRAM_NOTEMAP + 1], a
+            call init_level_3
             RegBitOp rGAME, GAMEB_BOSSLVL, set
     .done_check
     ret
