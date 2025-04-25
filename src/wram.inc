@@ -69,12 +69,10 @@ def PLAYERF_HIT     equ %10000000
 def PLAYERF_HOLD    equ %01000000
 def PLAYERF_A       equ %00100000
 def PLAYERF_B       equ %00010000
-def PLAYERF_LHOLD   equ %00001000
 
 def PLAYERB_HOLD    equ 6
 def PLAYERB_A       equ 5
 def PLAYERB_B       equ 4
-def PLAYERB_LHOLD   equ 3
 
 ;;; rCOLLISION
 def rCOLL_YHIGH     equ %10000000

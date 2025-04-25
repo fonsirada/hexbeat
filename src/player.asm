@@ -155,12 +155,10 @@ init_player_sprite_data:
 ; animation for player hit high
 player_hit_high:
     ld a, [rPLAYER]
-    bit PLAYERB_LHOLD, a
+    bit PLAYERB_HOLD, a ; checks to hold last frame of animation a second longer
     jr nz, .extend_frame
-        bit PLAYERB_HOLD, a ; checks to hold last frame of animation a second longer
-        jr nz, .extend_frame
-            UpdatePlayerAnim SPRITE_0_A_WRAM_LOCATION, SPRITE_ANIM_WRAM_THRES, SPRITE_HIT_HIGH_THRES_TILEID
-            jr .end_frame_update
+        UpdatePlayerAnim SPRITE_0_A_WRAM_LOCATION, SPRITE_ANIM_WRAM_THRES, SPRITE_HIT_HIGH_THRES_TILEID
+        jr .end_frame_update
 
     .extend_frame
     ; set player frame to $90
@@ -233,12 +231,22 @@ update_player:
     ; animation for A Button Press - player hit high
     .update_a
     bit PLAYERB_A, a
-    jr z, .update_run
+    jp z, .update_run
         ld a, [rPC_ACOUNT]
         cp HIT_ANIM_LENGTH
         jr nz, .update_anim_a
-            copy [rPC_ACOUNT], 0
-            jr .update_run
+            ld a, [PAD_LHOLD]
+            or a
+            jr z, .hold_last_frame
+                copy [rPC_ACOUNT], 0
+                jr .update_run
+
+            .hold_last_frame
+            SetPlayerTiles SPRITE_HIT_HIGH_THRES_TILEID
+            SetPlayerCoord JUMP_HOLD_Y, OAMA_Y
+            copy [SPRITE_8_ADDRESS + OAMA_Y], HIT_HIGH_SHIELD_Y
+            copy [SPRITE_8_ADDRESS + OAMA_X], SHIELD_X
+            jp .done_update
 
         .update_anim_a
         SetPlayerCoord JUMP_HOLD_Y, OAMA_Y
