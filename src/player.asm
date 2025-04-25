@@ -1,9 +1,9 @@
 ; 
-; CS-240 World 6: Fully functional draft
+; CS-240 World 7: Feature complete game
 ;
 ; @file player.asm
 ; @author Sydney Chen, Alfonso Rada
-; @date April 16, 2025
+; @date April 24, 2025
 ; @brief storing player functions
 
 include "src/hardware.inc"
