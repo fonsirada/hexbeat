@@ -25,7 +25,7 @@ println "WRAM usage: {d:WRAM_USAGE} bytes"
 assert WRAM_USAGE <= $2000, "Too many bytes used in WRAM"
 
 ; ROM usage
-def TIME_BETWEEN_NOTES          equ (20)
+def TIME_BETWEEN_NOTES          equ (10)
 ;equ %1100000
 
 Ch1_Notes:
@@ -165,113 +165,6 @@ update_sound:
     ;   spell must spawn when frame counter is -38
     ret 
 
-UpdateSample:
-    halt
-
-    ;UpdateJoypad WRAM_PAD_INPUT
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-    ; skip counter check if the counter is disabled (equals $FF)
-    ld a, $FF
-    ld hl, WRAM_FRAME_COUNTER
-    xor a, [hl]
-    jr z, .play_notes
-
-        ; decrease the timer and play the next sound when zero is reached
-        dec [hl]
-        jr nz, .sound_switch
-            ; increase note index
-            ld a, [WRAM_NOTE_INDEX]
-            inc a
-            ld [WRAM_NOTE_INDEX], a
-
-            sla a ; sla increases by 4?
-            ld d, 0
-            ld e, a
-
-            ; load note + note index
-            ld hl, Ch2_Notes
-            add hl, de
-
-            ; get note; if note is 0, stop sound
-            ld a, [hli]
-            or a, a
-            jr nz, .stop_sound
-                ld a, 0
-                ld [WRAM_NOTE_INDEX], a
-                ; play infinitely??
-                ; find where that fade is coming from...
-                
-                ; copy [rNR12], $00
-                ; copy [rNR14], $C0
-
-                ; copy [rNR22], $00
-                ; copy [rNR24], $C0
-                ld a, $FF
-                ld [WRAM_FRAME_COUNTER], a
-                jr .play_notes
-            .stop_sound
-
-            ld [rNR23], a
-            ld a, [hli]
-            ld [rNR24], a
-
-            ;; channel 1 notes are broken rn
-            ; ld hl, Ch1_Notes
-            ; add hl, de
-            ; ld [rNR13], a
-            ; ld a, [hli]
-            ; ld [rNR14], a
-
-            copy [WRAM_FRAME_COUNTER], TIME_BETWEEN_NOTES
-        .sound_switch
-
-    .play_notes
-
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ; NOTE: move this to a seperate func
-
-    ; start playing notes when start is pressed
-    ld a, [PAD_CURR]
-    bit PADB_START, a
-    jr nz, .start_notes
-        xor a
-        ld [WRAM_NOTE_INDEX], a
-
-        ;;; CHANNEL 1 ;;;
-        copy [rNR10], $00
-        copy [rNR11], $80
-        copy [rNR12], $F0
-
-        ; ld hl, Ch1_Notes
-        ; ld a, [hli]
-        ; ld [rNR13], a
-        ; ld a, [hl]
-        ; or a, $80
-        ; ld [rNR14], a
-        
-        ;;; CHANNEL 2 ;;;
-        ; high nibble = duty (0, 4, 8, C)
-        ; low nibble = length (00-3F)
-        copy [rNR21], $80 
-
-        ; high nibble = volume (0-F)
-        ; low nibble = envelope (down, 0-7; up, 8-F)
-        copy [rNR22], $F6;$F0
-
-        ; init first note & start sound
-        ld hl, Ch2_Notes
-        ld a, [hli]
-        ld [rNR23], a
-        ld a, [hl]
-        or a, $80
-        ld [rNR24], a
-
-        copy [WRAM_FRAME_COUNTER], TIME_BETWEEN_NOTES
-    .start_notes
-
-    ret
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export init_sound, update_sound, UpdateSample
+export init_sound, update_sound
