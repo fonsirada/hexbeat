@@ -121,10 +121,10 @@ init_level_1:
 init_level_2:
     halt
     copy [rSPELL_COUNT], LVL2_SPELL_NUM
-    SetSpriteXY 14, SPELL4_SPAWNX, SPELL_HIGH_Y
-    SetSpriteXY 15, SPELL4_SPAWNX, SPELL_HIGH_Y
-    SetSpriteXY 16, SPELL4_SPAWNX, SPELL_LOW_Y
-    SetSpriteXY 17, SPELL4_SPAWNX, SPELL_LOW_Y
+    SetSpriteXY 14, SPELL_SPAWNX, SPELL_HIGH_Y
+    SetSpriteXY 15, SPELL_SPAWNX, SPELL_HIGH_Y
+    SetSpriteXY 16, SPELL_SPAWNX, SPELL_LOW_Y
+    SetSpriteXY 17, SPELL_SPAWNX, SPELL_LOW_Y
     ret
 
 ; init level 3's spells
