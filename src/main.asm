@@ -58,14 +58,15 @@ main:
                     jr .post_graphics
         
             .graphics
+            call check_level_2
             call update_timers
+            call update_sound
             call update_graphics
             halt
             call update_sprites
             halt
             call update_player
-            call check_level_2
-            call update_sound
+            
         
         .post_graphics
         UpdateJoypad

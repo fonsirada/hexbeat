@@ -26,10 +26,7 @@ def SPELL1B_TILEID         equ $1E
 def SPELL2A_TILEID         equ $2E
 def SPELL2B_TILEID         equ $3E
 
-def SPELL1_SPAWNX          equ 168
-def SPELL2_SPAWNX          equ 120
-def SPELL3_SPAWNX          equ 120
-def SPELL4_SPAWNX          equ 168
+def SPELL_SPAWNX          equ 168
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -111,10 +108,10 @@ init_level_1:
     SetSpriteXY 7, TARGET_X, TARGET_LOW_Y
 
     ; SPELL OBJs
-    SetSpriteXY 10, SPELL1_SPAWNX, SPELL_HIGH_Y
-    SetSpriteXY 11, SPELL1_SPAWNX, SPELL_HIGH_Y
-    SetSpriteXY 12, SPELL1_SPAWNX, SPELL_LOW_Y
-    SetSpriteXY 13, SPELL1_SPAWNX, SPELL_LOW_Y
+    SetSpriteXY 10, SPELL_SPAWNX, SPELL_HIGH_Y
+    SetSpriteXY 11, SPELL_SPAWNX, SPELL_HIGH_Y
+    SetSpriteXY 12, SPELL_SPAWNX, SPELL_LOW_Y
+    SetSpriteXY 13, SPELL_SPAWNX, SPELL_LOW_Y
     ret
 
 ; check if the level 2 threshold is passed
@@ -134,10 +131,10 @@ check_level_2:
 init_level_2:
     halt
     copy [rSPELL_COUNT], LVL2_SPELL_NUM
-    SetSpriteXY 14, SPELL4_SPAWNX, SPELL_HIGH_Y
-    SetSpriteXY 15, SPELL4_SPAWNX, SPELL_HIGH_Y
-    SetSpriteXY 16, SPELL4_SPAWNX, SPELL_LOW_Y
-    SetSpriteXY 17, SPELL4_SPAWNX, SPELL_LOW_Y
+    SetSpriteXY 14, SPELL_SPAWNX, SPELL_HIGH_Y
+    SetSpriteXY 15, SPELL_SPAWNX, SPELL_HIGH_Y
+    SetSpriteXY 16, SPELL_SPAWNX, SPELL_LOW_Y
+    SetSpriteXY 17, SPELL_SPAWNX, SPELL_LOW_Y
     ret
 
 ; loops thru all active sprites in WRAM and updates them
@@ -350,6 +347,10 @@ handle_bad_collision:
     ld a, [rPC_HEALTH]
     dec a
     ld [rPC_HEALTH], a
+    
+    ; start player flash
+    ld a, PC_DMG_COUNT
+    ld [rTIMER_DMG], a
     cp a, 0
         jr nz, .done
             RegBitOp rGAME, GAMEB_END, set
