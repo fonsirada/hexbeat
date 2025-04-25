@@ -26,25 +26,22 @@ def SPELL1B_TILEID         equ $1E
 def SPELL2A_TILEID         equ $2E
 def SPELL2B_TILEID         equ $3E
 
-def SPAWN_DELAY            equ 10 ; ideally get to 38
+def SPAWN_DELAY            equ 10
+def COLLISION_OFFSET       equ $0004
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+; NOTE FORMAT:
+; $__ __ = $(spawn?)(high/low)
+; eg. $0100 = spawn note, spawn low
 Mapping:
-;dw $0000, $0000, $0000, $0000, $0000, $0000, $0000, $0000
-;dw $0000, $0000, $1111, $0000, $0000, $0000, $0000, $0000
-;dw $0000
-;dw $0100, $0100, $0100, $0100, $0100, $0100, $0100, $0100
 dw $0100, $0000, $0101, $0000, $0100, $0000, $0101, $0000
 dw $0000, $0100, $0101, $0000, $0101, $0101, $0000, $0100
 dw $0000
-; dw $0100, $0101, $0101, $0100, $0100, $0101, $0101, $0100
-; dw $0100, $0000, $0101, $0000, $0100, $0000, $0101, $0000
-; dw $0000, $0000, $0101, $0000, $0000, $0101, $0000, $0000
-; dw $0000
 
-; format: $__ __ = $(spawn?)(high/low)
-; eg. $0100 = spawn note, spawn low
+Boss_Level:
+dw $0100, $0101, $0101, $0101, $0000, $0100, $0000, $0101
+dw $0101, $0000, $0101, $0100, $0100, $0101, $0000, $0100
+dw $0000
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -123,8 +120,6 @@ init_level_2:
     SetSpriteXY 17, SPELL_SPAWNX, SPELL_LOW_Y
     ret
 
-; init level 3's spells
-
 ; check if the level 2 threshold is passed
 check_level_2:
     ld a, [rGAME_DIFF]
@@ -138,6 +133,7 @@ check_level_2:
     .done_check
     ret
 
+;check if game is currently on boss level + handle accordingly
 check_boss_level:
     ld a, [rGAME_DIFF]
     cp GAME_DIFF_THRES_WIN
@@ -151,7 +147,11 @@ check_boss_level:
         ld a, [rGAME]
         bit GAMEB_BOSSLVL, a
         jr nz, .done_check
-            ;call init_level_3
+            ld a, high(Boss_Level)
+            ld [WRAM_NOTEMAP], a
+            ld a, low(Boss_Level)
+            ld [WRAM_NOTEMAP], a
+            ld [WRAM_NOTEMAP + 1], a
             RegBitOp rGAME, GAMEB_BOSSLVL, set
     .done_check
     ret
@@ -301,15 +301,17 @@ check_collisions:
         jr z, .check_good
             call handle_collision
             jr .done_check
+
         .check_good
         bit COLLB_XGOOD, a
         jr z, .check_bad
-            ; currently, don't hit OR lose health
+            ; currently, don't hit OR lose health ("free" input buffer)
             jr .done_check
+
         .check_bad
         bit COLLB_XBAD, a
         jr z, .check_miss
-            call handle_bad_collision ;ISSUES W/ INPUT SPILLOVER
+            call handle_bad_collision
             jr .done_check
     
     .check_miss
@@ -329,7 +331,7 @@ handle_collision:
     ; set x val to 0
     ld a, 0
     ld [hl], a
-    ld bc, $0004 ; try de if being weird
+    ld bc, COLLISION_OFFSET
     add hl, bc
     ld [hl], a
 
@@ -340,6 +342,7 @@ handle_collision:
 
     ret
 
+; handle collision w/ bad timing
 handle_bad_collision:
     ; set off flag
     ld a, d
@@ -349,7 +352,7 @@ handle_bad_collision:
     ; set x val to 0
     ld a, 0
     ld [hl], a
-    ld bc, $0004 ; try de if being weird
+    ld bc, COLLISION_OFFSET
     add hl, bc
     ld [hl], a
 
@@ -388,9 +391,9 @@ handle_miss:
     .done
     ret
 
+; check if a given note should be spawned based on the music
 check_spawn:
     push hl
-    ;push de
 
     ld a, [WRAM_FRAME_COUNTER]
     xor a, SPAWN_DELAY
@@ -406,7 +409,17 @@ check_spawn:
             ld c, a
     
             ; load note + note index
-            ld hl, Mapping
+            ld a, [rGAME]
+            bit GAMEB_BOSSLVL, a
+            jr z, .load_map
+                ld a, [WRAM_NOTEMAP]
+                ld h, a
+                ld a, [WRAM_NOTEMAP + 1]
+                ld l, a
+                jr .get_note
+            .load_map
+                ld hl, Mapping
+            .get_note
             add hl, bc
 
             ;; SET OBJ FLAGS ;;
@@ -416,7 +429,6 @@ check_spawn:
             jr nz, .check_length
                 ld a, d
                 xor a, SPELLF_HIGH
-                ; set SPELLB_TIER, a
                 ld d, a
             .check_length
             ld a, [hl]
@@ -425,7 +437,7 @@ check_spawn:
                 set SPELLB_SPAWN, d
                 ld a, [rGAME]
                 set GAMEB_SPAWN, a
-                ld [rGAME], a ; may be needed below
+                ld [rGAME], a
             
             ;; LOAD NEW SET OF FLAGS ;;
             .load_flags

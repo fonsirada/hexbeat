@@ -21,6 +21,7 @@ def WRAM_PAD_INPUT                  rb 0 ;sizeof_PAD_INPUT
 def WRAM_FRAME_COUNTER              rb 1
 def WRAM_NOTE_INDEX                 rb 1
 def WRAM_END                        rb 0
+def WRAM_NOTEMAP                    rb 2
 
 rsset _RAM
 def PAD_CURR rb 1
