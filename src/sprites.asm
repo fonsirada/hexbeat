@@ -26,7 +26,7 @@ def SPELL1B_TILEID         equ $1E
 def SPELL2A_TILEID         equ $2E
 def SPELL2B_TILEID         equ $3E
 
-def SPELL_SPAWNX          equ 168
+def SPAWN_DELAY            equ 10 ; ideally get to 38
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -54,12 +54,8 @@ init_sprite_data:
 
     ; put spell flags into WRAM
     ld hl, SPELL_FLAG_START
-    ; ld [hl], %00000101
-    ; inc hl
-    ; ld [hl], %00000001
-    ; inc hl
     .load_spell_flag
-        ld a, %00000000;SPELLF_ON;%00000001;0
+        ld a, SPELLF_OFF ; SPELLF_ON
         ld [hli], a
         ld a, l
         cp a, low(SPELL_WRAM_START)
@@ -163,18 +159,11 @@ check_boss_level:
 ; working ver w/ new sprite system
 update_sprites:
     CheckTimer rTIMER_OBJ, 1
-    jp nz, .done_update
-    ; jr nz, .done_update
+    ; jp nz, .done_update
+    jr nz, .done_update
 
     ld hl, SPELL_WRAM_START
     .update_spell_sprite
-        ;;;;;;; TO DO ;;;;;;;;;
-        ; in this loop, per sprite:
-        ; if spawn = 1, spawn sprite & reset flag
-
-        ; NOTE: for testing, see CheckSpawn macro
-        ;;;;;;;;;;;;;;;;;;;;;;;
-
         ; preserve OG WRAM address 
         push hl
         
@@ -188,7 +177,7 @@ update_sprites:
             
         ; ---- SPELL IS OFF... ---- ;
             ; HANDLE SPELL SPAWNING ;
-            call check_spawn ;CheckSpawn d
+            call check_spawn
             bit SPELLB_SPAWN, d
             jr z, .skip_spawn
                 SpawnSpell d
@@ -264,10 +253,9 @@ update_sprites:
 
         ld a, [rSPELL_COUNT]
         cp a, l
-        jp nz, .update_spell_sprite
+        jr nz, .update_spell_sprite
     .done_update
     RegBitOp rGAME, GAMEB_SPAWN, res
-    ;SetShieldLocations 0, 0, 0, 0 
     ret
 
 ; check if the given spell obj in (hl) has been hit 
@@ -275,12 +263,11 @@ check_collisions:
     ; clear flags and raise miss flag
     copy [rCOLLISION], COLLF_XMISS
 
-    ; check if the current x is within the 'perfect' x range
-    ;CheckSpriteRange [hl] ; old ver
-    CheckSpriteRangeWIP [hl], HIT_PERF_MIN, HIT_PERF_MAX, COLLB_XPERF
-    ;CheckSpriteRange [hl], HIT_GOOD_MIN, HIT_GOOD_MAX, COLLB_XGOOD
-    CheckSpriteRangeWIP [hl], HIT_BAD_MIN, HIT_BAD_MAX, COLLB_XBAD
-    CheckSpriteRangeWIP [hl], HIT_MISS_MIN, HIT_MISS_MAX, COLLB_XMISS
+    ; check where the current x is & set rCOLLISION flags
+    CheckSpriteRange [hl], HIT_PERF_MIN, HIT_PERF_MAX, COLLB_XPERF
+    CheckSpriteRange [hl], HIT_GOOD_MIN, HIT_GOOD_MAX, COLLB_XGOOD
+    CheckSpriteRange [hl], HIT_BAD_MIN, HIT_BAD_MAX, COLLB_XBAD
+    CheckSpriteRange [hl], HIT_MISS_MIN, HIT_MISS_MAX, COLLB_XMISS
 
     ; if B pressed & obj low, try collision
     ld a, [PAD_PRSS]
@@ -315,11 +302,12 @@ check_collisions:
         .check_good
         bit COLLB_XGOOD, a
         jr z, .check_bad
-            ; add call here?
+            ; currently, don't hit OR lose health
+            jr .done_check
         .check_bad
         bit COLLB_XBAD, a
         jr z, .check_miss
-            ;call handle_bad_collision ;ISSUES W/ INPUT SPILLOVER
+            call handle_bad_collision ;ISSUES W/ INPUT SPILLOVER
             jr .done_check
     
     .check_miss
@@ -403,7 +391,7 @@ check_spawn:
     ;push de
 
     ld a, [WRAM_FRAME_COUNTER]
-    xor a, 10  ;ideally ~38 ; spawn timing, VERY 1 to 1
+    xor a, SPAWN_DELAY
     jr nz, .no_spawn
         ld a, [rGAME]
         bit GAMEB_SPAWN, a

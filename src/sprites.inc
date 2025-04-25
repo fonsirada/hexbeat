@@ -3,7 +3,7 @@
 ;
 ; @file sprites.inc
 ; @author Sydney Chen, Alfonso Rada
-; @date April 16, 2025
+; @date April 24, 2025
 ; @brief storing all sprite constants and macros
 
 if !def(SPRITES_RGBINC)
@@ -36,6 +36,7 @@ def SPRITE_16_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 16)
 def SPRITE_17_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 17)
 
 def OBJ16_OFFSET           equ 8
+def SPELLF_WRAM_OFFSET     equ $10
 
 def MC_TOP_Y               equ (80)
 def MC_BOT_Y               equ (MC_TOP_Y + 16)
@@ -49,11 +50,12 @@ def TARGET_X               equ 50
 def SPELL_HIGH_Y           equ (TARGET_HIGH_Y - 4)
 def SPELL_LOW_Y            equ (TARGET_LOW_Y - 4)
 def SPELL_SCROLL_SPEED     equ 3
+def SPELL_SPAWNX           equ 168
 
 ; TIMING
-def HIT_PERF_MIN           equ (TARGET_X - 2)
-def HIT_PERF_MAX           equ (TARGET_X + 8 + 2)
-def HIT_GOOD_MIN           equ (TARGET_X - 8)
+def HIT_PERF_MIN           equ (TARGET_X - 4)
+def HIT_PERF_MAX           equ (TARGET_X + 8 + 4)
+def HIT_GOOD_MIN           equ (TARGET_X - 12)
 def HIT_GOOD_MAX           equ (TARGET_X + 8 + 8)
 def HIT_BAD_MIN            equ (TARGET_X - 20)
 def HIT_BAD_MAX            equ (TARGET_X + 8 + 20)
@@ -186,40 +188,18 @@ endm
 
 ; checks if a given sprite's x val is within a given range
 ; params:
-;   curr_x, range_min, range_max, flag_bit, flag_binary
+;   curr_x, range_min, range_max, flag_bit
 ; ex: CheckSpriteRange [hl], HIT_PERF_MIN, HIT_PERF_MAX, rCOLLB_XPERF
-; NOTE: currently hard-coded to a perfect hit
 macro CheckSpriteRange
     ld a, \1
-    cp HIT_PERF_MIN
-        ; fail if less than min
-        jr c, .done_check\@
-        cp HIT_PERF_MAX
-            ; fail if greater than max
-            jr nc, .check_miss\@
-                RegBitOp rCOLLISION, COLLB_XPERF, set
-                jr .done_check\@
-    
-    ; reset miss flag if outside the threshold
-    .check_miss\@
-        cp HIT_MISS_MAX
-        jr c, .done_check\@
-            RegBitOp rCOLLISION, COLLB_XMISS, res
-    
-    .done_check\@
-endm
-
-
-macro CheckSpriteRangeWIP
-    ld a, \1
     cp \2
-        ; fail if less than min
+        ; don't set if less than min
         jr c, .done_check\@
         cp \3
-            ; fail if greater than max
+            ; don't set if greater than max
             jr nc, .done_check\@
                 ld a, [rCOLLISION]
-                set \4, a ; repl 'set' w/ \5?
+                set \4, a
                 ld [rCOLLISION], a
     .done_check\@
 endm
@@ -227,8 +207,6 @@ endm
 ; given an address in WRAM from (hl), get the OAM address there
 ; and store in (hl)
 ; NEW: store the address at (hl) in a given 16bit register
-; OLD: hardcoded to use bc as the transfer reg
-; note: this change lowk doesn't matter lol
 macro WRAMToOAM
     ld high(\1), [hl]
     inc hl
@@ -237,25 +215,26 @@ macro WRAMToOAM
     ld l, low(\1)
 endm
 
-; store the flags of sprite @ (hl) in a given reg
+; store the flags of spell sprite @ (hl) in a given reg
 macro GetSpriteFlags
     push hl
             
     ; do (hl) - $10
     ld a, l
-    sub a, $10
+    sub a, SPELLF_WRAM_OFFSET
     ld l, a
 
     ld \1, [hl]
     pop hl
 endm
 
+; set a spell sprite's flags
 macro SetSpriteFlags
     push hl
             
     ; do (hl) - $10
     ld a, l
-    sub a, $10
+    sub a, SPELLF_WRAM_OFFSET
     ld l, a
 
     ld [hl], \1
@@ -264,9 +243,8 @@ endm
 
 ; given sprite address (hl) and flags as param (in d)
 ; spawns a spell according to its tier flag
-; note: assumes that spell's pt 2 will update in main func
+; note: spell's pt 2 will update in main func
 macro SpawnSpell 
-    ; [ (hl) = spell OAM address, (d) = spell flags ]
     ld a, \1
     bit SPELLB_TIER, a
     jr z, .set_low\@
@@ -276,7 +254,7 @@ macro SpawnSpell
         ld [hl], SPELL_LOW_Y
     .set_x\@
     inc hl
-    ld [hl], 168 ; mag num
+    ld [hl], SPELL_SPAWNX
     dec hl
 endm
 
