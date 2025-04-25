@@ -20,10 +20,15 @@ section "vblank_interrupt", rom0[$0040]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 section "text", rom0
-GAME_OVER:
+YOU_LOSE:
     ; the tile ID's for each character in "GAME OVER\nPRESS SELECT\nTO RESTART"
     db $FE, $F8, $0C, $FC, $2A, $0E, $1D, $FC, $19, $0A, $0F, $19, $FC, $1A, $1A,\
-    $2A, $1A, $FC, $0B, $FC, $FA, $1B, $0A, $1B, $0E, $2A, $19, $FC, $1A, $1B, $F8, $19, $1B
+    $2A, $1A, $FC, $0B, $FC, $FA, $1B, $0A, $1B, $0E, $2A, $19, $FC, $1A, $1B, $F8, $19, $1B, $00
+
+YOU_WIN:
+    ; the tile ID's for each character in "YOU WIN\nPRESS SELECT\nTO PLAY AGAIN"
+    db $28, $0E, $1C, $2A, $1E, $08, $0D, $0A, $0F, $19, $FC, $1A, $1A, $2A, $1A,\
+    $FC, $0B, $FC, $FA, $1B, $0A, $1B, $0E, $2A, $0F, $0B, $F8, $28, $2A, $F8, $FE, $F8, $08, $0D, $00
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -66,6 +71,8 @@ def N_TILE_ID                       equ $0D
 def E_TILE_ID                       equ $FC
 def T_TILE_ID                       equ $1B
 def W_TILE_ID                       equ $1E
+def B_TILE_ID                       equ $F9
+def S_TILE_ID                       equ $1A
 
 ; start on row 2 of screen which starts at $9880
 def TEXT_START_LOCATION             equ $9880
@@ -138,7 +145,7 @@ init_registers:
     ld [rTIMER_PC], a
     ld [rTIMER_OBJ], a
     ld [rTIMER_DMG], a
-    copy [rSPELL_COUNT], LVL2_SPELL_NUM;LVL1_SPELL_NUM
+    copy [rSPELL_COUNT], LVL1_SPELL_NUM ;LVL2_SPELL_NUM
     ret
 
 update_graphics:
@@ -188,27 +195,40 @@ update_window:
 
     ret 
 
-; prints text on UI (window) that displays current level - ONE for 1, TWO for 2
+; prints text on UI (window) that displays current level - ONE for 1, TWO for 2, BOSS for 3
 level_text:
     ld hl, LEVEL_TEXT_START
 
     ld a, [rGAME]
-    bit GAMEB_LVL2, a
-    jr nz, .print_level_2
+    bit GAMEB_BOSSLVL, a
+    jr z, .print_level_2
+        ld [hl], B_TILE_ID
+        inc hl
         ld [hl], O_TILE_ID
         inc hl
-        ld [hl], N_TILE_ID
+        ld [hl], S_TILE_ID
         inc hl
-        ld [hl], E_TILE_ID
+        ld [hl], S_TILE_ID
         inc hl
         jr .done
 
     .print_level_2
-    ld [hl], T_TILE_ID
-    inc hl
-    ld [hl], W_TILE_ID
-    inc hl
+    bit GAMEB_LVL2, a
+    jr z, .print_level_1
+        ld [hl], T_TILE_ID
+        inc hl
+        ld [hl], W_TILE_ID
+        inc hl
+        ld [hl], O_TILE_ID
+        inc hl
+        jr .done
+
+    .print_level_1
     ld [hl], O_TILE_ID
+    inc hl
+    ld [hl], N_TILE_ID
+    inc hl
+    ld [hl], E_TILE_ID
     inc hl
 
     .done
@@ -272,7 +292,14 @@ game_over:
 ; prints the game over text using the tile ID's stored in ROM
 print_text:
     call find_center_tile
-    ld de, GAME_OVER 
+
+    ld a, [rGAME_DIFF]
+    cp GAME_DIFF_THRES_WIN
+    jr z, .win
+        ld de, YOU_LOSE
+        jr .print_tiles_loop
+    .win
+    ld de, YOU_WIN
 
     .print_tiles_loop
         halt

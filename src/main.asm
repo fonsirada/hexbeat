@@ -66,7 +66,9 @@ main:
             call update_sprites
             halt
             call update_player
-            
+            call check_level_2
+            call check_boss_level
+            call update_sound
         
         .post_graphics
         UpdateJoypad

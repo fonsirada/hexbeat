@@ -117,6 +117,11 @@ macro UpdatePlayerAnim
             ld a, [hl]
             xor a, OAMF_PAL1
             ld [hl], a
+            jr .done_flash
+        .no_flash
+            ld a, [hl]
+            and a, OAMF_PAL0
+            ld [hl], a
         .done_flash
 
         ; go to next tile in WRAM

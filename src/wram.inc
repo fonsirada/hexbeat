@@ -50,28 +50,29 @@ def GAME_BASE       equ %00000000
 def GAME_START      equ %00000001
 def GAME_END        equ %00000010
 def GAME_LVL2       equ %00000100
-def GAME_LVL3       equ %00001000
+def GAME_BOSSLVL    equ %00001000
 def GAMEF_SPAWN     equ %10000000 ; move/change where this flag is?
 
 def GAMEB_START     equ 0
 def GAMEB_END       equ 1
 def GAMEB_LVL2      equ 2
+def GAMEB_BOSSLVL   equ 3
 
 def GAMEB_SPAWN     equ 7
 
-def GAME_DIFF_THRES equ 16 ; 10
+def GAME_DIFF_THRES_LVL2    equ 16
+def GAME_DIFF_THRES_BOSSLVL equ 32
+def GAME_DIFF_THRES_WIN     equ 48
 
 ;;; rPLAYER
 def PLAYERF_HIT     equ %10000000
 def PLAYERF_HOLD    equ %01000000
 def PLAYERF_A       equ %00100000
 def PLAYERF_B       equ %00010000
-def PLAYERF_FALL    equ %00001000
 
 def PLAYERB_HOLD    equ 6
 def PLAYERB_A       equ 5
 def PLAYERB_B       equ 4
-def PLAYERB_FALL    equ 3
 
 ;;; rCOLLISION
 def rCOLL_YHIGH     equ %10000000

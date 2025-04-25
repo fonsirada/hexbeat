@@ -25,7 +25,7 @@ println "WRAM usage: {d:WRAM_USAGE} bytes"
 assert WRAM_USAGE <= $2000, "Too many bytes used in WRAM"
 
 ; ROM usage
-def TIME_BETWEEN_NOTES          equ (10)
+def TIME_BETWEEN_NOTES          equ (20)
 ;equ %1100000
 
 Ch1_Notes:
