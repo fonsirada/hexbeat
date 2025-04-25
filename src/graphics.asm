@@ -146,6 +146,19 @@ init_registers:
     copy [rSPELL_COUNT], LVL1_SPELL_NUM
     ret
 
+is_game_over:
+    ld a, [rPC_HEALTH]
+    cp a, 0
+    jr nz, .check_overflow
+        RegBitOp rGAME, GAMEB_END, set
+        jr .check_done
+    .check_overflow
+        cp a, PLAYER_HEALTH + 1
+        jr c, .check_done
+            RegBitOp rGAME, GAMEB_END, set
+    .check_done
+    ret
+
 update_graphics:
     CheckTimer rTIMER_BG, UPDATE_FRAME
     jr nz, .done_update
@@ -272,9 +285,14 @@ game_over:
     push hl
     push bc
 
-    call print_text
-
-    ; restart functionality
+    ; only call this once
+    ld a, [rGAME]
+    bit GAMEB_END_PRINT, a
+    jr nz, .check_restart_game
+        call print_text
+        RegBitOp rGAME, GAMEB_END_PRINT, set
+    
+    .check_restart_game
     ld a, [PAD_CURR]
     bit PADB_SELECT, a
     jr nz, .done_end
@@ -342,7 +360,7 @@ find_center_tile:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export init_graphics, init_registers, update_graphics, start, game_over, update_timers
+export init_graphics, init_registers, update_graphics, start, game_over, is_game_over, update_timers
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

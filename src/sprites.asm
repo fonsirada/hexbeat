@@ -27,7 +27,7 @@ def SPELL2A_TILEID         equ $2E
 def SPELL2B_TILEID         equ $3E
 
 def SPAWN_DELAY            equ 10
-def COLLISION_OFFSET       equ $0004
+def COLLISION_OFFSET       equ $0004 ; wram offset
 def SPRITE_MEM_OFFSET      equ $0004
 def SPRITE_P2_Y            equ $0003
 
@@ -70,6 +70,15 @@ init_sprite_data:
     Copy16BitVal [hli], [hli], SPRITE_15_ADDRESS
     Copy16BitVal [hli], [hli], SPRITE_16_ADDRESS
     Copy16BitVal [hli], [hli], SPRITE_17_ADDRESS
+
+    Copy16BitVal [hli], [hli], SPRITE_18_ADDRESS
+    Copy16BitVal [hli], [hli], SPRITE_19_ADDRESS
+    ; Copy16BitVal [hli], [hli], SPRITE_20_ADDRESS
+    ; Copy16BitVal [hli], [hli], SPRITE_21_ADDRESS
+    ; Copy16BitVal [hli], [hli], SPRITE_22_ADDRESS
+    ; Copy16BitVal [hli], [hli], SPRITE_23_ADDRESS
+    ; Copy16BitVal [hli], [hli], SPRITE_24_ADDRESS
+    ; Copy16BitVal [hli], [hli], SPRITE_25_ADDRESS
     
     ret
 
@@ -366,9 +375,6 @@ handle_bad_collision:
     ; start player flash
     ld a, PC_DMG_COUNT
     ld [rTIMER_DMG], a
-    cp a, 0
-        jr nz, .done
-            RegBitOp rGAME, GAMEB_END, set
     .done
     ret
 
@@ -385,11 +391,6 @@ handle_miss:
         ld a, [rPC_HEALTH]
         dec a
         ld [rPC_HEALTH], a
-
-        ; if health is 0, raise game_end flag
-        cp a, 0
-        jr nz, .done
-            RegBitOp rGAME, GAMEB_END, set
     .done
     ret
 

@@ -14,8 +14,9 @@ def SPRITES_RGBINC equ 1
 ; WRAM
 def SPELL_FLAG_START    equ ($C020)
 def SPELL_FLAG_INTERVAL equ (2)
-def SPELL_WRAM_START    equ ($C030)
-def SPELL_WRAM_END      equ ($C040)
+def SPELLF_WRAM_OFFSET  equ $10 ;$20
+def SPELL_WRAM_START    equ ($C030) ;$C040
+def SPELL_WRAM_END      equ ($C040) ;$C050
 
 ; TARGETS
 def SPRITE_6_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 6)
@@ -34,9 +35,16 @@ def SPRITE_14_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 14)
 def SPRITE_15_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 15)
 def SPRITE_16_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 16)
 def SPRITE_17_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 17)
+def SPRITE_18_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 18)
+def SPRITE_19_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 19)
+def SPRITE_20_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 20)
+def SPRITE_21_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 21)
+def SPRITE_22_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 22)
+def SPRITE_23_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 23)
+def SPRITE_24_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 24)
+def SPRITE_25_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 25)
 
 def OBJ16_OFFSET           equ 8
-def SPELLF_WRAM_OFFSET     equ $10
 
 def MC_TOP_Y               equ (80)
 def MC_BOT_Y               equ (MC_TOP_Y + 16)
@@ -112,14 +120,16 @@ macro UpdatePlayerAnim
         ld a, [rTIMER_DMG]
         cp a, 0
         jr z, .done_flash
-            dec a
-            ld [rTIMER_DMG], a
+            cp a, PC_DMG_COUNT + 1
+            jr nc, .done_flash
+                dec a
+                ld [rTIMER_DMG], a
 
-            inc hl
-            ld a, [hl]
-            xor a, OAMF_PAL1
-            ld [hl], a
-            jr .done_flash
+                inc hl
+                ld a, [hl]
+                xor a, OAMF_PAL1
+                ld [hl], a
+                jr .done_flash
         .no_flash
             ld a, [hl]
             and a, OAMF_PAL0

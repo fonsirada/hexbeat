@@ -15,7 +15,7 @@ include "src/hardware.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-rsset (_RAM + $40)
+rsset (_RAM + $60)
 
 def WRAM_PAD_INPUT                  rb 0
 def WRAM_FRAME_COUNTER              rb 1
@@ -41,10 +41,10 @@ def rCOLLISION      rb 1
 def rTIMER_BG       rb 1
 def rTIMER_PC       rb 1
 def rTIMER_OBJ      rb 1
-def rSPELL_COUNT    rb 1
-def rTIMER_DMG      equ $C01F
-def PC_DMG_COUNT equ (4 * 6)
+def rTIMER_DMG      rb 1
 
+def rSPELL_COUNT    equ $C01F
+def PC_DMG_COUNT    equ (4 * 6)
 
 ;;; rGAME
 def GAME_BASE       equ %00000000
@@ -53,6 +53,7 @@ def GAME_END        equ %00000010
 def GAME_LVL2       equ %00000100
 def GAME_BOSSLVL    equ %00001000
 def GAMEF_SPAWN     equ %10000000
+def GAMEF_END_PRINT equ %01000000
 
 def GAMEB_START     equ 0
 def GAMEB_END       equ 1
@@ -60,10 +61,8 @@ def GAMEB_LVL2      equ 2
 def GAMEB_BOSSLVL   equ 3
 
 def GAMEB_SPAWN     equ 7
+def GAMEB_END_PRINT equ 6
 
-def GAME_DIFF_THRES_LVL2    equ 16
-def GAME_DIFF_THRES_BOSSLVL equ 32
-def GAME_DIFF_THRES_WIN     equ 64
 
 ;;; rPLAYER
 def PLAYERF_HIT     equ %10000000
@@ -84,7 +83,6 @@ def COLLF_XBAD      equ %00001000
 def COLLF_XMISS     equ %00000100
 ; ^ one of these flags should always be set!
 
-
 def COLLB_YHIGH     equ 7
 def COLLB_YLOW      equ 6
 def COLLB_XPERF     equ 5
@@ -104,8 +102,11 @@ def SPELLB_SPAWN    equ 1
 def SPELLB_ON       equ 0
 
 ;;; GAME DIFFICULTY
-def LVL1_SPELL_NUM         equ $38
-def BOSSLVL_SPELL_NUM         equ $40
+def LVL1_SPELL_NUM          equ $38
+def BOSSLVL_SPELL_NUM       equ $40
+def GAME_DIFF_THRES_LVL2    equ 16
+def GAME_DIFF_THRES_BOSSLVL equ 32
+def GAME_DIFF_THRES_WIN     equ 56
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
