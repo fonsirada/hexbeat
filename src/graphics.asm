@@ -1,9 +1,9 @@
 ; 
-; CS-240 World 6: Fully functional draft
+; CS-240 World 7: Feature complete game
 ;
 ; @file graphics.asm
 ; @author Darren Strash, Sydney Chen, Alfonso Rada
-; @date April 16, 2025
+; @date April 24, 2025
 ; @brief store overall graphics-related functions
 
 include "src/utils.inc"
@@ -13,8 +13,6 @@ include "src/sprites.inc"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 section "vblank_interrupt", rom0[$0040]
-    ;ld hl, WRAM_FRAME_COUNTER
-    ;dec [hl]
     reti
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -145,8 +143,7 @@ init_registers:
     ld [rTIMER_PC], a
     ld [rTIMER_OBJ], a
     ld [rTIMER_DMG], a
-    copy [rSPELL_COUNT], LVL1_SPELL_NUM ;LVL2_SPELL_NUM
-    
+    copy [rSPELL_COUNT], LVL1_SPELL_NUM
     ret
 
 update_graphics:

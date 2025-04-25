@@ -1,9 +1,9 @@
 ; 
-; CS-240 World 6: Fully functional draft
+; CS-240 World 7: Feature complete game
 ;
 ; @file player.asm
 ; @author Sydney Chen, Alfonso Rada
-; @date April 16, 2025
+; @date April 24, 2025
 ; @brief storing player functions
 
 include "src/hardware.inc"
@@ -155,7 +155,7 @@ init_player_sprite_data:
 ; animation for player hit high
 player_hit_high:
     ld a, [rPLAYER]
-    bit PLAYERB_HOLD, a ; checks to hold last frame of animation a second longer
+    bit PLAYERB_HOLD, a
     jr nz, .extend_frame
         UpdatePlayerAnim SPRITE_0_A_WRAM_LOCATION, SPRITE_ANIM_WRAM_THRES, SPRITE_HIT_HIGH_THRES_TILEID
         jr .end_frame_update
@@ -225,7 +225,6 @@ update_player:
         SetPlayerCoord MC_TOP_Y, OAMA_Y
         call player_hit_low
         RegOp rPC_ACOUNT, inc
-        ; have to use jp instead here
         jp .done_update 
 
     ; animation for A Button Press - player hit high

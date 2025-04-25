@@ -110,10 +110,10 @@ init_level_1:
     SetSpriteXY 13, SPELL_SPAWNX, SPELL_LOW_Y
     ret
 
-; init level 2's spells (+2)
-init_level_2:
-    halt
-    copy [rSPELL_COUNT], LVL2_SPELL_NUM
+; init level 3's spells (+2)
+init_level_3:
+    halt 
+    copy [rSPELL_COUNT], BOSSLVL_SPELL_NUM
     SetSpriteXY 14, SPELL_SPAWNX, SPELL_HIGH_Y
     SetSpriteXY 15, SPELL_SPAWNX, SPELL_HIGH_Y
     SetSpriteXY 16, SPELL_SPAWNX, SPELL_LOW_Y
@@ -128,7 +128,6 @@ check_level_2:
         ld a, [rGAME]
         bit GAMEB_LVL2, a
         jr nz, .done_check
-            call init_level_2
             RegBitOp rGAME, GAMEB_LVL2, set
     .done_check
     ret

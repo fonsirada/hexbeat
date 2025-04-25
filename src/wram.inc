@@ -15,9 +15,9 @@ include "src/hardware.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-rsset (_RAM + $40) ; change this location at some point
+rsset (_RAM + $40)
 
-def WRAM_PAD_INPUT                  rb 0 ;sizeof_PAD_INPUT
+def WRAM_PAD_INPUT                  rb 0
 def WRAM_FRAME_COUNTER              rb 1
 def WRAM_NOTE_INDEX                 rb 1
 def WRAM_END                        rb 0
@@ -52,7 +52,7 @@ def GAME_START      equ %00000001
 def GAME_END        equ %00000010
 def GAME_LVL2       equ %00000100
 def GAME_BOSSLVL    equ %00001000
-def GAMEF_SPAWN     equ %10000000 ; move/change where this flag is?
+def GAMEF_SPAWN     equ %10000000
 
 def GAMEB_START     equ 0
 def GAMEB_END       equ 1
@@ -105,7 +105,7 @@ def SPELLB_ON       equ 0
 
 ;;; GAME DIFFICULTY
 def LVL1_SPELL_NUM         equ $38
-def LVL2_SPELL_NUM         equ $40
+def BOSSLVL_SPELL_NUM         equ $40
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
