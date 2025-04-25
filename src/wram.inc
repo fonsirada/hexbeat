@@ -104,7 +104,7 @@ def SPELLB_ON       equ 0
 
 ;;; GAME DIFFICULTY
 def LVL1_SPELL_NUM         equ $38
-def LVL2_SPELL_NUM         equ $40
+def BOSSLVL_SPELL_NUM         equ $40
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
