@@ -11,14 +11,6 @@ def SPRITES_RGBINC equ 1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; WRAM
-def SPELL_FLAG_START    equ ($C020)
-def SPELL_FLAG_INTERVAL equ (2)
-def SPELLF_WRAM_OFFSET  equ $20;$10 ;$20
-def SPELL_WRAM_START    equ $C040;($C030) ;$C040
-def SPELL_WRAM_END      equ $C050;($C040) ;$C050
-; note: debug update sprites
-
 ; TARGETS
 def SPRITE_6_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 6)
 def SPRITE_7_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 7)
@@ -115,18 +107,17 @@ macro UpdatePlayerAnim
             add a, MC_VRAM_ANIM_INT
 
         .finish_tile_load
-        ld [hl], a
+        ld [hli], a ; replace w/ hli & remove below line
 
         ;; FLASH PALETTE ;;
         ld a, [rTIMER_DMG]
         cp a, 0
-        jr z, .done_flash
-            cp a, PC_DMG_COUNT + 1
-            jr nc, .done_flash
+        jr z, .no_flash
+            cp a, (PC_DMG_COUNT + 1)
+            jr nc, .no_flash
                 dec a
                 ld [rTIMER_DMG], a
 
-                inc hl
                 ld a, [hl]
                 xor a, OAMF_PAL1
                 ld [hl], a
@@ -251,6 +242,7 @@ macro SetSpriteFlags
     ld [hl], \1
     pop hl
 endm
+
 
 ; given sprite address (hl) and flags as param (in d)
 ; spawns a spell according to its tier flag

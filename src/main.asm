@@ -68,7 +68,7 @@ main:
             call check_level_2
             call check_boss_level
             call update_sound
-            
+
             call is_game_over
         
         .post_graphics

@@ -27,7 +27,6 @@ def SPELL2A_TILEID         equ $2E
 def SPELL2B_TILEID         equ $3E
 
 def SPAWN_DELAY            equ 10
-def COLLISION_OFFSET       equ $0004 ; wram offset
 def SPRITE_MEM_OFFSET      equ $0004
 def SPRITE_P2_Y            equ $0003
 
@@ -71,14 +70,15 @@ init_sprite_data:
     Copy16BitVal [hli], [hli], SPRITE_16_ADDRESS
     Copy16BitVal [hli], [hli], SPRITE_17_ADDRESS
 
+    ; next 4:
     Copy16BitVal [hli], [hli], SPRITE_18_ADDRESS
     Copy16BitVal [hli], [hli], SPRITE_19_ADDRESS
-    ; Copy16BitVal [hli], [hli], SPRITE_20_ADDRESS
-    ; Copy16BitVal [hli], [hli], SPRITE_21_ADDRESS
-    ; Copy16BitVal [hli], [hli], SPRITE_22_ADDRESS
-    ; Copy16BitVal [hli], [hli], SPRITE_23_ADDRESS
-    ; Copy16BitVal [hli], [hli], SPRITE_24_ADDRESS
-    ; Copy16BitVal [hli], [hli], SPRITE_25_ADDRESS
+    Copy16BitVal [hli], [hli], SPRITE_20_ADDRESS
+    Copy16BitVal [hli], [hli], SPRITE_21_ADDRESS
+    Copy16BitVal [hli], [hli], SPRITE_22_ADDRESS
+    Copy16BitVal [hli], [hli], SPRITE_23_ADDRESS
+    Copy16BitVal [hli], [hli], SPRITE_24_ADDRESS
+    Copy16BitVal [hli], [hli], SPRITE_25_ADDRESS
     
     ret
 
@@ -123,6 +123,12 @@ init_level_1:
 
 ; init level 3's spells (+2)
 init_level_3:
+    ld a, high(Boss_Level)
+    ld [WRAM_NOTEMAP], a
+    ld a, low(Boss_Level)
+    ld [WRAM_NOTEMAP], a
+    ld [WRAM_NOTEMAP + 1], a
+
     halt 
     copy [rSPELL_COUNT], BOSSLVL_SPELL_NUM
     SetSpriteXY 14, SPELL_SPAWNX, SPELL_HIGH_Y
@@ -131,48 +137,11 @@ init_level_3:
     SetSpriteXY 17, SPELL_SPAWNX, SPELL_LOW_Y
     ret
 
-; check if the level 2 threshold is passed
-check_level_2:
-    ld a, [rGAME_DIFF]
-    cp a, GAME_DIFF_THRES_LVL2
-    jr nz, .done_check
-        ld a, [rGAME]
-        bit GAMEB_LVL2, a
-        jr nz, .done_check
-            RegBitOp rGAME, GAMEB_LVL2, set
-    .done_check
-    ret
-
-;check if game is currently on boss level + handle accordingly
-check_boss_level:
-    ld a, [rGAME_DIFF]
-    cp GAME_DIFF_THRES_WIN
-    jr nz, .check_boss_level_thres
-        RegBitOp rGAME, GAMEB_END, set
-        jr .done_check
-
-    .check_boss_level_thres
-    cp GAME_DIFF_THRES_BOSSLVL
-    jr nz, .done_check
-        ld a, [rGAME]
-        bit GAMEB_BOSSLVL, a
-        jr nz, .done_check
-            ld a, high(Boss_Level)
-            ld [WRAM_NOTEMAP], a
-            ld a, low(Boss_Level)
-            ld [WRAM_NOTEMAP], a
-            ld [WRAM_NOTEMAP + 1], a
-            call init_level_3
-            RegBitOp rGAME, GAMEB_BOSSLVL, set
-    .done_check
-    ret
-
 ; loops thru all active sprites in WRAM and updates them
 ; NOTE: returns hl and d for handle_collision and handle_miss
 ; working ver w/ new sprite system
 update_sprites:
     CheckTimer rTIMER_OBJ, 1
-    ; jp nz, .done_update
     jr nz, .done_update
 
     ld hl, SPELL_WRAM_START
@@ -188,20 +157,19 @@ update_sprites:
         bit SPELLB_ON, d
         jr nz, .spell_on
             
-        ; ---- SPELL IS OFF... ---- ;
+        ; ---- IF SPELL IS OFF... ---- ;
             ; HANDLE SPELL SPAWNING ;
             call check_spawn
             bit SPELLB_SPAWN, d
             jr z, .skip_spawn
-                SpawnSpell d
+                call spawn_spell
                 ld a, d
                 xor a, SPELLF_ON | SPELLF_SPAWN
                 ld d, a
             .skip_spawn
             jr .to_next_sprite
 
-
-        ; ---- SPELL IS ON... ---- ;
+        ; ---- IF SPELL IS ON... ---- ;
         .spell_on
         ; SPELL MOVEMENT ;
         ; update sprite pt 1
@@ -251,7 +219,7 @@ update_sprites:
 
         pop hl
 
-        ; SPELL COLLISION
+        ; SPELL COLLISION ;
         ; need sprite x-val address in (hl)
         bit SPELLB_ON, d
         jr z, .to_next_sprite
@@ -342,7 +310,7 @@ handle_collision:
     ; set x val to 0
     ld a, 0
     ld [hl], a
-    ld bc, COLLISION_OFFSET
+    ld bc, SPRITE_MEM_OFFSET
     add hl, bc
     ld [hl], a
 
@@ -363,7 +331,7 @@ handle_bad_collision:
     ; set x val to 0
     ld a, 0
     ld [hl], a
-    ld bc, COLLISION_OFFSET
+    ld bc, SPRITE_MEM_OFFSET
     add hl, bc
     ld [hl], a
 
@@ -447,6 +415,42 @@ check_spawn:
     .no_spawn
     pop hl
     ret
+
+; spawns a high/low spell based on its flag attributes
+spawn_spell:
+    ; halt ; helps but not enough
+
+    push hl
+    bit SPELLB_TIER, d
+    jr z, .set_low
+        ld [hl], SPELL_HIGH_Y
+        jr .set_x
+    .set_low
+        ld [hl], SPELL_LOW_Y
+    .set_x
+    inc hl
+    ld [hl], SPELL_SPAWNX
+
+    ; set tile ID
+    inc hl
+    ld bc, SPRITE_MEM_OFFSET
+    bit SPELLB_TIER, d
+    jr z, .set_low_id
+        ld [hl], SPELL1A_TILEID
+        add hl, bc
+        ld [hl], SPELL1B_TILEID
+        jr .set_flags
+    .set_low_id
+        ld [hl], SPELL2A_TILEID
+        add hl, bc
+        ld [hl], SPELL2B_TILEID
+
+    .set_flags
+    inc hl
+    ld [hl], OAMF_PAL0
+
+    pop hl
+    ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export init_sprite_data, init_sprites, init_level_1, check_level_2, check_boss_level, update_sprites
+export init_sprite_data, init_sprites, init_level_1, init_level_3, update_sprites

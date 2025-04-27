@@ -32,78 +32,85 @@ def PAD_LHOLD rb 1
 def HOLD_A_COUNTER rb 1
 
 ;;; ADDITIONAL REGISTERS ;;;
-def rGAME           rb 1
-def rGAME_DIFF      rb 1
-def rPLAYER         rb 1
-def rPC_HEALTH      rb 1
-def rPC_ACOUNT      rb 1
-def rCOLLISION      rb 1
-def rTIMER_BG       rb 1
-def rTIMER_PC       rb 1
-def rTIMER_OBJ      rb 1
-def rTIMER_DMG      rb 1
+def rGAME            rb 1
+def rGAME_DIFF       rb 1
+def rPLAYER          rb 1
+def rPC_HEALTH       rb 1
+def rPC_ACOUNT       rb 1
+def rCOLLISION       rb 1
+def rTIMER_BG        rb 1
+def rTIMER_PC        rb 1
+def rTIMER_OBJ       rb 1
+def rTIMER_DMG       rb 1
 
-def rSPELL_COUNT    equ $C01F
-def PC_DMG_COUNT    equ (4 * 6)
+def rSPELL_COUNT     equ $C01F
+def PC_DMG_COUNT     equ (4 * 6)
 
 ;;; rGAME
-def GAME_BASE       equ %00000000
-def GAME_START      equ %00000001
-def GAME_END        equ %00000010
-def GAME_LVL2       equ %00000100
-def GAME_BOSSLVL    equ %00001000
-def GAMEF_SPAWN     equ %10000000
-def GAMEF_END_PRINT equ %01000000
+def GAMEF_BASE       equ %00000000
+def GAMEF_START      equ %00000001
+def GAMEF_END        equ %00000010
+def GAMEF_LVL2       equ %00000100
+def GAMEF_BOSSLVL    equ %00001000
+def GAMEF_SPAWN      equ %10000000
+def GAMEF_END_PRINT  equ %01000000
 
-def GAMEB_START     equ 0
-def GAMEB_END       equ 1
-def GAMEB_LVL2      equ 2
-def GAMEB_BOSSLVL   equ 3
+def GAMEB_START      equ 0
+def GAMEB_END        equ 1
+def GAMEB_LVL2       equ 2
+def GAMEB_BOSSLVL    equ 3
 
-def GAMEB_SPAWN     equ 7
-def GAMEB_END_PRINT equ 6
-
+def GAMEB_SPAWN      equ 7
+def GAMEB_END_PRINT  equ 6
 
 ;;; rPLAYER
-def PLAYERF_HIT     equ %10000000
-def PLAYERF_HOLD    equ %01000000
-def PLAYERF_A       equ %00100000
-def PLAYERF_B       equ %00010000
+def PLAYERF_HIT      equ %10000000
+def PLAYERF_HOLD     equ %01000000
+def PLAYERF_A        equ %00100000
+def PLAYERF_B        equ %00010000
 
-def PLAYERB_HOLD    equ 6
-def PLAYERB_A       equ 5
-def PLAYERB_B       equ 4
+def PLAYERB_HOLD     equ 6
+def PLAYERB_A        equ 5
+def PLAYERB_B        equ 4
 
 ;;; rCOLLISION
-def rCOLL_YHIGH     equ %10000000
-def rCOLL_YLOW      equ %01000000
-def COLLF_XPERF     equ %00100000
-def COLLF_XGOOD     equ %00010000
-def COLLF_XBAD      equ %00001000
-def COLLF_XMISS     equ %00000100
+def rCOLL_YHIGH      equ %10000000
+def rCOLL_YLOW       equ %01000000
+def COLLF_XPERF      equ %00100000
+def COLLF_XGOOD      equ %00010000
+def COLLF_XBAD       equ %00001000
+def COLLF_XMISS      equ %00000100
 ; ^ one of these flags should always be set!
 
-def COLLB_YHIGH     equ 7
-def COLLB_YLOW      equ 6
-def COLLB_XPERF     equ 5
-def COLLB_XGOOD     equ 4
-def COLLB_XBAD      equ 3
-def COLLB_XMISS     equ 2
+def COLLB_YHIGH      equ 7
+def COLLB_YLOW       equ 6
+def COLLB_XPERF      equ 5
+def COLLB_XGOOD      equ 4
+def COLLB_XBAD       equ 3
+def COLLB_XMISS      equ 2
 
 ;;; SPELL OBJ WRAM FlAGS
-def SPELLF_HIGH     equ %00000100
-def SPELLF_LOW      equ %00000000
-def SPELLF_SPAWN    equ %00000010
-def SPELLF_ON       equ %00000001
-def SPELLF_OFF      equ %00000000
+def SPELLF_HIGH      equ %00000100
+def SPELLF_LOW       equ %00000000
+def SPELLF_SPAWN     equ %00000010
+def SPELLF_ON        equ %00000001
+def SPELLF_OFF       equ %00000000
 
-def SPELLB_TIER     equ 2
-def SPELLB_SPAWN    equ 1
-def SPELLB_ON       equ 0
+def SPELLB_TIER      equ 2
+def SPELLB_SPAWN     equ 1
+def SPELLB_ON        equ 0
+
+; WRAM
+def SPELL_FLAG_START    equ ($C020)
+def SPELL_FLAG_INTERVAL equ (2)
+def SPELLF_WRAM_OFFSET  equ $20 ; old: $10 | new: $20
+def SPELL_WRAM_START    equ $C040 ; old: $C030 | new: $C040
+def SPELL_WRAM_END      equ $C050 ; old: $C040 | new: $C050/60
+; note: for 8 sprites, set wram_end to $C060
 
 ;;; GAME DIFFICULTY
-def LVL1_SPELL_NUM          equ $38
-def BOSSLVL_SPELL_NUM       equ $40
+def LVL1_SPELL_NUM          equ low(SPELL_WRAM_END - $8)
+def BOSSLVL_SPELL_NUM       equ low(SPELL_WRAM_END)
 def GAME_DIFF_THRES_LVL2    equ 16
 def GAME_DIFF_THRES_BOSSLVL equ 32
 def GAME_DIFF_THRES_WIN     equ 56

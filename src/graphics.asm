@@ -42,11 +42,8 @@ def GRAPHICS_DATA_SIZE              equ (TILES_BYTE_SIZE + TILEMAPS_BYTE_SIZE)
 def GRAPHICS_DATA_ADDRESS_END       equ ($8000)
 def GRAPHICS_DATA_ADDRESS_START     equ (GRAPHICS_DATA_ADDRESS_END - GRAPHICS_DATA_SIZE)
 
-def BG_SCROLL_SPEED                 equ 2
-def BG_ANIMATION_TIMER              equ 1
 def UPDATE_FRAME                    equ 1
-def PC_ANIMATION_TIMER              equ 3
-def OBJ_ANIMATION_TIMER             equ 1
+def BG_SCROLL_SPEED                 equ 2
 
 def PALETTE_0                       equ %11100100
 def PALETTE_1                       equ %00011011
@@ -56,8 +53,6 @@ def START_SCX                       equ 0
 def WY_OFS                          equ 136
 def LEVEL_SCY                       equ 0
 def UI_Y                            equ 112
-
-def PLAYER_HEALTH                   equ 10
 
 def HEALTH_BAR_TILE_OFFSET          equ $21
 def HEALTH_HALF_TILEID              equ $3D
@@ -130,34 +125,6 @@ init_graphics:
 
     ret
 
-init_registers:
-    ; set up game and player settings
-    ld a, GAME_BASE 
-    ld [rGAME], a
-    ld [rGAME_DIFF], a
-    ld [rPLAYER], a
-    copy [rPC_HEALTH], PLAYER_HEALTH 
-    ld [rPC_ACOUNT], a
-    ld [rCOLLISION], a
-    ld [rTIMER_BG], a
-    ld [rTIMER_PC], a
-    ld [rTIMER_OBJ], a
-    ld [rTIMER_DMG], a
-    copy [rSPELL_COUNT], LVL1_SPELL_NUM
-    ret
-
-is_game_over:
-    ld a, [rPC_HEALTH]
-    cp a, 0
-    jr nz, .check_overflow
-        RegBitOp rGAME, GAMEB_END, set
-        jr .check_done
-    .check_overflow
-        cp a, PLAYER_HEALTH + 1
-        jr c, .check_done
-            RegBitOp rGAME, GAMEB_END, set
-    .check_done
-    ret
 
 update_graphics:
     CheckTimer rTIMER_BG, UPDATE_FRAME
@@ -243,12 +210,6 @@ level_text:
     inc hl
 
     .done
-    ret
-
-update_timers:
-    IncTimer rTIMER_BG, BG_ANIMATION_TIMER
-    IncTimer rTIMER_PC, PC_ANIMATION_TIMER
-    IncTimer rTIMER_OBJ, OBJ_ANIMATION_TIMER
     ret
 
 ; reads START press on the title screen and sets up the level screen
@@ -360,7 +321,7 @@ find_center_tile:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export init_graphics, init_registers, update_graphics, start, game_over, is_game_over, update_timers
+export init_graphics, update_graphics, start, game_over
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
