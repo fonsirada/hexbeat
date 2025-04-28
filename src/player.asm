@@ -65,6 +65,115 @@ def SHIELD_X                        equ 44
 def FRAME_TO_HOLD                   equ $3
 def HIT_ANIM_LENGTH                 equ $4
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; updates the Player sprite(s) to the next frame
+; by looping thru sprite locations stored in WRAM
+; run as: UpdatePlayerAnim (WRAM start address, WRAM end address, ending tileID)
+; ex: UpdatePlayerAnim $C010, $C01C, $30
+macro UpdatePlayerAnim
+    push af
+    push bc
+    push hl
+
+    ld hl, \1
+
+    ; loop through sprites thru WRAM address locs
+    .next_tile
+        push hl
+
+        ;; LOAD TILE ID ;;
+        ; store sprite address in hl
+        ld b, [hl]
+        inc hl
+        ld c, [hl]
+        ld h, b
+        ld l, c
+
+        ; get sprite's tileID address
+        ld a, l
+        add a, OAMA_TILEID
+        ld l, a
+        ld a, [hl] 
+
+        ; change tileID as appropriate
+        cp a, \3
+        jr c, .load_new_tileid
+            sub a, \3
+            jr .finish_tile_load
+
+        .load_new_tileid
+            add a, MC_VRAM_ANIM_INT
+
+        .finish_tile_load
+        ld [hli], a ; replace w/ hli & remove below line
+
+        ;; FLASH PALETTE ;;
+        ld a, [rTIMER_DMG]
+        cp a, 0
+        jr z, .no_flash
+            cp a, (PC_DMG_COUNT + 1)
+            jr nc, .no_flash
+                dec a
+                ld [rTIMER_DMG], a
+
+                ld a, [hl]
+                xor a, OAMF_PAL1
+                ld [hl], a
+                jr .done_flash
+        .no_flash
+            ld a, [hl]
+            and a, OAMF_PAL0
+            ld [hl], a
+        .done_flash
+
+        ; go to next tile in WRAM
+        pop hl
+        inc hl
+        inc hl
+    
+        ; check if last sprite was reached in WRAM
+        ld a, l
+        cp a, low(\2)
+        jr nz, .next_tile
+
+    .end_update
+    pop hl
+    pop bc
+    pop af
+endm
+
+; set the Player sprite(s)'s tileIDs based on the first sprite
+macro SetPlayerTiles
+   copy [SPRITE_0_ADDRESS + OAMA_TILEID], \1
+   copy [SPRITE_1_ADDRESS + OAMA_TILEID], \1 + 2
+   copy [SPRITE_2_ADDRESS + OAMA_TILEID], \1 + 4
+   copy [SPRITE_3_ADDRESS + OAMA_TILEID], \1 + 6
+   copy [SPRITE_4_ADDRESS + OAMA_TILEID], \1 + 8
+   copy [SPRITE_5_ADDRESS + OAMA_TILEID], \1 + 10
+endm
+
+; set the Player sprite(s)'s X or Y value based on the first sprite
+macro SetPlayerCoord
+    ld a, \1
+    ld [SPRITE_0_ADDRESS + \2], a
+    ld [SPRITE_1_ADDRESS + \2], a
+    ld [SPRITE_2_ADDRESS + \2], a
+    add a, MC_VRAM_ANIM_INT
+    ld [SPRITE_3_ADDRESS + \2], a
+    ld [SPRITE_4_ADDRESS + \2], a
+    ld [SPRITE_5_ADDRESS + \2], a
+    sub a, MC_VRAM_ANIM_INT
+endm
+
+; set 'shield' sprite locations in form (x1, y1), (x2, y2)
+macro SetShieldLocations
+    copy [SPRITE_8_ADDRESS + OAMA_X], \1
+    copy [SPRITE_8_ADDRESS + OAMA_Y], \2
+    
+    copy [SPRITE_9_ADDRESS + OAMA_X], \3
+    copy [SPRITE_9_ADDRESS + OAMA_Y], \4
+endm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -191,9 +300,21 @@ update_player:
     jp nz, .done_update 
     SetShieldLocations 0, 0, 0, 0
 
-    ; set flags from joypad input
-    ProcessInputForAnim PADB_B, PLAYERB_B, SPRITE_RUN_THRES_TILEID
-    ProcessInputForAnim PADB_A, PLAYERB_A, SPRITE_HIT_LOW_THRES_TILEID
+    ; set correct flags/registers/tileIDs from joypad input
+    ld a, [PAD_CURR]
+    bit PADB_B, a
+    jr nz, .done_b
+        RegBitOp rPLAYER, PLAYERB_B, set
+        RegBitOp rPLAYER, PLAYERB_A, res
+        SetPlayerTiles SPRITE_RUN_THRES_TILEID
+    .done_b
+    ld a, [PAD_CURR]
+    bit PADB_A, a
+    jr nz, .done_a
+        RegBitOp rPLAYER, PLAYERB_A, set
+        RegBitOp rPLAYER, PLAYERB_B, res
+        SetPlayerTiles SPRITE_HIT_LOW_THRES_TILEID
+    .done_a
 
     ; check if current frame should be held (4th frame)
     ld a, [rPC_ACOUNT]
@@ -208,16 +329,16 @@ update_player:
     jr z, .update_a
         ld a, [rPC_ACOUNT]
         cp HIT_ANIM_LENGTH
-        ; reset ACOUNT to 0 if full animation and extra frame hold has been reached
+        ; reset anim count to 0 if full animation and extra frame hold has been reached
         jr nz, .update_anim_b
             copy [rPC_ACOUNT], 0
             jr .update_a
 
         .update_anim_b
-        SetPlayerCoord MC_TOP_Y, OAMA_Y
-        call player_hit_low
-        RegOp rPC_ACOUNT, inc
-        jp .done_update 
+            SetPlayerCoord MC_TOP_Y, OAMA_Y
+            call player_hit_low
+            RegOp rPC_ACOUNT, inc
+            jp .done_update 
 
     ; animation for A Button Press - player hit high
     .update_a
@@ -240,17 +361,17 @@ update_player:
             jp .done_update
 
         .update_anim_a
-        SetPlayerCoord JUMP_HOLD_Y, OAMA_Y
-        call player_hit_high
-        RegOp rPC_ACOUNT, inc
-        jr .done_update
+            SetPlayerCoord JUMP_HOLD_Y, OAMA_Y
+            call player_hit_high
+            RegOp rPC_ACOUNT, inc
+            jr .done_update
     
     ; no button press - player runs
     .update_run
-    RegBitOp rPLAYER, PLAYERB_B, res
-    RegBitOp rPLAYER, PLAYERB_A, res
-    SetPlayerCoord MC_TOP_Y, OAMA_Y
-    UpdatePlayerAnim PC_0A_WRAM, SPRITE_ANIM_WRAM_THRES, SPRITE_RUN_THRES_TILEID
+        RegBitOp rPLAYER, PLAYERB_B, res
+        RegBitOp rPLAYER, PLAYERB_A, res
+        SetPlayerCoord MC_TOP_Y, OAMA_Y
+        UpdatePlayerAnim PC_0A_WRAM, SPRITE_ANIM_WRAM_THRES, SPRITE_RUN_THRES_TILEID
 
     .done_update
     ret

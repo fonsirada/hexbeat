@@ -368,10 +368,10 @@ check_spawn:
 
     ld a, [WRAM_FRAME_COUNTER]
     xor a, SPAWN_DELAY
-    jr nz, .no_spawn
+    jr nz, .done_spawn
         ld a, [rGAME]
         bit GAMEB_SPAWN, a
-        jr nz, .no_spawn
+        jr nz, .done_spawn
             ;; SET SPELL OBJ FLAGS ;;
             ; get first note
             ld a, [WRAM_NOTE_INDEX]
@@ -412,14 +412,13 @@ check_spawn:
             
             ;; LOAD NEW SET OF FLAGS ;;
             .load_flags
-    .no_spawn
+            ; to-do...?
+    .done_spawn
     pop hl
     ret
 
 ; spawns a high/low spell based on its flag attributes
 spawn_spell:
-    ; halt ; helps but not enough
-
     push hl
     bit SPELLB_TIER, d
     jr z, .set_low

@@ -75,127 +75,32 @@ def DMG_THRES              equ (4)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;; PLAYER MACROS ;;;
-
-; updates the Player sprite(s) to the next frame
-; by looping thru sprite locations stored in WRAM
-; run as: UpdatePlayerAnim (WRAM start address, WRAM end address, ending tileID)
-; ex: UpdatePlayerAnim $C010, $C01C, $30
-macro UpdatePlayerAnim
-    push af
-    push bc
-    push hl
-
-    ld hl, \1
-
-    ; loop through sprites thru WRAM address locs
-    .next_tile
-        push hl
-
-        ;; LOAD TILE ID ;;
-        ; store sprite address in hl
-        ld b, [hl]
-        inc hl
-        ld c, [hl]
-        ld h, b
-        ld l, c
-
-        ; get sprite's tileID address
-        ld a, l
-        add a, OAMA_TILEID
-        ld l, a
-        ld a, [hl] 
-
-        ; change tileID as appropriate
-        cp a, \3
-        jr c, .load_new_tileid
-            sub a, \3
-            jr .finish_tile_load
-
-        .load_new_tileid
-            add a, MC_VRAM_ANIM_INT
-
-        .finish_tile_load
-        ld [hli], a ; replace w/ hli & remove below line
-
-        ;; FLASH PALETTE ;;
-        ld a, [rTIMER_DMG]
-        cp a, 0
-        jr z, .no_flash
-            cp a, (PC_DMG_COUNT + 1)
-            jr nc, .no_flash
-                dec a
-                ld [rTIMER_DMG], a
-
-                ld a, [hl]
-                xor a, OAMF_PAL1
-                ld [hl], a
-                jr .done_flash
-        .no_flash
-            ld a, [hl]
-            and a, OAMF_PAL0
-            ld [hl], a
-        .done_flash
-
-        ; go to next tile in WRAM
-        pop hl
-        inc hl
-        inc hl
-    
-        ; check if last sprite was reached in WRAM
-        ld a, l
-        cp a, low(\2)
-        jr nz, .next_tile
-
-    .end_update
-    pop hl
-    pop bc
-    pop af
+; given an address in WRAM from (hl), get the OAM address there
+; and store in (hl)
+; NEW: store the address at (hl) in a given 16bit register
+macro WRAMToOAM
+    ld high(\1), [hl]
+    inc hl
+    ld low(\1), [hl]
+    ld h, high(\1)
+    ld l, low(\1)
 endm
 
-; set an input's associated animation flags/registers/tileIDs
-macro ProcessInputForAnim
-    ld a, [PAD_CURR]
-    bit \1, a
-    jr nz, .done_process\@
-        RegBitOp rPLAYER, \2, set
-        SetPlayerTiles \3
-    .done_process\@
+; params: sprite number, x val, y val
+macro SetSpriteXY
+    copy [(_OAMRAM + sizeof_OAM_ATTRS * \1) + OAMA_X], \2
+    copy [(_OAMRAM + sizeof_OAM_ATTRS * \1) + OAMA_Y], \3
 endm
 
-; set the Player sprite(s)'s tileIDs based on the first sprite
-macro SetPlayerTiles
-   copy [SPRITE_0_ADDRESS + OAMA_TILEID], \1
-   copy [SPRITE_1_ADDRESS + OAMA_TILEID], \1 + 2
-   copy [SPRITE_2_ADDRESS + OAMA_TILEID], \1 + 4
-   copy [SPRITE_3_ADDRESS + OAMA_TILEID], \1 + 6
-   copy [SPRITE_4_ADDRESS + OAMA_TILEID], \1 + 8
-   copy [SPRITE_5_ADDRESS + OAMA_TILEID], \1 + 10
+; params: sprite number, x val, y val, tile ID, flags
+macro SetSpriteData
+    SetSpriteXY \1, \2, \3
+    copy [(_OAMRAM + sizeof_OAM_ATTRS * \1) + OAMA_TILEID], \4
+    copy [(_OAMRAM + sizeof_OAM_ATTRS * \1) + OAMA_FLAGS], \5
 endm
 
-; set the Player sprite(s)'s X or Y value based on the first sprite
-macro SetPlayerCoord
-    ld a, \1
-    ld [SPRITE_0_ADDRESS + \2], a
-    ld [SPRITE_1_ADDRESS + \2], a
-    ld [SPRITE_2_ADDRESS + \2], a
-    add a, MC_VRAM_ANIM_INT
-    ld [SPRITE_3_ADDRESS + \2], a
-    ld [SPRITE_4_ADDRESS + \2], a
-    ld [SPRITE_5_ADDRESS + \2], a
-    sub a, MC_VRAM_ANIM_INT
-endm
 
-;;; SPRITE MACROS ;;;
-
-; set 'shield' sprite locations in form (x1, y1), (x2, y2)
-macro SetShieldLocations
-    copy [SPRITE_8_ADDRESS + OAMA_X], \1
-    copy [SPRITE_8_ADDRESS + OAMA_Y], \2
-    
-    copy [SPRITE_9_ADDRESS + OAMA_X], \3
-    copy [SPRITE_9_ADDRESS + OAMA_Y], \4
-endm
+;;; SPELL MACROS ;;;
 
 ; checks if a given sprite's x val is within a given range
 ; params:
@@ -213,17 +118,6 @@ macro CheckSpriteRange
                 set \4, a
                 ld [rCOLLISION], a
     .done_check\@
-endm
-
-; given an address in WRAM from (hl), get the OAM address there
-; and store in (hl)
-; NEW: store the address at (hl) in a given 16bit register
-macro WRAMToOAM
-    ld high(\1), [hl]
-    inc hl
-    ld low(\1), [hl]
-    ld h, high(\1)
-    ld l, low(\1)
 endm
 
 ; store the flags of spell sprite @ (hl) in a given reg
@@ -268,19 +162,6 @@ macro SpawnSpell
     inc hl
     ld [hl], SPELL_SPAWNX
     dec hl
-endm
-
-; params: sprite number, x val, y val
-macro SetSpriteXY
-    copy [(_OAMRAM + sizeof_OAM_ATTRS * \1) + OAMA_X], \2
-    copy [(_OAMRAM + sizeof_OAM_ATTRS * \1) + OAMA_Y], \3
-endm
-
-; params: sprite number, x val, y val, tile ID, flags
-macro SetSpriteData
-    SetSpriteXY \1, \2, \3
-    copy [(_OAMRAM + sizeof_OAM_ATTRS * \1) + OAMA_TILEID], \4
-    copy [(_OAMRAM + sizeof_OAM_ATTRS * \1) + OAMA_FLAGS], \5
 endm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
