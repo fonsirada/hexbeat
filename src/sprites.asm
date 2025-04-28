@@ -308,7 +308,7 @@ handle_collision:
     ld d, a
 
     ; set x val to 0
-    ld a, 0
+    xor a
     ld [hl], a
     ld bc, SPRITE_MEM_OFFSET
     add hl, bc
@@ -329,7 +329,7 @@ handle_bad_collision:
     ld d, a
 
     ; set x val to 0
-    ld a, 0
+    xor a
     ld [hl], a
     ld bc, SPRITE_MEM_OFFSET
     add hl, bc

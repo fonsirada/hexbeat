@@ -79,7 +79,7 @@ macro UpdateJoypad
         cp 5
         jr nz, .not_yet
             ; set flag saying its being long held
-            ld a, 0
+            xor a
             ld [PAD_LHOLD], a
             jr .disable_input
         .not_yet

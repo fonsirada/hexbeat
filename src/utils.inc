@@ -71,7 +71,7 @@ macro IncTimer
     ld a, [\1]
     cp a, \2
     jr nz, .finish_update\@
-        ld a, 0
+        xor a
     .finish_update\@
     inc a
     ld [\1], a
