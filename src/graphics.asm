@@ -156,7 +156,7 @@ update_window:
     ld hl, WIN_HEALTH_END
     .loop
         ld a, l
-        sub a, HEALTH_BAR_TILE_OFFSET
+        sub HEALTH_BAR_TILE_OFFSET
         ld b, a
 
         ld a, [rPC_HEALTH]
@@ -241,7 +241,7 @@ level_text:
     ld h, [hl]
     ld l, a
     CallHL
-    
+
     ret
 
 ; reads START press on the title screen and sets up the level screen

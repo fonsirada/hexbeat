@@ -56,7 +56,7 @@ init_sprite_data:
         ld a, SPELLF_OFF
         ld [hli], a
         ld a, l
-        cp a, low(SPELL_WRAM_START)
+        cp low(SPELL_WRAM_START)
         jr nz, .load_spell_flag
 
     ; put spell sprite addresses into WRAM
@@ -121,8 +121,8 @@ init_level_1:
     SetSpriteXY 13, SPELL_SPAWNX, SPELL_LOW_Y
     ret
 
-; init level 3's spells (+2)
-init_level_3:
+; init boss level's spells (+2)
+init_boss_level:
     ld a, high(Boss_Level)
     ld [WRAM_NOTEMAP], a
     ld a, low(Boss_Level)
@@ -184,7 +184,7 @@ update_sprites:
             jr nc, .update_x_movement
                 ; unflag ON
                 ld a, d
-                xor a, SPELLF_ON
+                xor SPELLF_ON
                 ld d, a
                 
                 ; set y-val to 0
@@ -213,7 +213,7 @@ update_sprites:
         ld [hl], e
         
         ; update sprite pt 2's x val
-        add a, OBJ16_OFFSET
+        add OBJ16_OFFSET
         inc hl
         ld [hl], a
 
@@ -233,7 +233,7 @@ update_sprites:
         add hl, bc
 
         ld a, [rSPELL_COUNT]
-        cp a, l
+        cp l
         jr nz, .update_spell_sprite
     .done_update
     RegBitOp rGAME, GAMEB_SPAWN, res
@@ -259,7 +259,7 @@ check_collisions:
         ld a, [hl]
         inc hl
 
-        cp a, SPELL_LOW_Y
+        cp SPELL_LOW_Y
         jr nz, .check_miss
             jr .run_check
     
@@ -271,7 +271,7 @@ check_collisions:
         ld a, [hl]
         inc hl
 
-        cp a, SPELL_HIGH_Y
+        cp SPELL_HIGH_Y
         jr nz, .check_miss
 
     .run_check
@@ -349,7 +349,7 @@ handle_bad_collision:
 ; runs if the player misses a note
 handle_miss:
     ld a, [hl]
-    cp a, DMG_THRES
+    cp DMG_THRES
     jr nc, .done
         ; start player flash
         ld a, PC_DMG_COUNT
@@ -367,7 +367,7 @@ check_spawn:
     push hl
 
     ld a, [WRAM_FRAME_COUNTER]
-    xor a, SPAWN_DELAY
+    xor SPAWN_DELAY
     jr nz, .done_spawn
         ld a, [rGAME]
         bit GAMEB_SPAWN, a
@@ -396,14 +396,14 @@ check_spawn:
             ;; SET OBJ FLAGS ;;
             ; if a = 1, set spawn low
             ld a, [hli]
-            xor a, $00
+            xor $00
             jr nz, .check_length
                 ld a, d
-                xor a, SPELLF_HIGH
+                xor SPELLF_HIGH
                 ld d, a
             .check_length
             ld a, [hl]
-            xor a, $00
+            xor $00
             jr z, .load_flags
                 set SPELLB_SPAWN, d
                 ld a, [rGAME]
@@ -452,4 +452,4 @@ spawn_spell:
     ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export init_sprite_data, init_sprites, init_level_1, init_level_3, update_sprites
+export init_sprite_data, init_sprites, init_level_1, init_boss_level, update_sprites

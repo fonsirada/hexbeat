@@ -93,38 +93,38 @@ macro UpdatePlayerAnim
 
         ; get sprite's tileID address
         ld a, l
-        add a, OAMA_TILEID
+        add OAMA_TILEID
         ld l, a
         ld a, [hl] 
 
         ; change tileID as appropriate
-        cp a, \3
+        cp \3
         jr c, .load_new_tileid
-            sub a, \3
+            sub \3
             jr .finish_tile_load
 
         .load_new_tileid
-            add a, PC_VRAM_ANIM_INT
+            add PC_VRAM_ANIM_INT
 
         .finish_tile_load
-        ld [hli], a ; replace w/ hli & remove below line
+        ld [hli], a
 
         ;; FLASH PALETTE ;;
         ld a, [rTIMER_DMG]
-        cp a, 0
+        or a
         jr z, .no_flash
-            cp a, (PC_DMG_COUNT + 1)
+            cp (PC_DMG_COUNT + 1)
             jr nc, .no_flash
                 dec a
                 ld [rTIMER_DMG], a
 
                 ld a, [hl]
-                xor a, OAMF_PAL1
+                xor OAMF_PAL1
                 ld [hl], a
                 jr .done_flash
         .no_flash
             ld a, [hl]
-            and a, OAMF_PAL0
+            and OAMF_PAL0
             ld [hl], a
         .done_flash
 
@@ -135,7 +135,7 @@ macro UpdatePlayerAnim
     
         ; check if last sprite was reached in WRAM
         ld a, l
-        cp a, low(\2)
+        cp low(\2)
         jr nz, .next_tile
 
     .end_update
@@ -160,11 +160,11 @@ macro SetPlayerCoord
     ld [SPRITE_0_ADDRESS + \2], a
     ld [SPRITE_1_ADDRESS + \2], a
     ld [SPRITE_2_ADDRESS + \2], a
-    add a, PC_VRAM_ANIM_INT
+    add PC_VRAM_ANIM_INT
     ld [SPRITE_3_ADDRESS + \2], a
     ld [SPRITE_4_ADDRESS + \2], a
     ld [SPRITE_5_ADDRESS + \2], a
-    sub a, PC_VRAM_ANIM_INT
+    sub PC_VRAM_ANIM_INT
 endm
 
 ; set 'shield' sprite locations in form (x1, y1), (x2, y2)
@@ -348,6 +348,7 @@ update_player:
         ld a, [rPC_ACOUNT]
         cp HIT_ANIM_LENGTH
         jr nz, .update_anim_a
+            ; long hold functionality
             ld a, [PAD_LHOLD]
             or a
             jr z, .hold_last_frame
@@ -379,4 +380,4 @@ update_player:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export jump, update_player, init_player, init_player_sprite_data, move_player_for_level
+export update_player, init_player, init_player_sprite_data, move_player_for_level

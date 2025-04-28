@@ -100,7 +100,7 @@ update_timers:
 ; game over and level checks
 is_game_over:
     ld a, [rPC_HEALTH]
-    cp a, 0
+    or a
     jr nz, .check_overflow
         RegBitOp rGAME, GAMEB_END, set
         jr .check_done
@@ -137,7 +137,7 @@ check_boss_level:
         ld a, [rGAME]
         bit GAMEB_BOSSLVL, a
         jr nz, .done_check
-            call init_level_3
+            call init_boss_level
             RegBitOp rGAME, GAMEB_BOSSLVL, set
     .done_check
     ret
