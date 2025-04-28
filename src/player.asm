@@ -149,7 +149,6 @@ init_player_sprite_data:
     Copy16BitVal [SPRITE_3_A_WRAM_LOCATION], [SPRITE_3_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 3
     Copy16BitVal [SPRITE_4_A_WRAM_LOCATION], [SPRITE_4_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 4
     Copy16BitVal [SPRITE_5_A_WRAM_LOCATION], [SPRITE_5_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 5
-
     ret
 
 ; animation for player hit high

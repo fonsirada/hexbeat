@@ -193,43 +193,69 @@ update_window:
 
     ret 
 
-; prints text on UI (window) that displays current level - ONE for 1, TWO for 2, BOSS for 3
-level_text:
+PrintLevelTable:
+    dw print_level_1
+    dw print_level_2
+    dw print_boss_level
+
+print_level_1:
     ld hl, LEVEL_TEXT_START
-
-    ld a, [rGAME]
-    bit GAMEB_BOSSLVL, a
-    jr z, .print_level_2
-        ld [hl], B_TILE_ID
-        inc hl
-        ld [hl], O_TILE_ID
-        inc hl
-        ld [hl], S_TILE_ID
-        inc hl
-        ld [hl], S_TILE_ID
-        inc hl
-        jr .done
-
-    .print_level_2
-    bit GAMEB_LVL2, a
-    jr z, .print_level_1
-        ld [hl], T_TILE_ID
-        inc hl
-        ld [hl], W_TILE_ID
-        inc hl
-        ld [hl], O_TILE_ID
-        inc hl
-        jr .done
-
-    .print_level_1
     ld [hl], O_TILE_ID
     inc hl
     ld [hl], N_TILE_ID
     inc hl
     ld [hl], E_TILE_ID
     inc hl
+    ret
 
-    .done
+print_level_2:
+    ld hl, LEVEL_TEXT_START
+    ld [hl], T_TILE_ID
+    inc hl
+    ld [hl], W_TILE_ID
+    inc hl
+    ld [hl], O_TILE_ID
+    inc hl
+    ret
+
+print_boss_level:
+    ld hl, LEVEL_TEXT_START
+    ld [hl], B_TILE_ID
+    inc hl
+    ld [hl], O_TILE_ID
+    inc hl
+    ld [hl], S_TILE_ID
+    inc hl
+    ld [hl], S_TILE_ID
+    inc hl
+    ret
+
+; prints text on UI (window) that displays current level - ONE for 1, TWO for 2, BOSS for 3
+level_text:
+    ld b, 0
+    ld a, [rGAME]
+    bit GAMEB_BOSSLVL, a
+    jr z, .check_lvl_2
+        ld b, 2
+        jr .got_level
+    
+    .check_lvl_2
+    bit GAMEB_LVL2, a
+    jr z, .got_level
+        ld b, 1
+
+    .got_level
+    ld d, 0
+    ld e, b
+    ld hl, PrintLevelTable
+    add hl, de
+    add hl, de
+
+    ld a, [hli]
+    ld h, [hl]
+    ld l, a
+    CallHL
+
     ret
 
 update_timers:

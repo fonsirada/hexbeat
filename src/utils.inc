@@ -98,6 +98,13 @@ macro EnableLCD
 
 endm
 
+macro CallHL
+    ld de, .call_return_address\@
+    push de
+    jp hl
+    .call_return_address\@
+endm
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 endc
