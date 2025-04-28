@@ -1,5 +1,5 @@
 ; 
-; CS-240 World 7: Feature complete game
+; CS-240 World 8: Your final, polished game
 ;
 ; @file joypad.inc
 ; @author Darren Strash, Sydney Chen, Alfonso Rada

@@ -1,5 +1,5 @@
 ; 
-; CS-240 World 7: Feature complete game
+; CS-240 World 8: Your final, polished game
 ;
 ; @file player.asm
 ; @author Sydney Chen, Alfonso Rada
@@ -18,14 +18,6 @@ section "player", rom0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; player sprites
-def SPRITE_0_ADDRESS                equ (_OAMRAM)
-def SPRITE_1_ADDRESS                equ (_OAMRAM + sizeof_OAM_ATTRS)
-def SPRITE_2_ADDRESS                equ (_OAMRAM + sizeof_OAM_ATTRS * 2)
-def SPRITE_3_ADDRESS                equ (_OAMRAM + sizeof_OAM_ATTRS * 3)
-def SPRITE_4_ADDRESS                equ (_OAMRAM + sizeof_OAM_ATTRS * 4)
-def SPRITE_5_ADDRESS                equ (_OAMRAM + sizeof_OAM_ATTRS * 5)
-
 def INITIAL_PLAYER_XY               equ 0
 
 def SPRITE_0_TILEID                 equ 0
@@ -39,19 +31,20 @@ def SPRITE_0_3_LEVEL_X              equ 20
 def SPRITE_1_4_LEVEL_X              equ 28
 def SPRITE_2_5_LEVEL_X              equ 36
 
-; location of 1st player sprite
-def SPRITE_0_A_WRAM_LOCATION        equ $C010
-def SPRITE_0_B_WRAM_LOCATION        equ $C011
-def SPRITE_1_A_WRAM_LOCATION        equ $C012
-def SPRITE_1_B_WRAM_LOCATION        equ $C013
-def SPRITE_2_A_WRAM_LOCATION        equ $C014
-def SPRITE_2_B_WRAM_LOCATION        equ $C015
-def SPRITE_3_A_WRAM_LOCATION        equ $C016
-def SPRITE_3_B_WRAM_LOCATION        equ $C017
-def SPRITE_4_A_WRAM_LOCATION        equ $C018
-def SPRITE_4_B_WRAM_LOCATION        equ $C019
-def SPRITE_5_A_WRAM_LOCATION        equ $C01A
-def SPRITE_5_B_WRAM_LOCATION        equ $C01B
+; player sprite locations in WRAM
+rsset _RAM + $10
+def PC_0A_WRAM       rb 1
+def PC_0B_WRAM       rb 1
+def PC_1A_WRAM       rb 1
+def PC_1B_WRAM       rb 1
+def PC_2A_WRAM       rb 1
+def PC_2B_WRAM       rb 1
+def PC_3A_WRAM       rb 1
+def PC_3B_WRAM       rb 1
+def PC_4A_WRAM       rb 1
+def PC_4B_WRAM       rb 1
+def PC_5A_WRAM       rb 1
+def PC_5B_WRAM       rb 1
 
 def JUMP_INCREMENT                  equ 8
 def JUMP_HOLD_Y                     equ 60
@@ -143,12 +136,12 @@ move_player_for_level:
 
 ; put PC sprite ids in WRAM
 init_player_sprite_data:
-    Copy16BitVal [SPRITE_0_A_WRAM_LOCATION], [SPRITE_0_B_WRAM_LOCATION], _OAMRAM
-    Copy16BitVal [SPRITE_1_A_WRAM_LOCATION], [SPRITE_1_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 1
-    Copy16BitVal [SPRITE_2_A_WRAM_LOCATION], [SPRITE_2_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 2
-    Copy16BitVal [SPRITE_3_A_WRAM_LOCATION], [SPRITE_3_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 3
-    Copy16BitVal [SPRITE_4_A_WRAM_LOCATION], [SPRITE_4_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 4
-    Copy16BitVal [SPRITE_5_A_WRAM_LOCATION], [SPRITE_5_B_WRAM_LOCATION], _OAMRAM + sizeof_OAM_ATTRS * 5
+    Copy16BitVal [PC_0A_WRAM], [PC_0B_WRAM], _OAMRAM
+    Copy16BitVal [PC_1A_WRAM], [PC_1B_WRAM], _OAMRAM + sizeof_OAM_ATTRS * 1
+    Copy16BitVal [PC_2A_WRAM], [PC_2B_WRAM], _OAMRAM + sizeof_OAM_ATTRS * 2
+    Copy16BitVal [PC_3A_WRAM], [PC_3B_WRAM], _OAMRAM + sizeof_OAM_ATTRS * 3
+    Copy16BitVal [PC_4A_WRAM], [PC_4B_WRAM], _OAMRAM + sizeof_OAM_ATTRS * 4
+    Copy16BitVal [PC_5A_WRAM], [PC_5B_WRAM], _OAMRAM + sizeof_OAM_ATTRS * 5
     ret
 
 ; animation for player hit high
@@ -156,7 +149,7 @@ player_hit_high:
     ld a, [rPLAYER]
     bit PLAYERB_HOLD, a
     jr nz, .extend_frame
-        UpdatePlayerAnim SPRITE_0_A_WRAM_LOCATION, SPRITE_ANIM_WRAM_THRES, SPRITE_HIT_HIGH_THRES_TILEID
+        UpdatePlayerAnim PC_0A_WRAM, SPRITE_ANIM_WRAM_THRES, SPRITE_HIT_HIGH_THRES_TILEID
         jr .end_frame_update
 
     .extend_frame
@@ -176,7 +169,7 @@ player_hit_low:
     ld a, [rPLAYER]
     bit PLAYERB_HOLD, a
     jr nz, .extend_frame
-        UpdatePlayerAnim SPRITE_0_A_WRAM_LOCATION, SPRITE_ANIM_WRAM_THRES, SPRITE_HIT_LOW_THRES_TILEID
+        UpdatePlayerAnim PC_0A_WRAM, SPRITE_ANIM_WRAM_THRES, SPRITE_HIT_LOW_THRES_TILEID
         jr .end_frame_update
 
     .extend_frame
@@ -257,7 +250,7 @@ update_player:
     RegBitOp rPLAYER, PLAYERB_B, res
     RegBitOp rPLAYER, PLAYERB_A, res
     SetPlayerCoord MC_TOP_Y, OAMA_Y
-    UpdatePlayerAnim SPRITE_0_A_WRAM_LOCATION, SPRITE_ANIM_WRAM_THRES, SPRITE_RUN_THRES_TILEID
+    UpdatePlayerAnim PC_0A_WRAM, SPRITE_ANIM_WRAM_THRES, SPRITE_RUN_THRES_TILEID
 
     .done_update
     ret

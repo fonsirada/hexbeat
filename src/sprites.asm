@@ -1,5 +1,5 @@
 ; 
-; CS-240 World 7: Feature complete game
+; CS-240 World 8: Your final, polished game
 ;
 ; @file sprites.asm
 ; @author Sydney Chen, Alfonso Rada
@@ -26,7 +26,7 @@ def SPELL1B_TILEID         equ $1E
 def SPELL2A_TILEID         equ $2E
 def SPELL2B_TILEID         equ $3E
 
-def SPAWN_DELAY            equ 10
+def SPAWN_DELAY            equ 9 
 def SPRITE_MEM_OFFSET      equ $0004
 def SPRITE_P2_Y            equ $0003
 
