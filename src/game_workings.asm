@@ -21,8 +21,56 @@ def OBJ_ANIMATION_TIMER             equ 1
 
 section "game_workings", rom0
 
-; init registers
-; set up game and player settings
+; initializes the game
+initialize:
+    DisableLCD
+
+    call init_graphics
+    call init_sound
+    call init_registers
+    call init_sprite_data
+    call init_player
+    call init_sprites
+
+    InitJoypad
+
+    EnableLCD
+
+    ret
+
+; updates the game, only if the game has been started and has not been ended
+update_game:
+    ld a, [rGAME]
+    bit GAMEB_START, a
+    jr z, .return
+        bit GAMEB_END, a
+        jr z, .updates
+            ; set up game over screen when game ends
+            call game_over
+            ld a, [rGAME]
+            bit GAMEB_END, a
+            jr nz, .return
+                ; reinitialize game if restarted
+                call initialize
+                jr .return
+    
+        .updates
+        call update_timers
+        call update_graphics
+        halt
+        call update_sprites
+        halt
+        call update_player
+        call check_level_2
+        call check_boss_level
+        call update_sound
+        call is_game_over
+        
+    .return
+    UpdateJoypad
+    ret
+
+; init registers - set up game and player settings
 init_registers:
     ld a, GAMEF_BASE 
     ld [rGAME], a
@@ -94,4 +142,4 @@ check_boss_level:
     ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-export init_registers, update_timers, is_game_over, check_level_2, check_boss_level
+export initialize, update_game

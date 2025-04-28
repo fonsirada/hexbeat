@@ -73,6 +73,10 @@ def W_TILE_ID                       equ $1E
 def B_TILE_ID                       equ $F9
 def S_TILE_ID                       equ $1A
 
+def LVL_1_TABLE_INDEX               equ 0
+def LVL_2_TABLE_INDEX               equ 1
+def BOSS_LVL_TABLE_INDEX            equ 2
+
 ; start on row 2 of screen which starts at $9880
 def TEXT_START_LOCATION             equ $9880
 def NEW_LINE                        equ $0A
@@ -131,11 +135,9 @@ init_graphics:
 
     ret
 
-
 update_graphics:
     CheckTimer rTIMER_BG, UPDATE_FRAME
     jr nz, .done_update
-
         ; scroll bg
         ld a, [rSCX]
         add BG_SCROLL_SPEED
@@ -213,17 +215,18 @@ print_boss_level:
 
 ; prints text on UI (window) that displays current level - ONE for 1, TWO for 2, BOSS for 3
 level_text:
-    ld b, 0
+    ld b, LVL_1_TABLE_INDEX
+
     ld a, [rGAME]
     bit GAMEB_BOSSLVL, a
     jr z, .check_lvl_2
-        ld b, 2
+        ld b, BOSS_LVL_TABLE_INDEX
         jr .got_level
     
     .check_lvl_2
     bit GAMEB_LVL2, a
     jr z, .got_level
-        ld b, 1
+        ld b, LVL_2_TABLE_INDEX
 
     .got_level
     ld d, 0
@@ -236,7 +239,7 @@ level_text:
     ld h, [hl]
     ld l, a
     CallHL
-
+    
     ret
 
 ; reads START press on the title screen and sets up the level screen
