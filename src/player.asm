@@ -32,7 +32,7 @@ def SPRITE_1_4_LEVEL_X              equ 28
 def SPRITE_2_5_LEVEL_X              equ 36
 
 ; player sprite locations in WRAM
-rsset _RAM + $10
+rsset _RAM + $14
 def PC_0A_WRAM       rb 1
 def PC_0B_WRAM       rb 1
 def PC_1A_WRAM       rb 1
@@ -46,11 +46,12 @@ def PC_4B_WRAM       rb 1
 def PC_5A_WRAM       rb 1
 def PC_5B_WRAM       rb 1
 
+
 def JUMP_INCREMENT                  equ 8
 def JUMP_HOLD_Y                     equ 60
 
 ; no more sprites at and including this wram address
-def SPRITE_ANIM_WRAM_THRES          equ $C01C
+def SPRITE_ANIM_WRAM_THRES          equ PC_5B_WRAM + 1
 ; hit high animation stops at this tile
 def SPRITE_HIT_HIGH_THRES_TILEID    equ $90
 ; hit low animation stops AND hit high animation begins at this tile
@@ -58,8 +59,8 @@ def SPRITE_HIT_LOW_THRES_TILEID     equ $60
 ; run animation stops AND hit low animation begins at this tile
 def SPRITE_RUN_THRES_TILEID         equ $30
 
-def HIT_HIGH_SHIELD_Y               equ MC_TOP_Y - 20
-def HIT_LOW_SHIELD_Y                equ MC_TOP_Y + 16
+def HIT_HIGH_SHIELD_Y               equ PC_TOP_Y - 20
+def HIT_LOW_SHIELD_Y                equ PC_TOP_Y + 16
 def SHIELD_X                        equ 44
 
 def FRAME_TO_HOLD                   equ $3
@@ -103,7 +104,7 @@ macro UpdatePlayerAnim
             jr .finish_tile_load
 
         .load_new_tileid
-            add a, MC_VRAM_ANIM_INT
+            add a, PC_VRAM_ANIM_INT
 
         .finish_tile_load
         ld [hli], a ; replace w/ hli & remove below line
@@ -159,11 +160,11 @@ macro SetPlayerCoord
     ld [SPRITE_0_ADDRESS + \2], a
     ld [SPRITE_1_ADDRESS + \2], a
     ld [SPRITE_2_ADDRESS + \2], a
-    add a, MC_VRAM_ANIM_INT
+    add a, PC_VRAM_ANIM_INT
     ld [SPRITE_3_ADDRESS + \2], a
     ld [SPRITE_4_ADDRESS + \2], a
     ld [SPRITE_5_ADDRESS + \2], a
-    sub a, MC_VRAM_ANIM_INT
+    sub a, PC_VRAM_ANIM_INT
 endm
 
 ; set 'shield' sprite locations in form (x1, y1), (x2, y2)
@@ -178,37 +179,37 @@ endm
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 init_player:
-    ; MC.00
+    ; PC.00
     copy [SPRITE_0_ADDRESS + OAMA_Y], INITIAL_PLAYER_XY
     copy [SPRITE_0_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
     copy [SPRITE_0_ADDRESS + OAMA_TILEID], SPRITE_0_TILEID
     copy [SPRITE_0_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
-    ; MC.01
+    ; PC.01
     copy [SPRITE_1_ADDRESS + OAMA_Y], INITIAL_PLAYER_XY
     copy [SPRITE_1_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
     copy [SPRITE_1_ADDRESS + OAMA_TILEID], SPRITE_1_TILEID
     copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
-    ; MC.02
+    ; PC.02
     copy [SPRITE_2_ADDRESS + OAMA_Y], INITIAL_PLAYER_XY
     copy [SPRITE_2_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
     copy [SPRITE_2_ADDRESS + OAMA_TILEID], SPRITE_2_TILEID
     copy [SPRITE_2_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
-    ; MC.10
+    ; PC.10
     copy [SPRITE_3_ADDRESS + OAMA_Y], INITIAL_PLAYER_XY
     copy [SPRITE_3_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
     copy [SPRITE_3_ADDRESS + OAMA_TILEID], SPRITE_3_TILEID
     copy [SPRITE_3_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
-    ; MC.11
+    ; PC.11
     copy [SPRITE_4_ADDRESS + OAMA_Y], INITIAL_PLAYER_XY
     copy [SPRITE_4_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
     copy [SPRITE_4_ADDRESS + OAMA_TILEID], SPRITE_4_TILEID
     copy [SPRITE_4_ADDRESS + OAMA_FLAGS], OAMF_PAL0
 
-    ; MC.12
+    ; PC.12
     copy [SPRITE_5_ADDRESS + OAMA_Y], INITIAL_PLAYER_XY
     copy [SPRITE_5_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
     copy [SPRITE_5_ADDRESS + OAMA_TILEID], SPRITE_5_TILEID
@@ -217,28 +218,28 @@ init_player:
     ret
 
 move_player_for_level:
-    ; MC.00
-    copy [SPRITE_0_ADDRESS + OAMA_Y], MC_TOP_Y
+    ; PC.00
+    copy [SPRITE_0_ADDRESS + OAMA_Y], PC_TOP_Y
     copy [SPRITE_0_ADDRESS + OAMA_X], SPRITE_0_3_LEVEL_X
 
-    ; MC.01
-    copy [SPRITE_1_ADDRESS + OAMA_Y], MC_TOP_Y
+    ; PC.01
+    copy [SPRITE_1_ADDRESS + OAMA_Y], PC_TOP_Y
     copy [SPRITE_1_ADDRESS + OAMA_X], SPRITE_1_4_LEVEL_X
 
-    ; MC.02
-    copy [SPRITE_2_ADDRESS + OAMA_Y], MC_TOP_Y
+    ; PC.02
+    copy [SPRITE_2_ADDRESS + OAMA_Y], PC_TOP_Y
     copy [SPRITE_2_ADDRESS + OAMA_X], SPRITE_2_5_LEVEL_X
 
-    ; MC.10
-    copy [SPRITE_3_ADDRESS + OAMA_Y], MC_BOT_Y
+    ; PC.10
+    copy [SPRITE_3_ADDRESS + OAMA_Y], PC_BOT_Y
     copy [SPRITE_3_ADDRESS + OAMA_X], SPRITE_0_3_LEVEL_X
 
-    ; MC.11
-    copy [SPRITE_4_ADDRESS + OAMA_Y], MC_BOT_Y
+    ; PC.11
+    copy [SPRITE_4_ADDRESS + OAMA_Y], PC_BOT_Y
     copy [SPRITE_4_ADDRESS + OAMA_X], SPRITE_1_4_LEVEL_X
 
-    ; MC.12
-    copy [SPRITE_5_ADDRESS + OAMA_Y], MC_BOT_Y
+    ; PC.12
+    copy [SPRITE_5_ADDRESS + OAMA_Y], PC_BOT_Y
     copy [SPRITE_5_ADDRESS + OAMA_X], SPRITE_2_5_LEVEL_X
 
     ret
@@ -335,7 +336,7 @@ update_player:
             jr .update_a
 
         .update_anim_b
-            SetPlayerCoord MC_TOP_Y, OAMA_Y
+            SetPlayerCoord PC_TOP_Y, OAMA_Y
             call player_hit_low
             RegOp rPC_ACOUNT, inc
             jp .done_update 
@@ -370,7 +371,7 @@ update_player:
     .update_run
         RegBitOp rPLAYER, PLAYERB_B, res
         RegBitOp rPLAYER, PLAYERB_A, res
-        SetPlayerCoord MC_TOP_Y, OAMA_Y
+        SetPlayerCoord PC_TOP_Y, OAMA_Y
         UpdatePlayerAnim PC_0A_WRAM, SPRITE_ANIM_WRAM_THRES, SPRITE_RUN_THRES_TILEID
 
     .done_update

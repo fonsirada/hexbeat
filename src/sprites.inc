@@ -48,13 +48,14 @@ def SPRITE_25_ADDRESS               rb sizeof_OAM_ATTRS
 
 def OBJ16_OFFSET           equ 8
 
-def MC_TOP_Y               equ (80)
-def MC_BOT_Y               equ (MC_TOP_Y + 16)
-def MC_JUMP_THRES          equ (MC_TOP_Y - 24)
-def MC_VRAM_ANIM_INT       equ $10
+def PC_TOP_Y               equ (80)
+def PC_BOT_Y               equ (PC_TOP_Y + 16)
+def PC_JUMP_THRES          equ (PC_TOP_Y - 24)
+def PC_VRAM_ANIM_INT       equ $10
+def PC_DMG_COUNT     equ (4 * 6)
 
-def TARGET_HIGH_Y          equ (MC_TOP_Y - 16)
-def TARGET_LOW_Y           equ (MC_TOP_Y + 16)
+def TARGET_HIGH_Y          equ (PC_TOP_Y - 16)
+def TARGET_LOW_Y           equ (PC_TOP_Y + 16)
 def TARGET_X               equ 50
 
 def SPELL_HIGH_Y           equ (TARGET_HIGH_Y - 4)
