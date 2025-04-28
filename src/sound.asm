@@ -21,6 +21,7 @@ Ch1_Notes:
 ;continuous example notes (scale)
 dw $060b, $0642, $0672, $0689, $06b2, $06d6, $06f7, $0706
 
+; add additional byte for "length between notes" val
 Ch2_Notes:
 dw $c689, $c6b2, $c6c4, $c6c4, $c689, $c6b2, $c6c4, $c6b2
 dw $8689, $86b2, $86c4, $86c4, $8689, $86b2, $86c4, $86b2
