@@ -36,6 +36,7 @@ PrintLevelTable:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; GRAPHICS INFO
 def TILES_COUNT                     equ (384)
 def BYTES_PER_TILE                  equ (16)
 def TILES_BYTE_SIZE                 equ (TILES_COUNT * BYTES_PER_TILE)
@@ -48,11 +49,12 @@ def GRAPHICS_DATA_SIZE              equ (TILES_BYTE_SIZE + TILEMAPS_BYTE_SIZE)
 def GRAPHICS_DATA_ADDRESS_END       equ ($8000)
 def GRAPHICS_DATA_ADDRESS_START     equ (GRAPHICS_DATA_ADDRESS_END - GRAPHICS_DATA_SIZE)
 
-def UPDATE_FRAME                    equ 1
-def BG_SCROLL_SPEED                 equ 2
-
 def PALETTE_0                       equ %11100100
 def PALETTE_1                       equ %00011011
+
+; BG & WINDOW
+def UPDATE_FRAME                    equ 1
+def BG_SCROLL_SPEED                 equ 2
 
 def START_SCY                       equ 120
 def START_SCX                       equ 0
@@ -65,6 +67,7 @@ def HEALTH_HALF_TILEID              equ $3D
 def HEALTH_EMPTY_TILEID             equ $3E
 def HEALTH_FULL_TILEID              equ $3C
 
+; TEXT
 def O_TILE_ID                       equ $0E
 def N_TILE_ID                       equ $0D
 def E_TILE_ID                       equ $FC
@@ -77,7 +80,6 @@ def LVL_1_TABLE_INDEX               equ 0
 def LVL_2_TABLE_INDEX               equ 1
 def BOSS_LVL_TABLE_INDEX            equ 2
 
-; start on row 2 of screen which starts at $9880
 def TEXT_START_LOCATION             equ $9880
 def NEW_LINE                        equ $0A
 def END_OF_STRING                   equ 0

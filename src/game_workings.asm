@@ -17,6 +17,7 @@ def PLAYER_HEALTH                   equ 10
 def BG_ANIMATION_TIMER              equ 1
 def PC_ANIMATION_TIMER              equ 3
 def OBJ_ANIMATION_TIMER             equ 1
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 section "game_workings", rom0
@@ -31,11 +32,9 @@ initialize:
     call init_sprite_data
     call init_player
     call init_sprites
-
     InitJoypad
 
     EnableLCD
-
     ret
 
 ; updates the game, only if the game has been started and has not been ended
@@ -57,10 +56,12 @@ update_game:
         .updates
         call update_timers
         call update_graphics
+        
         halt
         call update_sprites
         halt
         call update_player
+
         call check_level_2
         call check_boss_level
         call update_sound
