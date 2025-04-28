@@ -36,6 +36,7 @@ def rTIMER_PC        rb 1
 def rTIMER_OBJ       rb 1
 def rTIMER_DMG       rb 1
 def rSPELL_COUNT     rb 1
+def rGAME_LVL        rb 1
 
 ;;; SOUND 
 rsset (_RAM + $60)
@@ -49,15 +50,11 @@ def WRAM_NOTEMAP                    rb 2
 def GAMEF_BASE       equ %00000000
 def GAMEF_START      equ %00000001
 def GAMEF_END        equ %00000010
-def GAMEF_LVL2       equ %00000100
-def GAMEF_BOSSLVL    equ %00001000
 def GAMEF_END_PRINT  equ %01000000
 def GAMEF_SPAWN      equ %10000000
 
 def GAMEB_START      equ 0
 def GAMEB_END        equ 1
-def GAMEB_LVL2       equ 2
-def GAMEB_BOSSLVL    equ 3
 def GAMEB_END_PRINT  equ 6
 def GAMEB_SPAWN      equ 7
 

@@ -110,6 +110,7 @@ init_sprites:
 
 ; init level 1 targets & two spells
 init_level_1:
+    copy [rGAME_LVL], 0
     ; TARGETS
     SetSpriteXY 6, TARGET_X, TARGET_HIGH_Y
     SetSpriteXY 7, TARGET_X, TARGET_LOW_Y
@@ -121,8 +122,14 @@ init_level_1:
     SetSpriteXY 13, SPELL_SPAWNX, SPELL_LOW_Y
     ret
 
+; init level 2 spells
+init_level_2:
+    copy [rGAME_LVL], 1
+    ret
+
 ; init boss level's spells (+2)
 init_boss_level:
+    copy [rGAME_LVL], 2
     ld a, high(Boss_Level)
     ld [WRAM_NOTEMAP], a
     ld a, low(Boss_Level)
@@ -401,9 +408,10 @@ check_spawn:
             ld c, a
     
             ; load note + note index
-            ld a, [rGAME]
-            bit GAMEB_BOSSLVL, a
-            jr z, .load_map
+            ld a, [rGAME_LVL]
+            ; boss level is 2 in rGAME_LVL
+            cp 2
+            jr nz, .load_map
                 ld a, [WRAM_NOTEMAP]
                 ld h, a
                 ld a, [WRAM_NOTEMAP + 1]
