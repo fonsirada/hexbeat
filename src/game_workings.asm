@@ -81,6 +81,7 @@ init_registers:
     ld [rTIMER_PC], a
     ld [rTIMER_OBJ], a
     ld [rTIMER_DMG], a
+    ld [rGAME_LVL], a
 
     ; load player-related values
     ld [rPLAYER], a
@@ -116,10 +117,10 @@ check_level_2:
     ld a, [rGAME_DIFF]
     cp a, GAME_DIFF_THRES_LVL2
     jr nz, .done_check
-        ld a, [rGAME]
-        bit GAMEB_LVL2, a
+        ld a, [rGAME_LVL]
+        or a
         jr nz, .done_check
-            RegBitOp rGAME, GAMEB_LVL2, set
+            call init_level_2
     .done_check
     ret
 
@@ -134,11 +135,12 @@ check_boss_level:
     .check_boss_level_thres
     cp GAME_DIFF_THRES_BOSSLVL
     jr nz, .done_check
-        ld a, [rGAME]
-        bit GAMEB_BOSSLVL, a
+        ld a, [rGAME_LVL]
+        ; level 2 is 1 in rGAME_LVL
+        cp 1
         jr nz, .done_check
             call init_boss_level
-            RegBitOp rGAME, GAMEB_BOSSLVL, set
+
     .done_check
     ret
 
