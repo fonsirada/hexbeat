@@ -165,6 +165,24 @@ macro SpawnSpell
     dec hl
 endm
 
+
+; given sprite address (hl) and flags as param (in d)
+; despawns a spell
+macro DespawnSpell
+    ; unflag ON
+    ld a, \1
+    xor SPELLF_ON
+    ld \1, a
+    
+    ; set y-val to 0
+    dec hl
+    ld [hl], 0
+    
+    ld bc, SPRITE_MEM_OFFSET
+    add hl, bc
+    ld [hl], 0
+endm
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 endc

@@ -3,6 +3,10 @@
 # Notes data from C2 to B8
 # 20 * 34 + 8 = 688
 # 7 * 2 * (8 - 2) = 84
+NoteTable = {
+    
+}
+
 
 NoteTable = {
     """
@@ -66,3 +70,47 @@ def print_notes(music):
     for note in music:
         print(note[0] + note[1])
     return 0
+
+"""
+    ld a, [WRAM_NOTE_NUMBER]
+    ld c, a
+    sla a
+    ld h, 0
+    ld l, a
+    sla l
+    rl h
+    sla l
+    rl h
+
+    ld a, c
+    cpl
+    inc a
+    ld c, a
+    ld a, $FF
+    adc a, 0
+    ld b, a
+
+    add hl, bc
+    ld de, NoteTable + NOTE_FREQUENCY_CH124
+    add hl, de
+
+    ; load the frequency low bits
+    ld a, [hli]
+    ld [WRAM_CH2_REGISTER + 2], a
+
+    push hl
+    DisplayRegisterA 16, 17
+    pop hl
+
+    ; load the frequency high bits and set the start/length flags
+    ld b, $C0
+    ld a, [WRAM_LENGTH_INDEX]
+    or a, a
+    jr nz, .length_off
+        ld b, $80
+    .length_off
+
+    ld a, [hl]
+    or a, b
+    ld [WRAM_CH2_REGISTER + 3], a
+"""

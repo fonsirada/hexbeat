@@ -28,7 +28,7 @@ def SPELL2B_TILEID         equ $3E
 
 def SPAWN_DELAY            equ 9 
 def SPRITE_MEM_OFFSET      equ $0004
-def SPRITE_P2_Y            equ $0003
+def SPELL_P2_Y_OFFSET      equ $0003
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; NOTE FORMAT:
@@ -137,9 +137,42 @@ init_boss_level:
     SetSpriteXY 17, SPELL_SPAWNX, SPELL_LOW_Y
     ret
 
+; loops thru all active spell sprites in WRAM and checks if they
+; should be spawned
+update_sprites_spawning:
+    CheckTimer rTIMER_OBJ, 1
+    jr nz, .done_update
+
+    ld hl, SPELL_WRAM_START
+    .update_spell_sprite
+        ; preserve OG WRAM address 
+        push hl
+        
+        ; get flags in (d) and address in (hl)
+        GetSpriteFlags d
+        WRAMToOAM bc
+
+        ; if spell is off, check if it should be spawned
+        bit SPELLB_ON, d
+        jr nz, .to_next_sprite
+            call check_spawn
+
+        .to_next_sprite
+        ; restore and move to next WRAM loc
+        pop hl
+        SetSpriteFlags d
+        ld bc, SPRITE_MEM_OFFSET
+        add hl, bc
+
+        ld a, [rSPELL_COUNT]
+        cp l
+        jr nz, .update_spell_sprite
+    .done_update
+    RegBitOp rGAME, GAMEB_SPAWN, res
+    ret 
+
 ; loops thru all active sprites in WRAM and updates them
 ; NOTE: returns hl and d for handle_collision and handle_miss
-; working ver w/ new sprite system
 update_sprites:
     CheckTimer rTIMER_OBJ, 1
     jr nz, .done_update
@@ -159,7 +192,6 @@ update_sprites:
             
         ; ---- IF SPELL IS OFF... ---- ;
             ; HANDLE SPELL SPAWNING ;
-            call check_spawn
             bit SPELLB_SPAWN, d
             jr z, .skip_spawn
                 call spawn_spell
@@ -182,19 +214,7 @@ update_sprites:
             ; HANDLE SPELL DESPAWNING ;
             cp a, DMG_THRES
             jr nc, .update_x_movement
-                ; unflag ON
-                ld a, d
-                xor SPELLF_ON
-                ld d, a
-                
-                ; set y-val to 0
-                dec hl
-                ld [hl], 0
-                
-                ld bc, SPRITE_MEM_OFFSET
-                add hl, bc
-                ld [hl], 0
-                
+                DespawnSpell d
                 pop hl
                 jr .to_next_sprite
                 
@@ -208,7 +228,7 @@ update_sprites:
         inc hl
 
         ; update sprite pt 2's y val
-        ld bc, SPRITE_P2_Y
+        ld bc, SPELL_P2_Y_OFFSET
         add hl, bc
         ld [hl], e
         
@@ -236,7 +256,6 @@ update_sprites:
         cp l
         jr nz, .update_spell_sprite
     .done_update
-    RegBitOp rGAME, GAMEB_SPAWN, res
     ret
 
 ; check if the given spell obj in (hl) has been hit 
@@ -322,6 +341,7 @@ handle_collision:
     ret
 
 ; handle collision w/ bad timing
+; note: only called in check_collisions
 handle_bad_collision:
     ; set off flag
     ld a, d
@@ -347,6 +367,7 @@ handle_bad_collision:
     ret
 
 ; runs if the player misses a note
+; note: only called in check_collisions
 handle_miss:
     ld a, [hl]
     cp DMG_THRES
@@ -401,6 +422,8 @@ check_spawn:
                 ld a, d
                 xor SPELLF_HIGH
                 ld d, a
+            
+            ; if the note length is >0, set spawn
             .check_length
             ld a, [hl]
             xor $00
@@ -452,4 +475,4 @@ spawn_spell:
     ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export init_sprite_data, init_sprites, init_level_1, init_boss_level, update_sprites
+export init_sprite_data, init_sprites, init_level_1, init_boss_level, update_sprites, update_sprites_spawning
