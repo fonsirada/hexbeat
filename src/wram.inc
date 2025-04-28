@@ -35,8 +35,7 @@ def rTIMER_BG        rb 1
 def rTIMER_PC        rb 1
 def rTIMER_OBJ       rb 1
 def rTIMER_DMG       rb 1
-
-def rSPELL_COUNT     equ $C01F
+def rSPELL_COUNT     rb 1
 
 ;;; SOUND 
 rsset (_RAM + $60)
@@ -106,10 +105,9 @@ def SPELLB_ON        equ 0
 ; SPELL WRAM
 def SPELL_FLAG_START    equ ($C020)
 def SPELL_FLAG_INTERVAL equ (2)
-def SPELLF_WRAM_OFFSET  equ $20 ; old: $10 | new: $20
-def SPELL_WRAM_START    equ $C040 ; old: $C030 | new: $C040
-def SPELL_WRAM_END      equ $C050 ; old: $C040 | new: $C050/60
-; note: for 8 sprites, set wram_end to $C060
+def SPELLF_WRAM_OFFSET  equ $20
+def SPELL_WRAM_START    equ $C040
+def SPELL_WRAM_END      equ $C050 ; $C060 for 8 sprites
 
 ;;; GAME DIFFICULTY
 def LVL1_SPELL_NUM          equ low(SPELL_WRAM_END - $8)
@@ -118,7 +116,7 @@ def GAME_DIFF_THRES_LVL2    equ 16
 def GAME_DIFF_THRES_BOSSLVL equ 32
 def GAME_DIFF_THRES_WIN     equ 56
 
-def PC_DMG_COUNT     equ (4 * 6)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 endc
