@@ -28,6 +28,12 @@ YOU_WIN:
     db $28, $0E, $1C, $2A, $1E, $08, $0D, $0A, $0F, $19, $FC, $1A, $1A, $2A, $1A,\
     $FC, $0B, $FC, $FA, $1B, $0A, $1B, $0E, $2A, $0F, $0B, $F8, $28, $2A, $F8, $FE, $F8, $08, $0D, $00
 
+PrintLevelTable:
+    ; function addresses for printing level text on the UI
+    dw print_level_1
+    dw print_level_2
+    dw print_boss_level
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 def TILES_COUNT                     equ (384)
@@ -172,11 +178,6 @@ update_window:
         jr nz, .loop
 
     ret 
-
-PrintLevelTable:
-    dw print_level_1
-    dw print_level_2
-    dw print_boss_level
 
 print_level_1:
     ld hl, LEVEL_TEXT_START
