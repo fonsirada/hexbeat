@@ -1,17 +1,12 @@
 # CS 240 Game Boy Game
-
-You are not allowed to post any code or assets from this game until the end of the semester.
-
-Once the semester is over, you can make your repo public and even make your game playable online!
----
-
-README draft:
+> [example banner]
 
 **[GAME TITLE]** is a short rhythm game made for the original Nintendo Game Boy. Defend yourself by timing your defensive shields to the music, and survive until the end!
 
 # Table of Contents
-* How to Play
-* How to Build
+1. [How to Play](#how-to-play)
+2. [How to Build](#how-to-build)
+3. [Adding Custom Songs](#adding-custom-songs)
 
 ---
 
@@ -45,5 +40,5 @@ cd game-sydney-alfonso
 make
 ```
 ---
-# Adding Custom Songs
+# Adding Custom Songs:
 
