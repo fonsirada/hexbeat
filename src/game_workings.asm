@@ -1,5 +1,5 @@
 ; 
-; CS-240 World 8: [name]
+; CS-240 World 8: Your final, polished game
 ;
 ; @file game_workings.asm
 ; @author Darren Strash, Sydney Chen, Alfonso Rada

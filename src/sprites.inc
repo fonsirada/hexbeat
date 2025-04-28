@@ -1,5 +1,5 @@
 ; 
-; CS-240 World 7: Feature complete game
+; CS-240 World 8: Your final, polished game
 ;
 ; @file sprites.inc
 ; @author Sydney Chen, Alfonso Rada
@@ -11,31 +11,40 @@ def SPRITES_RGBINC equ 1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; PLAYER SPRITES
+rsset _OAMRAM
+def SPRITE_0_ADDRESS                rb sizeof_OAM_ATTRS
+def SPRITE_1_ADDRESS                rb sizeof_OAM_ATTRS
+def SPRITE_2_ADDRESS                rb sizeof_OAM_ATTRS
+def SPRITE_3_ADDRESS                rb sizeof_OAM_ATTRS
+def SPRITE_4_ADDRESS                rb sizeof_OAM_ATTRS
+def SPRITE_5_ADDRESS                rb sizeof_OAM_ATTRS
+
 ; TARGETS
-def SPRITE_6_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 6)
-def SPRITE_7_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 7)
+def SPRITE_6_ADDRESS                rb sizeof_OAM_ATTRS
+def SPRITE_7_ADDRESS                rb sizeof_OAM_ATTRS
 
 ; PLAYER 'SHIELD'
-def SPRITE_8_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 8)
-def SPRITE_9_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 9)
+def SPRITE_8_ADDRESS                rb sizeof_OAM_ATTRS
+def SPRITE_9_ADDRESS                rb sizeof_OAM_ATTRS
 
 ; SPELL OBJS
-def SPRITE_10_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 10)
-def SPRITE_11_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 11)
-def SPRITE_12_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 12)
-def SPRITE_13_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 13)
-def SPRITE_14_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 14)
-def SPRITE_15_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 15)
-def SPRITE_16_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 16)
-def SPRITE_17_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 17)
-def SPRITE_18_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 18)
-def SPRITE_19_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 19)
-def SPRITE_20_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 20)
-def SPRITE_21_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 21)
-def SPRITE_22_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 22)
-def SPRITE_23_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 23)
-def SPRITE_24_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 24)
-def SPRITE_25_ADDRESS equ (_OAMRAM + sizeof_OAM_ATTRS * 25)
+def SPRITE_10_ADDRESS               rb sizeof_OAM_ATTRS
+def SPRITE_11_ADDRESS               rb sizeof_OAM_ATTRS
+def SPRITE_12_ADDRESS               rb sizeof_OAM_ATTRS
+def SPRITE_13_ADDRESS               rb sizeof_OAM_ATTRS
+def SPRITE_14_ADDRESS               rb sizeof_OAM_ATTRS
+def SPRITE_15_ADDRESS               rb sizeof_OAM_ATTRS
+def SPRITE_16_ADDRESS               rb sizeof_OAM_ATTRS
+def SPRITE_17_ADDRESS               rb sizeof_OAM_ATTRS
+def SPRITE_18_ADDRESS               rb sizeof_OAM_ATTRS
+def SPRITE_19_ADDRESS               rb sizeof_OAM_ATTRS
+def SPRITE_20_ADDRESS               rb sizeof_OAM_ATTRS
+def SPRITE_21_ADDRESS               rb sizeof_OAM_ATTRS
+def SPRITE_22_ADDRESS               rb sizeof_OAM_ATTRS
+def SPRITE_23_ADDRESS               rb sizeof_OAM_ATTRS
+def SPRITE_24_ADDRESS               rb sizeof_OAM_ATTRS
+def SPRITE_25_ADDRESS               rb sizeof_OAM_ATTRS
 
 def OBJ16_OFFSET           equ 8
 

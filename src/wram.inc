@@ -1,5 +1,5 @@
 ; 
-; CS 240 World 6: Fully functional draft
+; CS-240 World 8: Your final, polished game
 ;
 ; @file wram.inc
 ; @author Darren Strash, Sydney Chen, Alfonso Rada
@@ -15,14 +15,7 @@ include "src/hardware.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-rsset (_RAM + $60)
-
-def WRAM_PAD_INPUT                  rb 0
-def WRAM_FRAME_COUNTER              rb 1
-def WRAM_NOTE_INDEX                 rb 1
-def WRAM_END                        rb 0
-def WRAM_NOTEMAP                    rb 2
-
+;;; JOYPAD HANDLING ;;;
 rsset _RAM
 def PAD_CURR rb 1
 def PAD_PREV rb 1
@@ -31,7 +24,7 @@ def PAD_RLSE rb 1
 def PAD_LHOLD rb 1
 def HOLD_A_COUNTER rb 1
 
-;;; ADDITIONAL REGISTERS ;;;
+;;; ADDITIONAL CUSTOM REGISTERS ;;;
 def rGAME            rb 1
 def rGAME_DIFF       rb 1
 def rPLAYER          rb 1
@@ -44,7 +37,14 @@ def rTIMER_OBJ       rb 1
 def rTIMER_DMG       rb 1
 
 def rSPELL_COUNT     equ $C01F
-def PC_DMG_COUNT     equ (4 * 6)
+
+;;; SOUND 
+rsset (_RAM + $60)
+def WRAM_PAD_INPUT                  rb 0
+def WRAM_FRAME_COUNTER              rb 1
+def WRAM_NOTE_INDEX                 rb 1
+def WRAM_END                        rb 0
+def WRAM_NOTEMAP                    rb 2
 
 ;;; rGAME
 def GAMEF_BASE       equ %00000000
@@ -52,16 +52,16 @@ def GAMEF_START      equ %00000001
 def GAMEF_END        equ %00000010
 def GAMEF_LVL2       equ %00000100
 def GAMEF_BOSSLVL    equ %00001000
-def GAMEF_SPAWN      equ %10000000
 def GAMEF_END_PRINT  equ %01000000
+def GAMEF_SPAWN      equ %10000000
 
 def GAMEB_START      equ 0
 def GAMEB_END        equ 1
 def GAMEB_LVL2       equ 2
 def GAMEB_BOSSLVL    equ 3
-
-def GAMEB_SPAWN      equ 7
 def GAMEB_END_PRINT  equ 6
+def GAMEB_SPAWN      equ 7
+
 
 ;;; rPLAYER
 def PLAYERF_HIT      equ %10000000
@@ -73,6 +73,7 @@ def PLAYERB_HOLD     equ 6
 def PLAYERB_A        equ 5
 def PLAYERB_B        equ 4
 
+
 ;;; rCOLLISION
 def rCOLL_YHIGH      equ %10000000
 def rCOLL_YLOW       equ %01000000
@@ -80,7 +81,6 @@ def COLLF_XPERF      equ %00100000
 def COLLF_XGOOD      equ %00010000
 def COLLF_XBAD       equ %00001000
 def COLLF_XMISS      equ %00000100
-; ^ one of these flags should always be set!
 
 def COLLB_YHIGH      equ 7
 def COLLB_YLOW       equ 6
@@ -89,10 +89,12 @@ def COLLB_XGOOD      equ 4
 def COLLB_XBAD       equ 3
 def COLLB_XMISS      equ 2
 
+
 ;;; SPELL OBJ WRAM FlAGS
 def SPELLF_HIGH      equ %00000100
 def SPELLF_LOW       equ %00000000
 def SPELLF_SPAWN     equ %00000010
+def SPELLF_NOSPAWN   equ %00000000
 def SPELLF_ON        equ %00000001
 def SPELLF_OFF       equ %00000000
 
@@ -100,7 +102,8 @@ def SPELLB_TIER      equ 2
 def SPELLB_SPAWN     equ 1
 def SPELLB_ON        equ 0
 
-; WRAM
+
+; SPELL WRAM
 def SPELL_FLAG_START    equ ($C020)
 def SPELL_FLAG_INTERVAL equ (2)
 def SPELLF_WRAM_OFFSET  equ $20 ; old: $10 | new: $20
@@ -115,6 +118,7 @@ def GAME_DIFF_THRES_LVL2    equ 16
 def GAME_DIFF_THRES_BOSSLVL equ 32
 def GAME_DIFF_THRES_WIN     equ 56
 
+def PC_DMG_COUNT     equ (4 * 6)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 endc
