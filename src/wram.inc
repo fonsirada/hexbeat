@@ -38,13 +38,16 @@ def rTIMER_DMG       rb 1
 def rSPELL_COUNT     rb 1
 def rGAME_LVL        rb 1
 
+
 ;;; SOUND 
 rsset (_RAM + $60)
 def WRAM_PAD_INPUT                  rb 0
 def WRAM_FRAME_COUNTER              rb 1
 def WRAM_NOTE_INDEX                 rb 1
 def WRAM_END                        rb 0
-def WRAM_NOTEMAP                    rb 2
+def rNOTEMAP                        rb 2
+def rSONGMAP                        rb 2
+def rSONGMAP_LENGTHS                rb 2
 
 ;;; rGAME
 def GAMEF_BASE       equ %00000000

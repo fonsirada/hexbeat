@@ -131,10 +131,10 @@ init_level_2:
 init_boss_level:
     copy [rGAME_LVL], 2
     ld a, high(Boss_Level)
-    ld [WRAM_NOTEMAP], a
+    ld [rNOTEMAP], a
     ld a, low(Boss_Level)
-    ld [WRAM_NOTEMAP], a
-    ld [WRAM_NOTEMAP + 1], a
+    ld [rNOTEMAP], a
+    ld [rNOTEMAP + 1], a
 
     halt 
     copy [rSPELL_COUNT], BOSSLVL_SPELL_NUM
@@ -412,9 +412,9 @@ check_spawn:
             ; boss level is 2 in rGAME_LVL
             cp 2
             jr nz, .load_map
-                ld a, [WRAM_NOTEMAP]
+                ld a, [rNOTEMAP]
                 ld h, a
-                ld a, [WRAM_NOTEMAP + 1]
+                ld a, [rNOTEMAP + 1]
                 ld l, a
                 jr .get_note
             .load_map
@@ -483,4 +483,4 @@ spawn_spell:
     ret
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export init_sprite_data, init_sprites, init_level_1, init_boss_level, update_sprites, update_sprites_spawning
+export init_sprite_data, init_sprites, init_level_1, init_level_2, init_boss_level, update_sprites, update_sprites_spawning
