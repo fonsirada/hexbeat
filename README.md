@@ -40,5 +40,13 @@ cd game-sydney-alfonso
 make
 ```
 ---
-# Adding Custom Songs:
+# CREDITS:
+Game Design: Sydney Chen, Alfonso Rada
+Art: Sydney Chen
+
+Special thanks to Prof. Darren Strash and Maximilien Dagois
+
+*This game's code is licensed under the GNU GPL*
+*Visual assets are licensed under CC NC*
+*more information can be found in LICENSE.md*
 
