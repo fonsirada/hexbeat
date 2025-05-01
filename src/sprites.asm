@@ -533,6 +533,7 @@ spawn_spell:
 
     pop hl
     ret
+    
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 export init_sprite_data, init_sprites, init_level_1, init_level_2, init_boss_level, update_sprites, update_sprites_spawning

@@ -121,7 +121,6 @@ macro CallHL
     .call_return_address\@
 endm
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 section "graphics", rom0 

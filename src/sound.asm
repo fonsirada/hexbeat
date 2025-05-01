@@ -12,17 +12,16 @@ include "src/joypad.inc"
 include "src/sprites.inc"
 include "src/utils.inc"
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 section "sound", rom0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 def TIME_BETWEEN_NOTES          equ (10)
 
-CH1_NOTES:
-;continuous example notes (scale)
-dw $060b, $0642, $0672, $0689, $06b2, $06d6, $06f7, $0706
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; add additional byte for "length between notes" val
 CH2_NOTES_LVL1:
 dw $8773, $874f, $8744, $874f, $8744, $8721, $8714, $8714, 
 dw $8721, $8714, $8721, $8714, $86e7, $86d6, $86c4, $86e7, 

@@ -18,7 +18,6 @@ section "game_workings", rom0
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 def PLAYER_HEALTH                   equ 10
-
 def BG_ANIMATION_TIMER              equ 1
 def PC_ANIMATION_TIMER              equ 3
 def OBJ_ANIMATION_TIMER             equ 1
@@ -116,6 +115,7 @@ init_registers:
     copy [rSPELL_COUNT], SPELL_NUM_LVL1
     ret
 
+; update all animation timers
 update_timers:
     IncTimer rTIMER_BG, BG_ANIMATION_TIMER
     IncTimer rTIMER_PC, PC_ANIMATION_TIMER
