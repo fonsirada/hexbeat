@@ -1,11 +1,11 @@
 ; 
-; CS-240 World 8: Your final, polished game
+; HEXBEAT (CS-240 World 8)
 ;
 ; @file game_workings.asm
-; @author Darren Strash, Sydney Chen, Alfonso Rada
-; @date April 27, 2025
+; @author Sydney Chen, Alfonso Rada
+; @date April 30, 2025
+; @license GNU GPL v3
 ; @brief store functions related to general game operations
-; @license
 
 include "src/utils.inc"
 include "src/joypad.inc"

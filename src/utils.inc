@@ -1,11 +1,11 @@
 ; 
-; CS-240 World 8: Your final, polished game
+; HEXBEAT (CS-240 World 8)
 ;
 ; @file utils.inc
 ; @author Darren Strash, Sydney Chen, Alfonso Rada
 ; @date April 24, 2025
+; @license GNU GPL v3
 ; @brief store general usage macros
-; @license
 
 if !def(UTILS_RGBINC)
 def UTILS_RGBINC equ 1

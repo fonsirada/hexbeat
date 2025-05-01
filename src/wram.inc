@@ -1,11 +1,11 @@
 ; 
-; CS-240 World 8: Your final, polished game
+; HEXBEAT (CS-240 World 8)
 ;
 ; @file wram.inc
-; @author Darren Strash, Sydney Chen, Alfonso Rada
-; @date April 16, 2025
+; @author Sydney Chen, Alfonso Rada
+; @date April 30, 2025
+; @license GNU GPL v3
 ; @brief a place to store all WRAM variables
-; @license
 
 if !def(WRAM_RGBINC)
 def WRAM_RGBINC equ 1

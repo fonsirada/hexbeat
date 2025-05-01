@@ -1,11 +1,11 @@
 ; 
-; CS-240 World 8: Your final, polished game
+; HEXBEAT (CS-240 World 8)
 ;
 ; @file sprites.inc
 ; @author Sydney Chen, Alfonso Rada
 ; @date April 24, 2025
+; @license GNU GPL v3
 ; @brief storing all sprite constants and macros
-; @license
 
 if !def(SPRITES_RGBINC)
 def SPRITES_RGBINC equ 1

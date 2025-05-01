@@ -1,11 +1,11 @@
 ;
-; CS-240 World 8: Your final, polished game
+; HEXBEAT (CS-240 World 8)
 ;
 ; @file main.asm
 ; @author Darren Strash, Sydney Chen, Alfonso Rada
-; @date April 24, 2025
+; @date April 30, 2025
+; @license GNU GPL v3
 ; @brief control overall program loop
-; @license 
 ;
 ; build with:
 ; make
