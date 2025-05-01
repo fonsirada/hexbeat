@@ -18,7 +18,8 @@
 * **[SELECT]** - when prompted, press **SELECT** to restart the game
 
 Use A and B as appropriate when a matching spell crosses its respective "target zone" in front of the player character. Pressing too early or too late will damage the player--you need to time it just right!
-> [example visual] [example visual]
+
+![a_press](assets/a_press.gif) ![b_press](assets/b_press.gif)
 
 Survive 3 waves of increasing difficulty in order to win!
 
