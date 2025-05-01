@@ -101,7 +101,7 @@ def SPELLB_TIER      equ 2
 def SPELLB_SPAWN     equ 1
 def SPELLB_ON        equ 0
 
-; SPELL WRAM
+;;; SPELL WRAM
 def SPELL_FLAG_START    equ $C020
 def SPELL_FLAG_INTERVAL equ 2
 def SPELLF_WRAM_OFFSET  equ $20
