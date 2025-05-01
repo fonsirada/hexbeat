@@ -7,7 +7,6 @@
 ; @license GNU GPL v3
 ; @brief storing non-player sprite functions
 
-
 include "src/hardware.inc"
 include "src/utils.inc"
 include "src/wram.inc"

@@ -14,10 +14,11 @@ include "src/wram.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-def INIT_COUNTER    equ $00
-def NONE_HELD       equ $FF
-def HIGH_NIB_MASK   equ $F0
-def LOW_NIB_MASK    equ $0F
+def INIT_COUNTER        equ $00
+def NONE_HELD           equ $FF
+def HIGH_NIB_MASK       equ $F0
+def LOW_NIB_MASK        equ $0F
+def HOLD_FRAME_LIMIT    equ 5
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -77,7 +78,7 @@ macro UpdateJoypad
     jr nz, .not_held
         ; check if it's been held for at least 5 frames
         ld a, [HOLD_A_COUNTER]
-        cp 5
+        cp HOLD_FRAME_LIMIT
         jr nz, .not_yet
             ; set flag saying its being long held
             xor a

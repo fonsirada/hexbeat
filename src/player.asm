@@ -95,7 +95,8 @@ endm
 
 ; updates the Player sprite(s) to the next frame
 ; by looping thru sprite locations stored in WRAM
-; run as: UpdatePlayerAnim (WRAM start address, WRAM end address, ending tileID)
+; params: 
+;   WRAM start address, WRAM end address, ending tileID
 ; ex: UpdatePlayerAnim $C010, $C01C, $30
 macro UpdatePlayerAnim
     push af
@@ -175,7 +176,7 @@ macro SetShieldLocations
     copy [SPRITE_9_ADDRESS + OAMA_Y], \4
 endm
 
-macro InitSprite
+macro InitPlayerSprite
     copy [SPRITE_\1_ADDRESS + OAMA_Y], INITIAL_PLAYER_XY
     copy [SPRITE_\1_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
     copy [SPRITE_\1_ADDRESS + OAMA_TILEID], SPRITE_\1_TILEID
@@ -186,12 +187,12 @@ endm
 
 ; initialize player sprites
 init_player:
-    InitSprite 0
-    InitSprite 1
-    InitSprite 2
-    InitSprite 3
-    InitSprite 4
-    InitSprite 5
+    InitPlayerSprite 0
+    InitPlayerSprite 1
+    InitPlayerSprite 2
+    InitPlayerSprite 3
+    InitPlayerSprite 4
+    InitPlayerSprite 5
     ret
 
 move_player_for_level:
@@ -274,7 +275,6 @@ player_hit_low:
 ; updates the player animation based on joypad press
 update_player:
     CheckTimer rTIMER_PC, 1
-    ; must be jp for now
     jp nz, .done_update 
     SetShieldLocations 0, 0, 0, 0
 
