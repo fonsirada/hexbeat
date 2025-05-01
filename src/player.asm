@@ -213,6 +213,16 @@ init_player:
     InitPlayerSprite 5
     ret
 
+; put PC sprite OAM addresses in WRAM
+init_player_sprite_data:
+    Copy16BitVal [PC_0A_WRAM], [PC_0B_WRAM], _OAMRAM
+    Copy16BitVal [PC_1A_WRAM], [PC_1B_WRAM], _OAMRAM + sizeof_OAM_ATTRS * 1
+    Copy16BitVal [PC_2A_WRAM], [PC_2B_WRAM], _OAMRAM + sizeof_OAM_ATTRS * 2
+    Copy16BitVal [PC_3A_WRAM], [PC_3B_WRAM], _OAMRAM + sizeof_OAM_ATTRS * 3
+    Copy16BitVal [PC_4A_WRAM], [PC_4B_WRAM], _OAMRAM + sizeof_OAM_ATTRS * 4
+    Copy16BitVal [PC_5A_WRAM], [PC_5B_WRAM], _OAMRAM + sizeof_OAM_ATTRS * 5
+    ret
+
 move_player_for_level:
     ; PC.00
     copy [SPRITE_0_ADDRESS + OAMA_Y], PC_TOP_Y
@@ -237,17 +247,6 @@ move_player_for_level:
     ; PC.12
     copy [SPRITE_5_ADDRESS + OAMA_Y], PC_BOT_Y
     copy [SPRITE_5_ADDRESS + OAMA_X], SPRITE_2_5_LEVEL_X
-
-    ret
-
-; put PC sprite ids in WRAM
-init_player_sprite_data:
-    Copy16BitVal [PC_0A_WRAM], [PC_0B_WRAM], _OAMRAM
-    Copy16BitVal [PC_1A_WRAM], [PC_1B_WRAM], _OAMRAM + sizeof_OAM_ATTRS * 1
-    Copy16BitVal [PC_2A_WRAM], [PC_2B_WRAM], _OAMRAM + sizeof_OAM_ATTRS * 2
-    Copy16BitVal [PC_3A_WRAM], [PC_3B_WRAM], _OAMRAM + sizeof_OAM_ATTRS * 3
-    Copy16BitVal [PC_4A_WRAM], [PC_4B_WRAM], _OAMRAM + sizeof_OAM_ATTRS * 4
-    Copy16BitVal [PC_5A_WRAM], [PC_5B_WRAM], _OAMRAM + sizeof_OAM_ATTRS * 5
     ret
 
 ; animation for player hit high
@@ -262,6 +261,7 @@ player_hit_high:
     ; set player frame to $90
     SetPlayerTiles SPRITE_HIT_HIGH_THRES_TILEID
     SetPlayerCoord JUMP_HOLD_Y, OAMA_Y
+
     ; set shield visible
     copy [SPRITE_8_ADDRESS + OAMA_Y], HIT_HIGH_SHIELD_Y
     copy [SPRITE_8_ADDRESS + OAMA_X], SHIELD_X
@@ -294,6 +294,7 @@ player_hit_low:
 update_player:
     CheckTimer rTIMER_PC, 1
     jp nz, .done_update 
+
     SetShieldLocations 0, 0, 0, 0
     SetButtonFlags
 
