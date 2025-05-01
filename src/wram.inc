@@ -5,6 +5,7 @@
 ; @author Darren Strash, Sydney Chen, Alfonso Rada
 ; @date April 16, 2025
 ; @brief a place to store all WRAM variables
+; @license
 
 if !def(WRAM_RGBINC)
 def WRAM_RGBINC equ 1

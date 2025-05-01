@@ -5,6 +5,7 @@
 ; @author Darren Strash, Sydney Chen, Alfonso Rada
 ; @date April 24, 2025
 ; @brief control overall program loop
+; @license 
 ;
 ; build with:
 ; make

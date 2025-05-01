@@ -5,6 +5,7 @@
 ; @author Sydney Chen, Alfonso Rada
 ; @date April 24, 2025
 ; @brief storing player functions
+; @license 
 
 include "src/hardware.inc"
 include "src/utils.inc"
