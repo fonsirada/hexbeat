@@ -117,11 +117,11 @@ macro UpdatePlayerAnim
             jr nc, .no_flash
                 dec a
                 ld [rTIMER_DMG], a
-
                 ld a, [hl]
                 xor OAMF_PAL1
                 ld [hl], a
                 jr .done_flash
+
         .no_flash
             ld a, [hl]
             and OAMF_PAL0
@@ -181,6 +181,24 @@ macro InitPlayerSprite
     copy [SPRITE_\1_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
     copy [SPRITE_\1_ADDRESS + OAMA_TILEID], SPRITE_\1_TILEID
     copy [SPRITE_\1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+endm
+
+macro SetButtonFlags
+    ; set correct flags/registers/tileIDs from joypad input
+    ld a, [PAD_CURR]
+    bit PADB_B, a
+    jr nz, .done_b
+        RegBitOp rPLAYER, PLAYERB_B, set
+        RegBitOp rPLAYER, PLAYERB_A, res
+        SetPlayerTiles SPRITE_RUN_THRES_TILEID
+    .done_b
+    ld a, [PAD_CURR]
+    bit PADB_A, a
+    jr nz, .done_a
+        RegBitOp rPLAYER, PLAYERB_A, set
+        RegBitOp rPLAYER, PLAYERB_B, res
+        SetPlayerTiles SPRITE_HIT_LOW_THRES_TILEID
+    .done_a
 endm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -277,22 +295,7 @@ update_player:
     CheckTimer rTIMER_PC, 1
     jp nz, .done_update 
     SetShieldLocations 0, 0, 0, 0
-
-    ; set correct flags/registers/tileIDs from joypad input
-    ld a, [PAD_CURR]
-    bit PADB_B, a
-    jr nz, .done_b
-        RegBitOp rPLAYER, PLAYERB_B, set
-        RegBitOp rPLAYER, PLAYERB_A, res
-        SetPlayerTiles SPRITE_RUN_THRES_TILEID
-    .done_b
-    ld a, [PAD_CURR]
-    bit PADB_A, a
-    jr nz, .done_a
-        RegBitOp rPLAYER, PLAYERB_A, set
-        RegBitOp rPLAYER, PLAYERB_B, res
-        SetPlayerTiles SPRITE_HIT_LOW_THRES_TILEID
-    .done_a
+    SetButtonFlags
 
     ; check if current frame should be held (4th frame)
     ld a, [rPC_ACOUNT]
