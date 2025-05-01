@@ -116,7 +116,6 @@ def GAME_DIFF_THRES_LVL2    equ 24
 def GAME_DIFF_THRES_BOSSLVL equ 56
 def GAME_DIFF_THRES_WIN     equ 96
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 endc

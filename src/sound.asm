@@ -117,7 +117,7 @@ bad_hit_sound:
 update_music:
     ld a, $FF
     ld hl, WRAM_FRAME_COUNTER
-    xor a, [hl]
+    xor [hl]
     jr z, .play_notes
         ; decrease the timer and play the next sound when zero is reached
         dec [hl]
@@ -178,7 +178,7 @@ update_music:
             ld a, [hli]
             ld [rNR23], a
             ld a, [hl]
-            or a, $80
+            or $80
             ld [rNR24], a
 
             copy [WRAM_FRAME_COUNTER], TIME_BETWEEN_NOTES

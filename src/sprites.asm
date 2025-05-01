@@ -246,14 +246,12 @@ update_sprites_spawning:
 update_sprites:
     CheckTimer rTIMER_OBJ, 1
     jr nz, .done_update
-    
-    RegBitOp rGAME, GAMEB_NOTE_HIT, res
 
+    RegBitOp rGAME, GAMEB_NOTE_HIT, res
     ld hl, SPELL_WRAM_START
     .update_spell_sprite
         ; preserve OG WRAM address 
         push hl
-        
         ; get flags in (d) and address in (hl)
         GetSpriteFlags d
         WRAMToOAM bc
@@ -261,17 +259,15 @@ update_sprites:
         ; SPELL OFF/ON
         bit SPELLB_ON, d
         jr nz, .spell_on
-            
         ; ---- IF SPELL IS OFF... ---- ;
             ; HANDLE SPELL SPAWNING ;
             bit SPELLB_SPAWN, d
-            jr z, .skip_spawn
+            jr z, .to_next_sprite
                 call spawn_spell
                 ld a, d
-                xor a, SPELLF_ON | SPELLF_SPAWN
+                xor SPELLF_ON | SPELLF_SPAWN
                 ld d, a
-            .skip_spawn
-            jr .to_next_sprite
+                jr .to_next_sprite
 
         ; ---- IF SPELL IS ON... ---- ;
         .spell_on
@@ -282,9 +278,8 @@ update_sprites:
         add hl, bc
         push hl
         ld a, [hl]
-
             ; HANDLE SPELL DESPAWNING ;
-            cp a, DMG_THRES
+            cp DMG_THRES
             jr nc, .update_x_movement
                 DespawnSpell d
                 pop hl

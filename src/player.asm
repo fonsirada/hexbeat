@@ -34,22 +34,18 @@ def SPRITE_2_5_LEVEL_X              equ 36
 
 ; player sprite locations in WRAM
 rsset _RAM + $14
-def PC_0A_WRAM       rb 1
-def PC_0B_WRAM       rb 1
-def PC_1A_WRAM       rb 1
-def PC_1B_WRAM       rb 1
-def PC_2A_WRAM       rb 1
-def PC_2B_WRAM       rb 1
-def PC_3A_WRAM       rb 1
-def PC_3B_WRAM       rb 1
-def PC_4A_WRAM       rb 1
-def PC_4B_WRAM       rb 1
-def PC_5A_WRAM       rb 1
-def PC_5B_WRAM       rb 1
-
-
-def JUMP_INCREMENT                  equ 8
-def JUMP_HOLD_Y                     equ 60
+def PC_0A_WRAM                      rb 1
+def PC_0B_WRAM                      rb 1
+def PC_1A_WRAM                      rb 1
+def PC_1B_WRAM                      rb 1
+def PC_2A_WRAM                      rb 1
+def PC_2B_WRAM                      rb 1
+def PC_3A_WRAM                      rb 1
+def PC_3B_WRAM                      rb 1
+def PC_4A_WRAM                      rb 1
+def PC_4B_WRAM                      rb 1
+def PC_5A_WRAM                      rb 1
+def PC_5B_WRAM                      rb 1
 
 ; no more sprites at and including this wram address
 def SPRITE_ANIM_WRAM_THRES          equ PC_5B_WRAM + 1
@@ -60,6 +56,7 @@ def SPRITE_HIT_LOW_THRES_TILEID     equ $60
 ; run animation stops AND hit low animation begins at this tile
 def SPRITE_RUN_THRES_TILEID         equ $30
 
+def JUMP_HOLD_Y                     equ 60
 def HIT_HIGH_SHIELD_Y               equ PC_TOP_Y - 20
 def HIT_LOW_SHIELD_Y                equ PC_TOP_Y + 16
 def SHIELD_X                        equ 44
@@ -68,6 +65,33 @@ def FRAME_TO_HOLD                   equ $3
 def HIT_ANIM_LENGTH                 equ $4
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+macro ChangeTile
+    ;; LOAD TILE ID - store sprite address in hl
+    ld b, [hl]
+    inc hl
+    ld c, [hl]
+    ld h, b
+    ld l, c
+
+    ; get sprite's tileID address
+    ld a, l
+    add OAMA_TILEID
+    ld l, a
+    ld a, [hl] 
+
+    ; change tileID as appropriate
+    cp \1
+    jr c, .load_new_tileid
+        sub \1
+        jr .finish_tile_load
+
+    .load_new_tileid
+        add PC_VRAM_ANIM_INT
+
+    .finish_tile_load
+    ld [hli], a
+endm
 
 ; updates the Player sprite(s) to the next frame
 ; by looping thru sprite locations stored in WRAM
@@ -79,36 +103,10 @@ macro UpdatePlayerAnim
     push hl
 
     ld hl, \1
-
     ; loop through sprites thru WRAM address locs
     .next_tile
         push hl
-
-        ;; LOAD TILE ID ;;
-        ; store sprite address in hl
-        ld b, [hl]
-        inc hl
-        ld c, [hl]
-        ld h, b
-        ld l, c
-
-        ; get sprite's tileID address
-        ld a, l
-        add OAMA_TILEID
-        ld l, a
-        ld a, [hl] 
-
-        ; change tileID as appropriate
-        cp \3
-        jr c, .load_new_tileid
-            sub \3
-            jr .finish_tile_load
-
-        .load_new_tileid
-            add PC_VRAM_ANIM_INT
-
-        .finish_tile_load
-        ld [hli], a
+        ChangeTile \3
 
         ;; FLASH PALETTE ;;
         ld a, [rTIMER_DMG]
@@ -127,8 +125,8 @@ macro UpdatePlayerAnim
             ld a, [hl]
             and OAMF_PAL0
             ld [hl], a
-        .done_flash
 
+        .done_flash
         ; go to next tile in WRAM
         pop hl
         inc hl
@@ -177,45 +175,23 @@ macro SetShieldLocations
     copy [SPRITE_9_ADDRESS + OAMA_Y], \4
 endm
 
+macro InitSprite
+    copy [SPRITE_\1_ADDRESS + OAMA_Y], INITIAL_PLAYER_XY
+    copy [SPRITE_\1_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
+    copy [SPRITE_\1_ADDRESS + OAMA_TILEID], SPRITE_\1_TILEID
+    copy [SPRITE_\1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
+endm
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; initialize player sprites
 init_player:
-    ; PC.00
-    copy [SPRITE_0_ADDRESS + OAMA_Y], INITIAL_PLAYER_XY
-    copy [SPRITE_0_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
-    copy [SPRITE_0_ADDRESS + OAMA_TILEID], SPRITE_0_TILEID
-    copy [SPRITE_0_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-
-    ; PC.01
-    copy [SPRITE_1_ADDRESS + OAMA_Y], INITIAL_PLAYER_XY
-    copy [SPRITE_1_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
-    copy [SPRITE_1_ADDRESS + OAMA_TILEID], SPRITE_1_TILEID
-    copy [SPRITE_1_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-
-    ; PC.02
-    copy [SPRITE_2_ADDRESS + OAMA_Y], INITIAL_PLAYER_XY
-    copy [SPRITE_2_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
-    copy [SPRITE_2_ADDRESS + OAMA_TILEID], SPRITE_2_TILEID
-    copy [SPRITE_2_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-
-    ; PC.10
-    copy [SPRITE_3_ADDRESS + OAMA_Y], INITIAL_PLAYER_XY
-    copy [SPRITE_3_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
-    copy [SPRITE_3_ADDRESS + OAMA_TILEID], SPRITE_3_TILEID
-    copy [SPRITE_3_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-
-    ; PC.11
-    copy [SPRITE_4_ADDRESS + OAMA_Y], INITIAL_PLAYER_XY
-    copy [SPRITE_4_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
-    copy [SPRITE_4_ADDRESS + OAMA_TILEID], SPRITE_4_TILEID
-    copy [SPRITE_4_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-
-    ; PC.12
-    copy [SPRITE_5_ADDRESS + OAMA_Y], INITIAL_PLAYER_XY
-    copy [SPRITE_5_ADDRESS + OAMA_X], INITIAL_PLAYER_XY
-    copy [SPRITE_5_ADDRESS + OAMA_TILEID], SPRITE_5_TILEID
-    copy [SPRITE_5_ADDRESS + OAMA_FLAGS], OAMF_PAL0
-
+    InitSprite 0
+    InitSprite 1
+    InitSprite 2
+    InitSprite 3
+    InitSprite 4
+    InitSprite 5
     ret
 
 move_player_for_level:

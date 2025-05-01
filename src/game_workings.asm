@@ -43,32 +43,30 @@ update_game:
     ld a, [rGAME]
     bit GAMEB_START, a
     jr z, .return
+    bit GAMEB_END, a
+    jr z, .updates
+        ; set up game over screen when game ends
+        call game_over
+        ld a, [rGAME]
         bit GAMEB_END, a
-        jr z, .updates
-            ; set up game over screen when game ends
-            call game_over
-            ld a, [rGAME]
-            bit GAMEB_END, a
-            jr nz, .return
-                ; reinitialize game if restarted
-                call initialize
-                jr .return
+        jr nz, .return
+            ; reinitialize game if restarted
+            call initialize
+            jr .return
     
-        .updates
-        call update_timers
-        call update_graphics
-        call update_sound
+    .updates
+    call update_timers
+    call update_graphics
+    call update_sound
+    call update_sprites_spawning
+    halt
+    call update_sprites
+    halt
+    call update_player
 
-        call update_sprites_spawning
-        halt
-        call update_sprites
-
-        halt
-        call update_player
-
-        call check_level_2
-        call check_boss_level
-        call is_game_over
+    call check_level_2
+    call check_boss_level
+    call is_game_over
         
     .return
     UpdateJoypad

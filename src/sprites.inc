@@ -47,33 +47,33 @@ def SPRITE_23_ADDRESS               rb sizeof_OAM_ATTRS
 def SPRITE_24_ADDRESS               rb sizeof_OAM_ATTRS
 def SPRITE_25_ADDRESS               rb sizeof_OAM_ATTRS
 
-def OBJ16_OFFSET           equ 8
+def OBJ16_OFFSET                    equ 8
 
-def PC_TOP_Y               equ (80)
-def PC_BOT_Y               equ (PC_TOP_Y + 16)
-def PC_JUMP_THRES          equ (PC_TOP_Y - 24)
-def PC_VRAM_ANIM_INT       equ $10
-def PC_DMG_COUNT     equ (4 * 6)
+def PC_TOP_Y                        equ (80)
+def PC_BOT_Y                        equ (PC_TOP_Y + 16)
+def PC_JUMP_THRES                   equ (PC_TOP_Y - 24)
+def PC_VRAM_ANIM_INT                equ $10
+def PC_DMG_COUNT                    equ (4 * 6)
 
-def TARGET_HIGH_Y          equ (PC_TOP_Y - 16)
-def TARGET_LOW_Y           equ (PC_TOP_Y + 16)
-def TARGET_X               equ 50
+def TARGET_HIGH_Y                   equ (PC_TOP_Y - 16)
+def TARGET_LOW_Y                    equ (PC_TOP_Y + 16)
+def TARGET_X                        equ 50
 
-def SPELL_HIGH_Y           equ (TARGET_HIGH_Y - 4)
-def SPELL_LOW_Y            equ (TARGET_LOW_Y - 4)
-def SPELL_SCROLL_SPEED     equ 3
-def SPELL_SPAWNX           equ 168
+def SPELL_HIGH_Y                    equ (TARGET_HIGH_Y - 4)
+def SPELL_LOW_Y                     equ (TARGET_LOW_Y - 4)
+def SPELL_SCROLL_SPEED              equ 3
+def SPELL_SPAWNX                    equ 168
 
 ; TIMING
-def HIT_PERF_MIN           equ (TARGET_X - 2)
-def HIT_PERF_MAX           equ (TARGET_X + 8 + 2)
-def HIT_GOOD_MIN           equ (TARGET_X - 12)
-def HIT_GOOD_MAX           equ (TARGET_X + 8 + 8)
-def HIT_BAD_MIN            equ (TARGET_X - 20)
-def HIT_BAD_MAX            equ (TARGET_X + 8 + 20)
-def HIT_MISS_MAX           equ (HIT_BAD_MIN - 1)
-def HIT_MISS_MIN           equ (0)
-def DMG_THRES              equ (4)
+def HIT_PERF_MIN                    equ (TARGET_X - 2)
+def HIT_PERF_MAX                    equ (TARGET_X + 8 + 2)
+def HIT_GOOD_MIN                    equ (TARGET_X - 12)
+def HIT_GOOD_MAX                    equ (TARGET_X + 8 + 8)
+def HIT_BAD_MIN                     equ (TARGET_X - 20)
+def HIT_BAD_MAX                     equ (TARGET_X + 8 + 20)
+def HIT_MISS_MAX                    equ (HIT_BAD_MIN - 1)
+def HIT_MISS_MIN                    equ (0)
+def DMG_THRES                       equ (4)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -100,7 +100,6 @@ macro SetSpriteData
     copy [(_OAMRAM + sizeof_OAM_ATTRS * \1) + OAMA_TILEID], \4
     copy [(_OAMRAM + sizeof_OAM_ATTRS * \1) + OAMA_FLAGS], \5
 endm
-
 
 ;;; SPELL MACROS ;;;
 
@@ -148,7 +147,6 @@ macro SetSpriteFlags
     pop hl
 endm
 
-
 ; given sprite address (hl) and flags as param (in d)
 ; spawns a spell according to its tier flag
 ; note: spell's pt 2 will update in main func
@@ -165,7 +163,6 @@ macro SpawnSpell
     ld [hl], SPELL_SPAWNX
     dec hl
 endm
-
 
 ; given sprite address (hl) and flags as param (in d)
 ; despawns a spell
