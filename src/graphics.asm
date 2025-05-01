@@ -5,6 +5,7 @@
 ; @author Darren Strash, Sydney Chen, Alfonso Rada
 ; @date April 24, 2025
 ; @brief store overall graphics-related functions
+; @license 
 
 include "src/utils.inc"
 include "src/joypad.inc"
