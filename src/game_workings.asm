@@ -148,7 +148,7 @@ check_level_2:
     .done_check
     ret
 
-;check if game is currently on boss level + handle accordingly
+; check if game is currently on boss level + handle accordingly
 check_boss_level:
     ld a, [rGAME_DIFF]
     cp GAME_DIFF_THRES_WIN

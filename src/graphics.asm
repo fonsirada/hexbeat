@@ -113,6 +113,7 @@ macro InitOAM
         jr nz, .init_oam\@
 endm
 
+; calls function whose address is stored in Hl
 macro CallHL
     ld de, .call_return_address\@
     push de
