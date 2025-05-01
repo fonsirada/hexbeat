@@ -5,6 +5,7 @@
 ; @author Darren Strash, Sydney Chen, Alfonso Rada
 ; @date April 24, 2025
 ; @brief store general usage macros
+; @license
 
 if !def(UTILS_RGBINC)
 def UTILS_RGBINC equ 1

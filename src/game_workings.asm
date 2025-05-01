@@ -5,6 +5,7 @@
 ; @author Darren Strash, Sydney Chen, Alfonso Rada
 ; @date April 27, 2025
 ; @brief store functions related to general game operations
+; @license
 
 include "src/utils.inc"
 include "src/joypad.inc"

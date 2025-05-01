@@ -5,6 +5,7 @@
 ; @author Darren Strash, Sydney Chen, Alfonso Rada
 ; @date April 24, 2025
 ; @brief stores joypad handling macros
+; @license
 
 if !def(JOYPAD_RGBINC)
 def JOYPAD_RGBINC equ 1
