@@ -1,4 +1,4 @@
-# CS 240 Game Boy Game
+# HEXBEAT
 > [example banner]
 
 ***HEXBEAT*** is a short rhythm game made for the original Nintendo Game Boy. Defend yourself against an onslaught of spells by timing your shields to the music, and survive until the end!
