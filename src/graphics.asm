@@ -242,7 +242,9 @@ start:
         ld a, [PAD_CURR]
         bit PADB_START, a
         jr nz, .return
-            ; sets up level 1
+            call ui_sound
+
+            ; set up level 1
             ld a, LEVEL_SCY
             ld [rSCY], a
             ld a, UI_Y
@@ -272,6 +274,7 @@ game_over:
     ld a, [PAD_CURR]
     bit PADB_SELECT, a
     jr nz, .done_end
+        call ui_sound
         RegBitOp rGAME, GAMEB_END, res
 
     .done_end

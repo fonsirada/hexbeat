@@ -23,21 +23,22 @@ dw $060b, $0642, $0672, $0689, $06b2, $06d6, $06f7, $0706
 
 ; add additional byte for "length between notes" val
 CH2_NOTES_LVL1:
-dw $8773, $874f, $8744, $874f, $8744, $8721, $8714, $8714,
-dw $8721, $8714, $8721, $8714, $86e7, $86d6,
-dw $c689, $c6b2, $c6c4, $c6c4, $c689, $c6b2, $c6c4, $c6b2
-dw $8689, $86b2, $86c4, $86c4, $8689, $86b2, $86c4, $86b2
-
+dw $8773, $874f, $8744, $874f, $8744, $8721, $8714, $8714, 
+dw $8721, $8714, $8721, $8714, $86e7, $86d6, $86c4, $86e7, 
+dw $86f7, $86f7, $86c4, $86e7, $86f7, $86f7, $86c4, $86e7, 
+dw $8706, $8714, $8706, $8714, $8706, $86d6, $86c4, $86f7, 
+dw $86f7, $86c4, $86e7, $86f7, $86f7, $86c4, $86e7, $8706, 
+dw $86f7, $86e7, $874f
 dw $0000
 
 CH2_NOTES_LENGTHS_LVL1:
-dw $0010, $0008, $0010, $0008, $0010, $0010, $0010, $0008, 
-dw $0008, $0008, $0008, $0008, $0008, $0008,
-
-dw $0008, $0008, $0008, $0008, $0008, $0008, $0008, $0008
-dw $0008, $0008, $0008, $0008, $0008, $0008, $0008, $0008
+dw $0018, $0008, $0010, $0010, $0010, $0010, $0010, $0008, 
+dw $0008, $0008, $0008, $0008, $0008, $0008, $0008, $0008, 
+dw $0008, $0008, $0008, $0008, $0008, $0008, $0008, $0008, 
+dw $0008, $0008, $0008, $0008, $0008, $0008, $0008, $0008, 
+dw $0008, $0008, $0008, $0008, $0008, $0008, $0008, $0010, 
+dw $0010, $0020, $0010,
 dw $0001
-; see commented out code below!
 
 CH2_NOTES_LVL3:
 dw $8762, $878a, $8762, $877b, $878a, $877b, $8762, $8762,  
@@ -66,14 +67,14 @@ dw $0001
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 init_sound:
-    ld a, high(CH2_NOTES_LVL3)
+    ld a, high(CH2_NOTES_LVL1)
     ld [rSONGMAP], a
-    ld a, low(CH2_NOTES_LVL3)
+    ld a, low(CH2_NOTES_LVL1)
     ld [rSONGMAP + 1], a
 
-    ld a, high(CH2_NOTES_LENGTHS_LVL3)
+    ld a, high(CH2_NOTES_LENGTHS_LVL1)
     ld [rSONGMAP_LENGTHS], a
-    ld a, low(CH2_NOTES_LENGTHS_LVL3)
+    ld a, low(CH2_NOTES_LENGTHS_LVL1)
     ld [rSONGMAP_LENGTHS + 1], a
 
     copy [WRAM_FRAME_COUNTER], 0
@@ -88,9 +89,28 @@ init_sound:
 
     ret
 
-; hmm... test sound func w/ ch 1?
-play_hit_effect:
+ui_sound:
+    copy [rNR10], $08
+    copy [rNR11], $A2
+    copy [rNR12], $F2
+    copy [rNR13], $8A
+    copy [rNR14], $C7
+    ret
 
+perf_hit_sound:
+    copy [rNR10], $26
+    copy [rNR11], $22
+    copy [rNR12], $F2
+    copy [rNR13], $8A
+    copy [rNR14], $C7
+    ret
+
+bad_hit_sound:
+    copy [rNR10], $2D
+    copy [rNR11], $9C
+    copy [rNR12], $F2
+    copy [rNR13], $73
+    copy [rNR14], $C7
     ret
 
 update_music:
@@ -128,10 +148,7 @@ update_music:
             ld a, [hli]
             ld [rNR24], a
 
-            ; copy [WRAM_FRAME_COUNTER], TIME_BETWEEN_NOTES
-            ; push/pop may not be needed
-            ; push hl
-            ;ld hl, CH2_NOTES_LENGTHS
+            ; load new note length into WRAM_FRAME_COUNTER
             ld a, [rSONGMAP_LENGTHS]
             ld h, a
             ld a, [rSONGMAP_LENGTHS + 1]
@@ -139,7 +156,7 @@ update_music:
             add hl, de
             ld a, [hl]
             copy [WRAM_FRAME_COUNTER], a
-            ; pop hl
+            ld [rNOTE_DELAY], a
 
     .play_notes
     ld a, [rGAME]
@@ -174,4 +191,4 @@ update_sound:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-export init_sound, update_sound
+export init_sound, update_sound, ui_sound, perf_hit_sound, bad_hit_sound, CH2_NOTES_LVL3, CH2_NOTES_LENGTHS_LVL3

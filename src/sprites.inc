@@ -64,8 +64,8 @@ def SPELL_SCROLL_SPEED     equ 3
 def SPELL_SPAWNX           equ 168
 
 ; TIMING
-def HIT_PERF_MIN           equ (TARGET_X - 4)
-def HIT_PERF_MAX           equ (TARGET_X + 8 + 4)
+def HIT_PERF_MIN           equ (TARGET_X - 2)
+def HIT_PERF_MAX           equ (TARGET_X + 8 + 2)
 def HIT_GOOD_MIN           equ (TARGET_X - 12)
 def HIT_GOOD_MAX           equ (TARGET_X + 8 + 8)
 def HIT_BAD_MIN            equ (TARGET_X - 20)

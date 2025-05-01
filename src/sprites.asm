@@ -26,22 +26,41 @@ def SPELL1B_TILEID         equ $1E
 def SPELL2A_TILEID         equ $2E
 def SPELL2B_TILEID         equ $3E
 
-def SPAWN_DELAY            equ 9 
 def SPRITE_MEM_OFFSET      equ $0004
 def SPELL_P2_Y_OFFSET      equ $0003
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ; NOTE FORMAT:
-; $__ __ = $(spawn?)(high/low)
+; $__ __ = $(spawn)(high/low)
 ; eg. $0100 = spawn note, spawn low
-Mapping:
-dw $0100, $0000, $0101, $0000, $0100, $0000, $0101, $0000
-dw $0000, $0100, $0101, $0000, $0101, $0101, $0000, $0100
+MAPPING_LVL1:
+dw $0000, $0100, $0000, $0000, $0101, $0000, $0000, $0100
+dw $0000, $0101, $0000, $0000, $0101, $0000, $0000, $0100
+dw $0000, $0000, $0101, $0000, $0100, $0000, $0101, $0000
+dw $0001, $0000, $0000, $0000, $0101, $0101, $0000, $0000
+dw $0101, $0000, $0101, $0000, $0100, $0000, $0101, $0000
 dw $0000
 
-Boss_Level:
+MAPPING_LVL2:
+dw $0100, $0000, $0101, $0000, $0100, $0000, $0101, $0000
+dw $0000, $0100, $0101, $0000, $0101, $0101, $0000, $0100
+dw $0100, $0000, $0101, $0000, $0100, $0000, $0101, $0000
+dw $0000, $0100, $0101, $0000, $0101, $0101, $0000, $0100
+dw $0101, $0000, $0101, $0000, $0100, $0000, $0101, $0000
+dw $0000
+
+MAPPING_LVL3:
+dw $0000, $0000, $0000, $0101, $0101, $0100, $0000, $0000, 
+dw $0100, $0101, $0101, $0000, $0100, $0000, $0101, $0000, 
+dw $0100, $0100, $0101, $0101, $0000, $0100, $0000, $0101, 
+dw $0101, $0000, $0000, $0101, $0100, $0101, $0100, $0000, 
+dw $0101, $0000, $0101, $0100, $0100, $0101, $0000, $0100
 dw $0100, $0101, $0101, $0101, $0000, $0100, $0000, $0101
 dw $0101, $0000, $0101, $0100, $0100, $0101, $0000, $0100
+dw $0100, $0000, $0101, $0000, $0100, $0000, $0101, $0000
+dw $0100, $0101, $0101, $0101, $0000, $0100, $0000, $0101
+dw $0101, $0000, $0101, $0100, $0100, $0101, $0000, $0000
 dw $0000
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -59,7 +78,7 @@ init_sprite_data:
         cp low(SPELL_WRAM_START)
         jr nz, .load_spell_flag
 
-    ; put spell sprite addresses into WRAM
+    ; put 4 spell sprite addresses into WRAM
     ld hl, SPELL_WRAM_START
     Copy16BitVal [hli], [hli], SPRITE_10_ADDRESS
     Copy16BitVal [hli], [hli], SPRITE_11_ADDRESS
@@ -106,11 +125,29 @@ init_sprites:
     SetSpriteData 16, 0, 0, SPELL2A_TILEID, OAMF_PAL0
     SetSpriteData 17, 0, 0, SPELL2B_TILEID, OAMF_PAL0
 
+    SetSpriteData 18, 0, 0, SPELL1A_TILEID, OAMF_PAL0
+    SetSpriteData 19, 0, 0, SPELL1B_TILEID, OAMF_PAL0
+
+    SetSpriteData 20, 0, 0, SPELL2A_TILEID, OAMF_PAL0
+    SetSpriteData 21, 0, 0, SPELL2B_TILEID, OAMF_PAL0
+
+    SetSpriteData 22, 0, 0, SPELL1A_TILEID, OAMF_PAL0
+    SetSpriteData 23, 0, 0, SPELL1B_TILEID, OAMF_PAL0
+
+    SetSpriteData 24, 0, 0, SPELL2A_TILEID, OAMF_PAL0
+    SetSpriteData 25, 0, 0, SPELL2B_TILEID, OAMF_PAL0
+
     ret
 
 ; init level 1 targets & two spells
 init_level_1:
     copy [rGAME_LVL], 0
+
+    ld a, high(MAPPING_LVL1)
+    ld [rNOTEMAP], a
+    ld a, low(MAPPING_LVL1)
+    ld [rNOTEMAP + 1], a
+    
     ; TARGETS
     SetSpriteXY 6, TARGET_X, TARGET_HIGH_Y
     SetSpriteXY 7, TARGET_X, TARGET_LOW_Y
@@ -125,19 +162,44 @@ init_level_1:
 ; init level 2 spells
 init_level_2:
     copy [rGAME_LVL], 1
+
+    ld a, high(MAPPING_LVL2)
+    ld [rNOTEMAP], a
+    ld a, low(MAPPING_LVL2)
+    ld [rNOTEMAP + 1], a
+    
+    halt
+    copy [rSPELL_COUNT], SPELL_NUM_LVL2
+
     ret
 
 ; init boss level's spells (+2)
 init_boss_level:
     copy [rGAME_LVL], 2
-    ld a, high(Boss_Level)
+
+    ; set new spell map
+    ld a, high(MAPPING_LVL3)
     ld [rNOTEMAP], a
-    ld a, low(Boss_Level)
-    ld [rNOTEMAP], a
+    ld a, low(MAPPING_LVL3)
     ld [rNOTEMAP + 1], a
 
+    ; set new song + note lengths
+    ld a, high(CH2_NOTES_LVL3)
+    ld [rSONGMAP], a
+    ld a, low(CH2_NOTES_LVL3)
+    ld [rSONGMAP + 1], a
+
+    ld a, high(CH2_NOTES_LENGTHS_LVL3)
+    ld [rSONGMAP_LENGTHS], a
+    ld a, low(CH2_NOTES_LENGTHS_LVL3)
+    ld [rSONGMAP_LENGTHS + 1], a
+
+    ; go to start of music
+    xor a
+    ld [WRAM_NOTE_INDEX], a
+    
     halt 
-    copy [rSPELL_COUNT], BOSSLVL_SPELL_NUM
+    copy [rSPELL_COUNT], SPELL_NUM_LVL3
     SetSpriteXY 14, SPELL_SPAWNX, SPELL_HIGH_Y
     SetSpriteXY 15, SPELL_SPAWNX, SPELL_HIGH_Y
     SetSpriteXY 16, SPELL_SPAWNX, SPELL_LOW_Y
@@ -183,6 +245,8 @@ update_sprites_spawning:
 update_sprites:
     CheckTimer rTIMER_OBJ, 1
     jr nz, .done_update
+    
+    RegBitOp rGAME, GAMEB_NOTE_HIT, res
 
     ld hl, SPELL_WRAM_START
     .update_spell_sprite
@@ -250,7 +314,11 @@ update_sprites:
         ; need sprite x-val address in (hl)
         bit SPELLB_ON, d
         jr z, .to_next_sprite
-            call check_collisions
+            ; if a collision has already occurred, go to next sprite
+            ld a, [rGAME]
+            bit GAMEB_NOTE_HIT, a
+            jr nz, .to_next_sprite
+                call check_collisions
 
         .to_next_sprite
         ; restore and move to next WRAM loc
@@ -305,18 +373,20 @@ check_collisions:
         bit COLLB_XPERF, a
         jr z, .check_good
             call handle_collision
+            call perf_hit_sound
             jr .done_check
 
         .check_good
         bit COLLB_XGOOD, a
         jr z, .check_bad
-            ; currently, don't hit OR lose health ("free" input buffer)
+            ; don't hit OR lose health ("free" input buffer)
             jr .done_check
 
         .check_bad
         bit COLLB_XBAD, a
         jr z, .check_miss
             call handle_bad_collision
+            call bad_hit_sound
             jr .done_check
     
     .check_miss
@@ -328,6 +398,8 @@ check_collisions:
 ; resets the sprite x value
 ; note: only called in check_collisions
 handle_collision:
+    RegBitOp rGAME, GAMEB_NOTE_HIT, set
+
     ; set off flag
     ld a, d
     res SPELLB_ON, d
@@ -350,6 +422,8 @@ handle_collision:
 ; handle collision w/ bad timing
 ; note: only called in check_collisions
 handle_bad_collision:
+    RegBitOp rGAME, GAMEB_NOTE_HIT, set
+
     ; set off flag
     ld a, d
     res SPELLB_ON, d
@@ -394,32 +468,27 @@ handle_miss:
 check_spawn:
     push hl
 
+    ; is it time to spawn a note?
+    ld a, [rNOTE_DELAY]
+    ld b, a
     ld a, [WRAM_FRAME_COUNTER]
-    xor SPAWN_DELAY
+    xor a, b
     jr nz, .done_spawn
         ld a, [rGAME]
         bit GAMEB_SPAWN, a
         jr nz, .done_spawn
             ;; SET SPELL OBJ FLAGS ;;
-            ; get first note
+            ; get note index
             ld a, [WRAM_NOTE_INDEX]
             sla a
             ld b, 0
             ld c, a
     
             ; load note + note index
-            ld a, [rGAME_LVL]
-            ; boss level is 2 in rGAME_LVL
-            cp 2
-            jr nz, .load_map
-                ld a, [rNOTEMAP]
-                ld h, a
-                ld a, [rNOTEMAP + 1]
-                ld l, a
-                jr .get_note
-            .load_map
-                ld hl, Mapping
-            .get_note
+            ld a, [rNOTEMAP]
+            ld h, a
+            ld a, [rNOTEMAP + 1]
+            ld l, a
             add hl, bc
 
             ;; SET OBJ FLAGS ;;
@@ -451,6 +520,8 @@ check_spawn:
 ; spawns a high/low spell based on its flag attributes
 spawn_spell:
     push hl
+
+    ; set y value
     bit SPELLB_TIER, d
     jr z, .set_low
         ld [hl], SPELL_HIGH_Y
