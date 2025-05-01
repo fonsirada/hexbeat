@@ -1,20 +1,7 @@
 # License
-**[GAME TITLE]** is licensed under the GNU General Public License (read below).
+All code is licensed under the GNU General Public License (see below). <br>
 
 Visual assets are licensed under the [Creative Commons NonCommercial License](https://creativecommons.org/licenses/by-nc/4.0/)
-
-### CREDITS:
-* Game Design by Sydney Chen and Alfonso Rada
-* Art by Sydney Chen
-* Music modified from [link], by [composer]
-
-*maybe do this in the README
----
-
-Put the license information for your assets here. Include:
-- links to original assets
-- a description of how you changed the assets (if applicable)
-- a link to and description of the license that shows you have permission to use the assets the way you have.
 
 ---
 

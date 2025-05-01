@@ -1,5 +1,5 @@
 ; 
-; CS-240 World 8: Your final, polished game
+; HEXBEAT (CS-240 World 8)
 ;
 ; @file joypad.inc
 ; @author Darren Strash, Sydney Chen, Alfonso Rada

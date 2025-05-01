@@ -1,11 +1,12 @@
 ; 
-; CS-240 World 8: Your final, polished game
+; HEXBEAT (CS-240 World 8)
 ;
 ; @file sprites.asm
 ; @author Sydney Chen, Alfonso Rada
-; @date April 24, 2025
+; @date April 30, 2025
+; @license GNU GPL v3
 ; @brief storing non-player sprite functions
-; @license
+
 
 include "src/hardware.inc"
 include "src/utils.inc"
@@ -152,33 +153,26 @@ init_level_1:
     ; TARGETS
     SetSpriteXY 6, TARGET_X, TARGET_HIGH_Y
     SetSpriteXY 7, TARGET_X, TARGET_LOW_Y
-
-    ; SPELL OBJs
-    SetSpriteXY 10, SPELL_SPAWNX, SPELL_HIGH_Y
-    SetSpriteXY 11, SPELL_SPAWNX, SPELL_HIGH_Y
-    SetSpriteXY 12, SPELL_SPAWNX, SPELL_LOW_Y
-    SetSpriteXY 13, SPELL_SPAWNX, SPELL_LOW_Y
     ret
 
 ; init level 2 spells
 init_level_2:
     copy [rGAME_LVL], 1
 
+    ; set new note map
     ld a, high(MAPPING_LVL2)
     ld [rNOTEMAP], a
     ld a, low(MAPPING_LVL2)
     ld [rNOTEMAP + 1], a
     
-    halt
     copy [rSPELL_COUNT], SPELL_NUM_LVL2
-
     ret
 
 ; init boss level's spells (+2)
 init_boss_level:
     copy [rGAME_LVL], 2
 
-    ; set new spell map
+    ; set new note map
     ld a, high(MAPPING_LVL3)
     ld [rNOTEMAP], a
     ld a, low(MAPPING_LVL3)
@@ -199,12 +193,7 @@ init_boss_level:
     xor a
     ld [WRAM_NOTE_INDEX], a
     
-    halt 
     copy [rSPELL_COUNT], SPELL_NUM_LVL3
-    SetSpriteXY 14, SPELL_SPAWNX, SPELL_HIGH_Y
-    SetSpriteXY 15, SPELL_SPAWNX, SPELL_HIGH_Y
-    SetSpriteXY 16, SPELL_SPAWNX, SPELL_LOW_Y
-    SetSpriteXY 17, SPELL_SPAWNX, SPELL_LOW_Y
     ret
 
 ; loops thru all active spell sprites in WRAM and checks if they
@@ -237,6 +226,7 @@ update_sprites_spawning:
         ld a, [rSPELL_COUNT]
         cp l
         jr nz, .update_spell_sprite
+
     .done_update
     RegBitOp rGAME, GAMEB_SPAWN, res
     ret 
@@ -307,7 +297,7 @@ update_sprites:
         pop hl
 
         ; SPELL COLLISION ;
-        ; need sprite x-val address in (hl)
+        ; uses sprite x-val address in (hl)
         bit SPELLB_ON, d
         jr z, .to_next_sprite
             ; if a collision has already occurred, go to next sprite
@@ -391,7 +381,6 @@ check_collisions:
     ret
 
 ; runs if player successfully hits a note
-; resets the sprite x value
 ; note: only called in check_collisions
 handle_collision:
     RegBitOp rGAME, GAMEB_NOTE_HIT, set
@@ -500,15 +489,12 @@ check_spawn:
             .check_length
             ld a, [hl]
             xor $00
-            jr z, .load_flags
+            jr z, .done_spawn
                 set SPELLB_SPAWN, d
                 ld a, [rGAME]
                 set GAMEB_SPAWN, a
                 ld [rGAME], a
-            
-            ;; LOAD NEW SET OF FLAGS ;;
-            .load_flags
-            ; to-do...?
+
     .done_spawn
     pop hl
     ret

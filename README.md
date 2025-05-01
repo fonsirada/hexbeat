@@ -52,7 +52,7 @@ make
 
 Special thanks to Darren Strash and Maximilien Dagois!
 
-*This game's code is licensed under the GNU GPL*<br>
-*Visual assets are licensed under CC NC*<br>
-*More information can be found in [LICENSE.md](assets/LICENSE.md)*
+*This game's code is licensed under GNU GPL v3*<br>
+*Visual assets are licensed under CC BY-NC 4.0*<br>
+*Detailed licensing information can be found in [LICENSE.md](assets/LICENSE.md)*
 

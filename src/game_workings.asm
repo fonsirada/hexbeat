@@ -1,15 +1,19 @@
 ; 
-; CS-240 World 8: Your final, polished game
+; HEXBEAT (CS-240 World 8)
 ;
 ; @file game_workings.asm
-; @author Darren Strash, Sydney Chen, Alfonso Rada
-; @date April 27, 2025
+; @author Sydney Chen, Alfonso Rada
+; @date April 30, 2025
+; @license GNU GPL v3
 ; @brief store functions related to general game operations
-; @license
 
 include "src/utils.inc"
 include "src/joypad.inc"
 include "src/sprites.inc"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+section "game_workings", rom0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -21,7 +25,26 @@ def OBJ_ANIMATION_TIMER             equ 1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-section "game_workings", rom0
+macro DisableLCD
+    ; wait for the vblank
+    .wait_vblank\@
+        ld a, [rLY]
+        cp a, SCRN_Y
+        jr nz, .wait_vblank\@
+
+    ; turn the LCD off
+    xor a
+    ld [rLCDC], a
+endm
+
+macro EnableLCD
+    ; set the graphics parameters and turn back LCD on
+    ld a, LCDCF_ON | LCDCF_WIN9C00 | LCDCF_WINON | LCDCF_BG8800 | LCDCF_BG9800 | LCDCF_OBJ16 | LCDCF_OBJON | LCDCF_BGON
+    ld [rLCDC], a
+
+endm
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; initializes the game
 initialize:

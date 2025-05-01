@@ -1,11 +1,11 @@
 ; 
-; CS-240 World 8: Your final, polished game
+; HEXBEAT (CS-240 World 8)
 ;
 ; @file graphics.asm
 ; @author Darren Strash, Sydney Chen, Alfonso Rada
-; @date April 24, 2025
+; @date April 30, 2025
+; @license GNU GPL v3
 ; @brief store overall graphics-related functions
-; @license 
 
 include "src/utils.inc"
 include "src/joypad.inc"
@@ -112,6 +112,14 @@ macro InitOAM
         dec c
         jr nz, .init_oam\@
 endm
+
+macro CallHL
+    ld de, .call_return_address\@
+    push de
+    jp hl
+    .call_return_address\@
+endm
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

@@ -1,11 +1,11 @@
 ; 
-; CS-240 World 8: Your final, polished game
+; HEXBEAT (CS-240 World 8)
 ;
 ; @file utils.inc
 ; @author Darren Strash, Sydney Chen, Alfonso Rada
 ; @date April 24, 2025
+; @license GNU GPL v3
 ; @brief store general usage macros
-; @license
 
 if !def(UTILS_RGBINC)
 def UTILS_RGBINC equ 1
@@ -28,24 +28,11 @@ macro copy
 endm
 
 ; copy 16bit reg \2 into 16bit reg \1 using (a)
-; IF THINGS BREAK, REG PRESERVATION!
 macro Copy16BitVal
     ld a, high(\3)
     ld \1, a
     ld a, low(\3)
     ld \2, a
-endm
-
-macro Copy16Bit
-    ld low(\2), low(\1)
-    ld high(\2), high(\1)
-endm
-
-macro AddHLN
-    push bc
-    ld bc, \1
-    add hl, bc
-    pop bc
 endm
 
 ; run a bit operation \3 on address \1 at bit \2 using (a)
@@ -62,12 +49,13 @@ macro RegOp
     ld [\1], a
 endm
 
-; graphics macro --> might need to move?
+; compare the current value of a given timer register
 macro CheckTimer
     ld a, [\1]
     cp \2
 endm
 
+; increment (or reset) a given timer
 macro IncTimer
     ld a, [\1]
     cp a, \2
@@ -76,34 +64,6 @@ macro IncTimer
     .finish_update\@
     inc a
     ld [\1], a
-endm
-
-;;; LCD CONTROL ;;;
-
-macro DisableLCD
-    ; wait for the vblank
-    .wait_vblank\@
-        ld a, [rLY]
-        cp a, SCRN_Y
-        jr nz, .wait_vblank\@
-
-    ; turn the LCD off
-    xor a
-    ld [rLCDC], a
-endm
-
-macro EnableLCD
-    ; set the graphics parameters and turn back LCD on
-    ld a, LCDCF_ON | LCDCF_WIN9C00 | LCDCF_WINON | LCDCF_BG8800 | LCDCF_BG9800 | LCDCF_OBJ16 | LCDCF_OBJON | LCDCF_BGON
-    ld [rLCDC], a
-
-endm
-
-macro CallHL
-    ld de, .call_return_address\@
-    push de
-    jp hl
-    .call_return_address\@
 endm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
