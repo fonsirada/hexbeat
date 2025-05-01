@@ -39,7 +39,6 @@ def rTIMER_DMG       rb 1
 def rSPELL_COUNT     rb 1
 def rGAME_LVL        rb 1
 
-
 ;;; SOUND 
 rsset (_RAM + $60)
 def WRAM_PAD_INPUT                  rb 0
@@ -49,19 +48,21 @@ def WRAM_END                        rb 0
 def rNOTEMAP                        rb 2
 def rSONGMAP                        rb 2
 def rSONGMAP_LENGTHS                rb 2
+def rNOTE_DELAY                     rb 1
 
 ;;; rGAME
 def GAMEF_BASE       equ %00000000
 def GAMEF_START      equ %00000001
 def GAMEF_END        equ %00000010
-def GAMEF_END_PRINT  equ %01000000
+def GAMEF_END_PRINT  equ %00000100
+def GAMEF_NOTE_HIT   equ %01000000
 def GAMEF_SPAWN      equ %10000000
 
 def GAMEB_START      equ 0
 def GAMEB_END        equ 1
-def GAMEB_END_PRINT  equ 6
+def GAMEB_END_PRINT  equ 2
+def GAMEB_NOTE_HIT   equ 6
 def GAMEB_SPAWN      equ 7
-
 
 ;;; rPLAYER
 def PLAYERF_HIT      equ %10000000
@@ -72,7 +73,6 @@ def PLAYERF_B        equ %00010000
 def PLAYERB_HOLD     equ 6
 def PLAYERB_A        equ 5
 def PLAYERB_B        equ 4
-
 
 ;;; rCOLLISION
 def rCOLL_YHIGH      equ %10000000
@@ -89,7 +89,6 @@ def COLLB_XGOOD      equ 4
 def COLLB_XBAD       equ 3
 def COLLB_XMISS      equ 2
 
-
 ;;; SPELL OBJ WRAM FlAGS
 def SPELLF_HIGH      equ %00000100
 def SPELLF_LOW       equ %00000000
@@ -102,20 +101,20 @@ def SPELLB_TIER      equ 2
 def SPELLB_SPAWN     equ 1
 def SPELLB_ON        equ 0
 
-
 ; SPELL WRAM
-def SPELL_FLAG_START    equ ($C020)
-def SPELL_FLAG_INTERVAL equ (2)
+def SPELL_FLAG_START    equ $C020
+def SPELL_FLAG_INTERVAL equ 2
 def SPELLF_WRAM_OFFSET  equ $20
 def SPELL_WRAM_START    equ $C040
-def SPELL_WRAM_END      equ $C050 ; $C060 for 8 sprites
+def SPELL_WRAM_END      equ $C060
 
 ;;; GAME DIFFICULTY
-def LVL1_SPELL_NUM          equ low(SPELL_WRAM_END - $8)
-def BOSSLVL_SPELL_NUM       equ low(SPELL_WRAM_END)
-def GAME_DIFF_THRES_LVL2    equ 16
-def GAME_DIFF_THRES_BOSSLVL equ 32
-def GAME_DIFF_THRES_WIN     equ 56
+def SPELL_NUM_LVL1          equ low(SPELL_WRAM_END - $10)
+def SPELL_NUM_LVL2          equ low(SPELL_WRAM_END - $8)
+def SPELL_NUM_LVL3          equ low(SPELL_WRAM_END)
+def GAME_DIFF_THRES_LVL2    equ 24
+def GAME_DIFF_THRES_BOSSLVL equ 56
+def GAME_DIFF_THRES_WIN     equ 96
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

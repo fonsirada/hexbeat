@@ -92,7 +92,7 @@ init_registers:
     copy [rPC_HEALTH], PLAYER_HEALTH 
 
     ; load sprite-related values
-    copy [rSPELL_COUNT], LVL1_SPELL_NUM
+    copy [rSPELL_COUNT], SPELL_NUM_LVL1
     ret
 
 update_timers:
