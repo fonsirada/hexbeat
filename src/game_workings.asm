@@ -107,7 +107,7 @@ is_game_over:
         RegBitOp rGAME, GAMEB_END, set
         jr .check_done
     .check_overflow
-        cp a, PLAYER_HEALTH + 1
+        cp PLAYER_HEALTH + 1
         jr c, .check_done
             RegBitOp rGAME, GAMEB_END, set
     .check_done
@@ -116,7 +116,7 @@ is_game_over:
 ; check if the level 2 threshold is passed
 check_level_2:
     ld a, [rGAME_DIFF]
-    cp a, GAME_DIFF_THRES_LVL2
+    cp GAME_DIFF_THRES_LVL2
     jr nz, .done_check
         ld a, [rGAME_LVL]
         or a

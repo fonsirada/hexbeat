@@ -323,7 +323,6 @@ print_text:
 ; loads (hl) with the VRAM address that corresponds to the tile on the center of the screen
 find_center_tile:
     ld hl, TEXT_START_LOCATION 
-
     ld a, [rSCX]
     ; get the corresponding background tile column
     srl a
