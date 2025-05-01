@@ -1,5 +1,6 @@
-# HEXBEAT
-> [example banner]
+<img alt="HEXBEAT" src="assets/hexbeat_banner.png" width="100%">
+
+---
 
 ***HEXBEAT*** is a short rhythm game made for the original Nintendo Game Boy. Defend yourself against an onslaught of spells by timing your shields to the music, and survive until the end!
 
