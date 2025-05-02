@@ -2,7 +2,7 @@
 
 ---
 
-***HEXBEAT*** is a short rhythm game made for the original Nintendo Game Boy. Defend yourself against an onslaught of spells by timing your shields to the music, and survive until the end!
+***HEXBEAT*** is a short rhythm game made for the original Nintendo Game Boy. Defend yourself against an onslaught of spells by timing your attacks to the music, and survive until the end!
 
 # Table of Contents
 1. [How to Play](#how-to-play)
