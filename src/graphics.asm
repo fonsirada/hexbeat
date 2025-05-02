@@ -352,6 +352,6 @@ export init_graphics, update_graphics, start, game_over
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 section "graphics_data", rom0[GRAPHICS_DATA_ADDRESS_START]
-incbin "assets/tileset_16mode.chr"
-incbin "assets/witch_bg_hall_v1.tlm"
-incbin "assets/w5_window_v1.tlm"
+incbin "assets/hexbeat_tileset_16mode.chr"
+incbin "assets/hexbeat_hall_tilemap.tlm"
+incbin "assets/hexbeat_window.tlm"
