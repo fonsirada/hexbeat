@@ -1,0 +1,129 @@
+<!--
+
+ JSGB v0.02 - a JavaScript Nintendo GameBoy Emulator
+ Copyright (C) 2009 Pedro Ladaria <Sonic1980 at Gmail dot com>
+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License
+ version 2 as published by the Free Software Foundation.
+ The full license is available at http://www.gnu.org/licenses/gpl.html
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU General Public License for more details.
+
+-->
+
+<!-- saved from url=(0037)https://bitnenfer.com/dev/flappy-boy/ -->
+
+<!DOCTYPE html>
+<html>
+<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Leap O' Fate</title>
+  <script src="./JSGB/toolbox.js" type="application/x-javascript"></script>
+  <script src="./JSGB/scrollbar.js" type="application/x-javascript"></script>
+  <script src="./JSGB/jsgb.cpu.js" type="application/x-javascript"></script>
+  <script src="./JSGB/jsgb.memory.js" type="application/x-javascript"></script>
+  <script src="./JSGB/jsgb.rom.js" type="application/x-javascript"></script>
+  <script src="./JSGB/jsgb.interrupts.js" type="application/x-javascript"></script>
+  <script src="./JSGB/jsgb.input.js" type="application/x-javascript"></script>
+  <script src="./JSGB/jsgb.lcd.js" type="application/x-javascript"></script>
+  <script src="./JSGB/jsgb.timers.js" type="application/x-javascript"></script>
+  <script src="./JSGB/jsgb.debugger.js" type="application/x-javascript"></script>
+  <script src="./JSGB/jsgb.gameboy.js" type="application/x-javascript"></script>
+  <link href="./JSGB/jsgb.styles.css" rel="stylesheet" type="text/css">
+  <link rel="icon" type="image/x-icon" href="./ico.gif">
+</head>
+<body>
+  <div class="C">
+    <canvas style="display:none;" id="LCD" width="160" height="144"></canvas>
+    <canvas id="BUFFER" width="640" height="576"></canvas>
+
+    <div>
+      <a href="https://github.com/panpov/leap-o-fate" target="_blank">View Source</a> | <a href="https://github.com/panpov/panpov.github.io/raw/refs/heads/main/roms/game.gb">Download ROM</a>
+    </div>
+  </div>
+
+  <div id="FOOTER" class="CLR C">
+    <div class="IB L">
+      <center><strong>Controls</strong></center>
+      <strong>S</strong>: Button A<br>
+      <strong>A</strong>: Button B<br>
+      <strong>Enter</strong>: Start<br>
+      <strong>Shift</strong>: Select<br>
+      <center>← ↑ → ↓</center>
+    </div>
+  </div>
+
+  <script type="application/x-javascript">
+
+  var gbSeconds = 0;
+  var gbFrames  = 0;
+  var canvas;
+  var ctx;
+
+  function gb_Resize_LCD() {
+    if ($('BX').value=='Size x2') {
+      $('BX').value='Size x3';
+      $('LCD').style.width='320px';
+      $('LCD').style.height='288px';
+    }
+    else if ($('BX').value=='Size x3') {
+      
+    }
+    else {
+      $('BX').value='Size x2';
+      $('LCD').style.width='160px';
+      $('LCD').style.height='144px';
+    }
+  }
+
+  function gb_Show_Fps() {
+    /*gbFrames+=gbFPS;
+    gbSeconds++;
+    $('STATUS').innerHTML = 
+      'Running: '+gbFPS+' '+
+      'fps - Average: '+(gbFrames/gbSeconds).toFixed(2)+' - '+
+      'Bank switches/s: '+gbBankSwitchCount;
+    gbFPS=0;
+    gbBankSwitchCount=0;*/
+  }
+
+  function gb_Toggle_Debugger(show) {
+    $('DEBUGGER').style.height=(show)?'auto':'0px';
+  }
+
+  function run () {
+    requestAnimationFrame(run);
+    
+    ctx.imageSmoothingEnabled = false;
+    ctx.oImageSmoothingEnabled = false;
+    ctx.mozImageSmoothingEnabled = false;
+    ctx.webkitImageSmoothingEnabled = false;
+    ctx.save();
+    ctx.scale(4, 4);
+    ctx.drawImage(gbLCDCtx.canvas, 0, 0);
+    ctx.restore();
+  }
+
+  window.onload = function() {
+    canvas = document.getElementById("BUFFER"),
+    ctx = canvas.getContext('2d');
+    gb_Insert_Cartridge('game.gb', false);
+    gb_Run();
+    run();
+  }
+
+  </script>
+
+  <footer style="bottom:0px; position: fixed;width:100%; padding-bottom: 20px;">
+    <center>  
+      Powered by JSGB v.0.02: a JavaScript Nintendo GameBoy Emulator and Debugger
+      <br>
+      <a href="https://sourceforge.net/projects/jsgbemu/" target="_blank">SourceForge</a> | <a href="https://github.com/pladaria/JSGB">GitHub</a>
+    </center>
+  </footer>
+
+</body>
+</html>
